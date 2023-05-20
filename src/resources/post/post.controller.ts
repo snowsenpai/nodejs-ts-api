@@ -23,11 +23,11 @@ class PostController implements Controller {
     );
   }
 
-  private create = async (
+  private async create (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<Response | void> {
     try {
       const { title, body } = req.body;
 

@@ -14,6 +14,7 @@ class UserService {
   role: string
  ): Promise<void | Error> {
   try {
+    // TODO return a confirmation message
     await this.user.create({
       name,
       email,
