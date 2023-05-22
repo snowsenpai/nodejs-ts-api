@@ -10,6 +10,7 @@ module.exports = {
     sourceType: 'module',
   },
   rules: {
+    'object-curly-spacing': ['error', 'always'],
     'prettier/prettier': [
       'error',
       {
