@@ -7,24 +7,28 @@ class UserService {
   /**
    * Register a new user
   */
+  // TODO other methods findById, findByEmail...
+
  public async register(
   name: string,
   email: string,
   password: string,
   role: string
- ): Promise<void | Error> {
+ ): Promise<boolean | Error> {
   try {
-    // TODO return a confirmation message
+    // TODO chech db for existing user 'this.findByEmail'
+    // if(user) throw error
     await this.user.create({
       name,
       email,
       password,
       role,
     });
-  } catch (error) {
-    if(error instanceof Error){
-      throw new Error(error.message);
-    }  
+    
+    return true;
+  } catch (error: any) {
+    // TODO throw new DataBaseError()
+    throw new Error('Failed to register user');
   }
  }
 
@@ -45,11 +49,11 @@ class UserService {
       if(await user.isValidPassword(password)) {
         return token.createToken(user);
       } else {
-        throw new Error('Wrong credentials were given');
+        throw new Error('Wrong credentials');
       }
 
-    } catch (error) {
-      throw new Error('Unable to login user');
+    } catch (error: any) {
+      throw new Error(error.message);
     }
   }  
 }

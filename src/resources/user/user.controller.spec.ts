@@ -9,6 +9,7 @@ describe('User controller .api/user', () => {
   let res: Partial<Response>;
   let next: NextFunction;
 
+  // bracket notation to access private methods and properties
   beforeEach(() => {
     userController = new UserController();
     userController['UserService'] = new UserService();
@@ -109,7 +110,7 @@ describe('User controller .api/user', () => {
   });
 
   describe('getUser', () => {
-    it('should return return 200 with user data if user exist in req', () => {
+    it('should return 200 with user data if user exist in req', () => {
       const user = {
         id: 1,
         name: 'Uncle test',

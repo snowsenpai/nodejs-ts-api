@@ -42,7 +42,7 @@ class UserController implements Controller{
   ): Promise<Response | void> {
     try {
       const { name, email, password } = req.body;
-      
+      // verify registrationResult then use a guard to handle error
       await this.UserService.register(
         name,
         email,
