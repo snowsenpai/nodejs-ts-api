@@ -1,37 +1,31 @@
 import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 
 // TODO use an test database, memory server fails to start
-let mongoServer: MongoMemoryServer;
-
-const id = new mongoose.Types.ObjectId().toString();
 
 // for Db related tests...
 // run beforeAll
-const connectDB = async() => {
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
-
-  await mongoose.connect(uri);
-}
+const connectDB = async () => {
+  const { MONGO_PATH, MONGO_DATABASE } = process.env;
+  mongoose.connect(`${MONGO_PATH}/${MONGO_DATABASE}`);
+};
 
 // run afterAll
-const dropDB = async() => {
-  if(mongoServer) {
-    await mongoose.connection.dropDatabase();
-    await mongoose.connection.close();
-    await mongoServer.stop();
-  }
-}
+const dropDB = async () => {
+  mongoose.connection.dropDatabase();
+  await mongoose.connection.close();
+};
 
 // run afterEach
-const dropCollections = async() => {
-  if(mongoServer) {
-    const collections = await mongoose.connection.db.collections();
-    for (let collection of collections) {
-      await collection.drop();
-    }
+const dropCollections = async () => {
+  const collections = await mongoose.connection.db.collections();
+  for (let collection of collections) {
+    await collection.drop();
   }
-}
+};
 
-export { id, connectDB, dropDB, dropCollections };
+// afterAll
+const closeDB = async () => {
+  await mongoose.connection.close();
+};
+
+export { connectDB, dropDB, dropCollections, closeDB };
