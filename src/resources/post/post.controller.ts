@@ -19,7 +19,7 @@ class PostController implements Controller {
     this.router.post(
       `${this.path}`,
       validationMiddleware(validate.create),
-      this.create
+      this.create.bind(this)
     );
   }
 

@@ -19,13 +19,13 @@ class UserController implements Controller{
     this.router.post(
       `${this.path}/register`,
       validationMiddleware(validate.register),
-      this.register
+      this.register.bind(this)
     );
 
     this.router.post(
       `${this.path}/login`,
       validationMiddleware(validate.login),
-      this.login
+      this.login.bind(this)
     );
 
     this.router.get(

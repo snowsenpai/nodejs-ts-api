@@ -23,7 +23,6 @@ describe('PostService', () => {
   beforeEach(() => {
     postService = new PostService();
     mockPostModel = PostModel as jest.Mocked<typeof PostModel>;
-    // postService['post'] = mockPostModel;
   });
 
   afterEach(() => {

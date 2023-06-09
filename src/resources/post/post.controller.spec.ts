@@ -15,29 +15,29 @@ describe('PostController', () => {
   const post = {
     _title: title,
     _body: body
-  }  
+  }
+
   beforeEach(() => {
     postController = new PostController();
-    postController['PostService'] = new PostService();
     req = {};
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
-    next = jest.fn();
-    
+    next = jest.fn();    
   });
+
   describe('create', () => {
-    it('should call PostSercvice create method and return a new post', async () => {
-      const createSpy = jest.spyOn(postController['PostService'], 'create')
+    it('should call PostSercvice create method and return a new post', async () => {      
+      const serviceSpy = jest.spyOn(postController['PostService'], 'create')
       // @ts-ignore
       .mockReturnValueOnce(post);
-
+      
       req.body = {title, body};
 
       await postController['create'](req as Request, res as Response, next);
 
-      expect(createSpy).toHaveBeenCalledWith(title, body);
+      expect(serviceSpy).toHaveBeenCalledWith(title, body);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({ post });
       expect(next).not.toHaveBeenCalled();
