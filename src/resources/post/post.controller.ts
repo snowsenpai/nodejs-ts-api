@@ -19,24 +19,24 @@ class PostController implements Controller {
     this.router.post(
       `${this.path}`,
       validationMiddleware(validate.create),
-      this.create
+      this.create.bind(this)
     );
   }
 
-  private create = async (
+  private async create (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<Response | void> {
     try {
       const { title, body } = req.body;
 
       const post = await this.PostService.create(title, body);
 
       res.status(201).json({ post });
-    } catch (error) {
+    } catch (error: any) {
       // error.message will be the error message thrown from the post service
-      next(new HttpException(400, 'Cannot create post'));
+      next(new HttpException(400, error.message));
     }
   };
 }

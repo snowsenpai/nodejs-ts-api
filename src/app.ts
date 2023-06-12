@@ -1,5 +1,4 @@
 import express, { Application } from 'express';
-import mongoose from 'mongoose';
 import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -11,11 +10,11 @@ class App {
   public express: Application;
   public port: number;
 
+  // remove port arg, move to listen() method
   constructor(controllers: Controller[], port: number) {
     this.express = express();
     this.port = port;
 
-    this.initialiseDatabaseConnection();
     this.initialiseMiddleware();
     this.initialiseControllers(controllers);
     this.initialiseErrorHandling();
@@ -40,12 +39,7 @@ class App {
     this.express.use(ErrorMiddleware);
   }
 
-  private initialiseDatabaseConnection(): void {
-    const { MONGO_DATABASE, MONGO_PATH } = process.env;
-
-    mongoose.connect(`${MONGO_PATH}/${MONGO_DATABASE}`);
-  }
-
+  // TODO listen should recive a PORT param -> listen(port)
   public listen(): void {
     this.express.listen(this.port, () => {
       console.log(`App listening on the port ${this.port}`);

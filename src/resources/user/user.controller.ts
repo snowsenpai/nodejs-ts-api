@@ -19,30 +19,30 @@ class UserController implements Controller{
     this.router.post(
       `${this.path}/register`,
       validationMiddleware(validate.register),
-      this.register
+      this.register.bind(this)
     );
 
     this.router.post(
       `${this.path}/login`,
       validationMiddleware(validate.login),
-      this.login
+      this.login.bind(this)
     );
 
     this.router.get(
       `${this.path}`,
       authenticated,
       this.getUser
-    )
+    );
   }
 
-  private register = async (
+  private async register (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<Response | void> {
     try {
       const { name, email, password } = req.body;
-      
+      // verify registrationResult then use a guard to handle error
       await this.UserService.register(
         name,
         email,
@@ -58,11 +58,11 @@ class UserController implements Controller{
     }
   }
 
-  private login = async (
+  private async login (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<Response | void> {
     try {
       const { email, password } = req.body;
 
@@ -75,11 +75,11 @@ class UserController implements Controller{
     }
   }
 
-  private getUser = (
+  private getUser (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Response | void => {
+  ): Response | void {
     if(!req.user) {
       return next(new HttpException(404, 'No logged in user'));
     }
