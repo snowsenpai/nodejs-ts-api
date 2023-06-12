@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import UserController from './user.controller';
-import UserService from './user.service';
 import HttpException from '@/utils/exceptions/http.exceptions';
 
 describe('User controller .api/user', () => {
@@ -12,7 +11,6 @@ describe('User controller .api/user', () => {
   // bracket notation to access private methods and properties
   beforeEach(() => {
     userController = new UserController();
-    userController['UserService'] = new UserService();
     req = {}
     res = { 
       status: jest.fn().mockReturnThis(),

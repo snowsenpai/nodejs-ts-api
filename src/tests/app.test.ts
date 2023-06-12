@@ -5,16 +5,46 @@ import { connectDB, closeDB } from './mongooseTestDB';
 import PostController from '@/resources/post/post.controller';
 import UserController from '@/resources/user/user.controller';
 
-const app = new App([new PostController(), new UserController()], 3000).express;  
+const postController = new PostController();
+const userController = new UserController();
+
+const app = new App([postController, userController], 3000).express;  
 
 const postPayload = {
   title: 'new post',
   body: 'test post sent with supertest'
 };
 
+const userInput = {
+  email: 'john@test.com',
+  name: 'John',
+  password: 'password123',
+}
+
+const userLogin = {
+  email: userInput.email,
+  password: userInput.password
+}
+
+// existing test user in db
+const userPayload = {
+  _id: '6487051ff8ab20e9d872da4c',
+  name: 'John',
+  email: 'john@test.com',
+  role: 'user',
+  createdAt: new Date('2023-06-12T11:44:31.823Z').toISOString(),
+  updatedAt: new Date('2023-06-12T11:44:31.823Z').toISOString(),
+  __v: 0
+}
+
+let access_token: string;
+
 describe('Api base /api endpoint', () => {
   beforeAll(async () => {
     await connectDB();
+
+    const { body } = await request(app).post('/api/user/login').send(userLogin);
+    access_token = body.access_token;
   });
 
   afterAll(async () => {
@@ -42,8 +72,52 @@ describe('Api base /api endpoint', () => {
   });
 
   describe('/user endpoint', () => {
-    it('should not allow unauthenticated users', async () => {
+    it('should not grant access to unauthenticated users', async () => {
       await request(app).get('/api/user').expect(401);
     });
+
+    it('should return a user object for an authenticated user', async () => {
+      const { statusCode, body } = await request(app).get('/api/user').set('Authorization', `Bearer ${access_token}`);
+
+      expect(statusCode).toBe(200);
+      expect(body).toEqual({ data: userPayload});
+    });
+
+    describe('/register', () => {
+      it('should register a new user and return a success message', async () => {
+        const userServiceMock = jest.spyOn(userController['UserService'], 'register')
+        .mockResolvedValue(true)
+
+        const { statusCode, body } = await request(app).post('/api/user/register').send(userInput);
+
+        expect(statusCode).toBe(201);
+        expect(body).toEqual({message: 'User created'});
+        expect(userServiceMock).toHaveBeenCalled();  
+      });
+
+      it('should not register a user if UserService throws', async () => {
+        const userServiceMock = jest.spyOn(userController['UserService'], 'register');
+
+        const { statusCode, body } = await request(app).post('/api/user/register').send(userInput);
+        
+        expect(statusCode).toBe(400);
+        expect(body).toEqual({message: 'Failed to register user', status: 400});
+        expect(userServiceMock).toHaveBeenCalled();
+      });
+    });
+    
+    describe('/login', () => {
+      it('should return an access_token for a registered user', async () => {
+        const userServiceMock = jest.spyOn(userController['UserService'], 'login')
+        .mockResolvedValue('login token');
+
+        const { statusCode, body } = await request(app).post('/api/user/login').send(userLogin);
+        
+        expect(statusCode).toBe(200);
+        expect(body).toEqual({access_token: 'login token'});
+        expect(userServiceMock).toHaveBeenCalledWith(userLogin.email, userLogin.password);
+      });
+    });
+
   });
 });
