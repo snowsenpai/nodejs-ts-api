@@ -4,6 +4,7 @@ import HttpException from '@/utils/exceptions/http.exceptions';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/user/user.validation';
 import UserService from './user.service';
+import User from './user.interface';
 import authenticated from '@/middleware/authenticated.middleware';
 
 class UserController implements Controller{
@@ -16,6 +17,22 @@ class UserController implements Controller{
   }
 
   private initialiseRoutes(): void {
+    this.router.get(
+      this.path,
+      authenticated,
+      this.getUser
+    );
+
+    this.router.get(
+      `${this.path}/:id`,
+      this.findUser.bind(this)
+    );
+
+    this.router.get(
+      `${this.path}/:id/posts`,
+      this.userPost.bind(this)
+    );
+
     this.router.post(
       `${this.path}/register`,
       validationMiddleware(validate.register),
@@ -28,10 +45,17 @@ class UserController implements Controller{
       this.login.bind(this)
     );
 
-    this.router.get(
+    this.router.patch(
       `${this.path}`,
       authenticated,
-      this.getUser
+      validationMiddleware(validate.updateUser),
+      this.updateUser.bind(this)
+    );
+
+    this.router.delete(
+      this.path,
+      authenticated,
+      this.deleteUser.bind(this)
     );
   }
 
@@ -42,15 +66,16 @@ class UserController implements Controller{
   ): Promise<Response | void> {
     try {
       const { name, email, password } = req.body;
-      // verify registrationResult then use a guard to handle error
-      await this.UserService.register(
+      const user = await this.UserService.register(
         name,
         email,
         password,
         'user'
       );
 
-      res.status(201).json({ message: 'User created' });
+      if (user) {
+        res.status(201).json({ message: 'User created' });
+      }
     } catch (error) {
       if(error instanceof Error){
         next(new HttpException(400, error.message));
@@ -86,6 +111,55 @@ class UserController implements Controller{
 
     res.status(200).send({ data: req.user });
   };
+
+  private async findUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userId = req.params.id;
+
+    const user = await this.UserService.findById(userId);
+
+    res.status(200).json({ data: user });
+  }
+
+  private async updateUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userId = req.user?._id;
+    const userData: Partial<User> = req.body;
+    // if userData.role || password? 401 forbidden
+
+    const updatedUser = await this.UserService.updateUser(userId, userData);
+    
+    res.status(201).json({ updatedUser });
+  }
+
+  private async userPost(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userId = req.params.id;
+
+    const posts = await this.UserService.getAllPostsOfUser(userId);
+
+    res.status(200).json({ posts: posts });
+  }
+
+  private async deleteUser(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    const userId = req.params.id;
+    const response = await this.UserService.deleteUser(userId);
+
+    res.status(200).json({ response });
+  }
 }
 
 export default UserController;

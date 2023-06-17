@@ -7,8 +7,6 @@ class UserService {
   /**
    * Register a new user
   */
-  // TODO other methods findById, findByEmail...
-
  public async register(
   name: string,
   email: string,
@@ -16,8 +14,14 @@ class UserService {
   role: string
  ): Promise<boolean | Error> {
   try {
-    // TODO chech db for existing user 'this.findByEmail'
-    // if(user) throw error
+    // try Joi.external to validate email before reaching controller
+    // UserModel will be used directly, more db calls...
+    const existingUser = await this.findbyEmail(email);
+    
+    if (existingUser) {
+      throw new Error('User already exists');
+    }
+
     await this.user.create({
       name,
       email,
@@ -55,7 +59,60 @@ class UserService {
     } catch (error: any) {
       throw new Error(error.message);
     }
-  }  
+  }
+
+  /**
+   * Find all users
+   */
+  public async findAllUsers() {
+    const users = await this.user.find({}, '-password');
+
+    return users;
+  }
+
+  /**
+   * Find a user by email
+   */
+  public async findbyEmail(userEmail: string) {
+    const user = await this.user.findOne({email: userEmail}, '-password').exec();
+    return user;
+  }
+
+  /**
+   * Find a user by id
+   */
+  public async findById(userId: string) {
+    const user = await this.user.findById(userId, '-password');
+    return user;
+  }
+
+  /**
+   * Update a user
+   */
+  public async updateUser(userId: string, userData: object) {
+    const user = await this.user.findByIdAndUpdate(userId, userData);
+    if (user) {
+      return this.findById(userId);
+    }
+  }
+
+  /**
+   * Delete a user
+   */
+  public async deleteUser(userId: string) {
+    await this.user.findByIdAndDelete(userId);
+    return 'User deleted';
+  }
+  
+  /**
+   * Get all posts of a user
+   */
+  public async getAllPostsOfUser(userId: string) {
+    const user = await this.findById(userId);
+    const posts = user?.populate('posts');
+
+    return posts;
+  }
 }
 
 export default UserService;
