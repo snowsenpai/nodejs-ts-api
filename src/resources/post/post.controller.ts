@@ -4,6 +4,7 @@ import HttpException from '@/utils/exceptions/http.exceptions';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/post/post.validation';
 import PostService from '@/resources/post/post.service';
+import authenticated from '@/middleware/authenticated.middleware';
 
 class PostController implements Controller {
   public path = '/posts';
@@ -18,6 +19,7 @@ class PostController implements Controller {
   private initializeRoutes(): void {
     this.router.post(
       `${this.path}`,
+      authenticated,
       validationMiddleware(validate.create),
       this.create.bind(this)
     );
@@ -29,9 +31,10 @@ class PostController implements Controller {
     next: NextFunction
   ): Promise<Response | void> {
     try {
+      const userId = req.user?._id;
       const { title, body } = req.body;
 
-      const post = await this.PostService.create(title, body);
+      const post = await this.PostService.create(title, body, userId);
 
       res.status(201).json({ post });
     } catch (error: any) {

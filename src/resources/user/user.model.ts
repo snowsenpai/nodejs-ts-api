@@ -21,10 +21,18 @@ const UserSchema = new Schema({
       required: true,
     },
   }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+      virtuals: true
+    }
   }
-
 );
+
+UserSchema.virtual('posts', {
+  ref: 'Post',
+  localField: '_id',
+  foreignField: 'creator'
+});
 
 UserSchema.pre<User>('save', async function (next) {
   if (!this.isModified('password')) {

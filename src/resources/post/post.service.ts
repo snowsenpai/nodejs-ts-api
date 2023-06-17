@@ -7,9 +7,9 @@ class PostService {
   /**
    * Create a new post
    */
-  public async create(title: string, body: string): Promise<Post | Error> {
+  public async create(title: string, body: string, creator: string): Promise<Post | Error> {
     try {
-      const post = await this.post.create({ title, body });
+      const post = await this.post.create({ title, body, creator });
 
       return post;
     } catch (error) {
