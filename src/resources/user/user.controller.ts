@@ -155,7 +155,7 @@ class UserController implements Controller{
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const userId = req.params.id;
+    const userId = req.user?._id;    
     const response = await this.UserService.deleteUser(userId);
 
     res.status(200).json({ response });

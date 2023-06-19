@@ -32,7 +32,7 @@ async function authenticatedMiddleware(
       .exec();
 
     if (!user) {
-      return next(new HttpException(401, 'Unauthorized'));
+      return next(new HttpException(404, 'User not found'));
     }
 
     req.user = user;

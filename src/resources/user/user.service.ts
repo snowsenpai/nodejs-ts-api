@@ -32,7 +32,7 @@ class UserService {
     return true;
   } catch (error: any) {
     // TODO throw new DataBaseError()
-    throw new Error('Failed to register user');
+    throw new Error(error.message);
   }
  }
 
