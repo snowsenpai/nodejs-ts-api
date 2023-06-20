@@ -88,8 +88,14 @@ class PostController implements Controller {
   ): Promise<Response | void> {
     try {
       const postId = req.params.id;
+      const creator = req.query.creator;
 
-      const post = await this.PostService.findOne(postId);
+      let post;
+      if (!creator && creator !== 'true') {
+        post = await this.PostService.findOne(postId);
+      }
+
+      post = await this.PostService.findOne(postId, creator);
 
       res.status(200).json({ post });
     } catch (error: any) {
@@ -103,13 +109,12 @@ class PostController implements Controller {
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      // get userId and send to service
       const postId = req.params.id;
-      //check value of postData if it holds fields of Post
-      
+      const userId = req.user?._id;
+
       const postData: Partial<Post> = req.body;
 
-      const modifiedPost = await this.PostService.modifyPost(postId, postData);
+      const modifiedPost = await this.PostService.modifyPost(postId, postData, userId);
 
       res.status(201).json({ modifiedPost });
     } catch (error: any) {
@@ -124,8 +129,9 @@ class PostController implements Controller {
   ): Promise<Response | void> {
     try {
       const postId = req.params.id;
+      const userId = req.user?._id;
   
-      const message = await this.PostService.deletePost(postId);
+      const message = await this.PostService.deletePost(postId, userId);
       
       res.status(200).json({ message: message });
     } catch (error: any) {
