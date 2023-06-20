@@ -117,11 +117,15 @@ class UserController implements Controller{
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const userId = req.params.id;
-
-    const user = await this.UserService.findById(userId);
-
-    res.status(200).json({ data: user });
+    try {
+      const userId = req.params.id;
+  
+      const user = await this.UserService.findById(userId);
+  
+      res.status(200).json({ data: user });
+    } catch (error) {
+      next(error);
+    }
   }
 
   private async updateUser(
@@ -129,13 +133,17 @@ class UserController implements Controller{
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const userId = req.user?._id;
-    const userData: Partial<User> = req.body;
-    // if userData.role || password? 401 forbidden
-
-    const updatedUser = await this.UserService.updateUser(userId, userData);
-    
-    res.status(201).json({ updatedUser });
+    try {
+      const userId = req.user?._id;
+      const userData: Partial<User> = req.body;
+      // if userData.role || password? 401 forbidden
+  
+      const updatedUser = await this.UserService.updateUser(userId, userData);
+      
+      res.status(201).json({ updatedUser });
+    } catch (error) {
+      next(error);
+    }
   }
 
   private async userPost(
@@ -143,11 +151,15 @@ class UserController implements Controller{
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const userId = req.params.id;
-
-    const posts = await this.UserService.getAllPostsOfUser(userId);
-
-    res.status(200).json({ posts: posts });
+    try {
+      const userId = req.params.id;
+  
+      const posts = await this.UserService.getAllPostsOfUser(userId);
+  
+      res.status(200).json({ posts: posts });
+    } catch (error) {
+      next(error);
+    }
   }
 
   private async deleteUser(
@@ -155,10 +167,14 @@ class UserController implements Controller{
     res: Response,
     next: NextFunction
   ): Promise<Response | void> {
-    const userId = req.user?._id;    
-    const response = await this.UserService.deleteUser(userId);
-
-    res.status(200).json({ response });
+    try {
+      const userId = req.user?._id;    
+      const response = await this.UserService.deleteUser(userId);
+  
+      res.status(200).json({ response });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
