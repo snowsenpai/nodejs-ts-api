@@ -1,45 +1,29 @@
-import HttpException from "./http.exceptions";
+import CustomHttpException from "./custom.httpException";
 
-export class BadRequest extends HttpException{
-  /**
-   * A default message is used if none is provided 
-   */ 
+export class BadRequest extends CustomHttpException{
   constructor(customMessage?: string) {
     const defaultMessage = 'Resource already exist';
-    const message = customMessage ?? defaultMessage;
-    super(400, message);
+    super(400, defaultMessage, customMessage);
   }
 }
 
-export class Unauthorized extends HttpException{
-  /**
-   * A default message is used if none is provided 
-   */ 
+export class Unauthorized extends CustomHttpException{
   constructor(customMessage?: string) {
     const defaultMessage = "You're not authorized";
-    const message = customMessage ?? defaultMessage;
-    super(401, message);
+    super(401, defaultMessage, customMessage);
   }
 }
 
-export class Forbidden extends HttpException{
-  /**
-   * A default message is used if none is provided 
-   */ 
+export class Forbidden extends CustomHttpException{
   constructor(customMessage?: string) {
     const defaultMessage = "You're not permitted";
-    const message = customMessage ?? defaultMessage;
-    super(403, message);
+    super(403, defaultMessage, customMessage);
   }
 }
 
-export class NotFound extends HttpException{
-  /**
-   * A default message is used if none is provided 
-   */ 
+export class NotFound extends CustomHttpException{
   constructor(customMessage?: string) {
     const defaultMessage = 'Resource does not exist';
-    const message = customMessage ?? defaultMessage;
-    super(404, message);
+    super(404, defaultMessage, customMessage);
   }
 }
