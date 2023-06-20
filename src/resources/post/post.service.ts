@@ -23,6 +23,9 @@ class PostService {
   public async findAll() {
     // mongoose.Schema middleware to populate 'creator' and exclude '-password' for find*() queries?
     const posts = await this.post.find();
+    if (!posts) {
+      throw new Error('No post found')
+    }
 
     return posts;
   }
@@ -33,10 +36,13 @@ class PostService {
    */
   public async findOne(id: string, creator?: any) {
     const post = await this.post.findById(id);
+    if (!post) {
+      throw new Error('post not found');
+    }
     if (creator === 'true') {
       // if creator is populated, creator field will be the full doc, post.creator.toString() !== userId.toString() wil not work
       // toString() wont work on creator field
-      return post?.populate('creator', '-password');
+      return await post.populate('creator', '-password');
     }
     return post;
   }
@@ -47,9 +53,6 @@ class PostService {
   public async modifyPost(postId: string, postData: object, userId: string) {
     const post = await this.findOne(postId);
 
-    if (!post) {
-      throw new Error('Post not found');
-    }
     if (post.creator.toString() !== userId.toString()) {
       throw new Error('Not authorized');
     }
@@ -66,9 +69,6 @@ class PostService {
   public async deletePost(postId: string, userId: string) {
     const post = await this.findOne(postId);
 
-    if (!post) {
-      throw new Error('post not found');
-    }
     if (post.creator.toString() !== userId.toString()) {
       throw new Error('Not authorized');
     }

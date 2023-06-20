@@ -66,7 +66,9 @@ class UserService {
    */
   public async findAllUsers() {
     const users = await this.user.find({}, '-password');
-
+    if(!users){
+      throw new Error('Unable to find any user');
+    }
     return users;
   }
 
@@ -75,6 +77,9 @@ class UserService {
    */
   public async findbyEmail(userEmail: string) {
     const user = await this.user.findOne({email: userEmail}, '-password').exec();
+    if(!user){
+      throw new Error('Unable to find user with that email');
+    }
     return user;
   }
 
@@ -83,6 +88,9 @@ class UserService {
    */
   public async findById(userId: string) {
     const user = await this.user.findById(userId, '-password');
+    if(!user){
+      throw new Error('Unable to find user');
+    }
     return user;
   }
 
@@ -90,17 +98,21 @@ class UserService {
    * Update a user
    */
   public async updateUser(userId: string, userData: object) {
-    const user = await this.user.findByIdAndUpdate(userId, userData);
-    if (user) {
-      return this.findById(userId);
+    const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
+    if (!user) {
+      throw new Error('User not found');
     }
+    return user;
   }
 
   /**
    * Delete a user
    */
   public async deleteUser(userId: string) {
-    await this.user.findByIdAndDelete(userId);
+    const user = await this.user.findByIdAndDelete(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
     return 'User deleted';
   }
   
@@ -109,7 +121,10 @@ class UserService {
    */
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
-    const posts = user?.populate('posts');
+    if (!user) {
+      throw new Error('User does not exist');
+    }
+    const posts = await user.populate('posts');
 
     return posts;
   }
