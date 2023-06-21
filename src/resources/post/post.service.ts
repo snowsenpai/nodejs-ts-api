@@ -1,6 +1,7 @@
 import PostModel from "./post.model";
 import Post from "./post.interface";
-// TODO better error handling in services and controllers
+import { NotFound, BadRequest, Forbidden } from "@/utils/exceptions/clientErrorResponse";
+
 class PostService {
   private post = PostModel;
 
@@ -8,13 +9,11 @@ class PostService {
    * Create a new post
    */
   public async create(title: string, body: string, creator: string): Promise<Post | Error> {
-    try {
-      const post = await this.post.create({ title, body, creator });
-
-      return post;
-    } catch (error) {
-      throw new Error('Unable to create post');
+    const post = await this.post.create({ title, body, creator });
+    if(!post) {
+      throw new BadRequest('Unable to create post');
     }
+    return post;
   }
 
   /**
@@ -24,7 +23,7 @@ class PostService {
     // mongoose.Schema middleware to populate 'creator' and exclude '-password' for find*() queries?
     const posts = await this.post.find();
     if (!posts) {
-      throw new Error('No post found')
+      throw new NotFound('No post found')
     }
 
     return posts;
@@ -37,7 +36,7 @@ class PostService {
   public async findOne(id: string, creator?: any) {
     const post = await this.post.findById(id);
     if (!post) {
-      throw new Error('post not found');
+      throw new NotFound('post not found');
     }
     if (creator === 'true') {
       // if creator is populated, creator field will be the full doc, post.creator.toString() !== userId.toString() wil not work
@@ -54,13 +53,12 @@ class PostService {
     const post = await this.findOne(postId);
 
     if (post.creator.toString() !== userId.toString()) {
-      throw new Error('Not authorized');
+      throw new Forbidden();
     }
 
     const modifiedPost = await this.post.findByIdAndUpdate(postId, postData, { new: true });
 
     return modifiedPost;
-    
   }
 
   /**
@@ -70,7 +68,7 @@ class PostService {
     const post = await this.findOne(postId);
 
     if (post.creator.toString() !== userId.toString()) {
-      throw new Error('Not authorized');
+      throw new Forbidden();
     }
     await post.deleteOne();
 

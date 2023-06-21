@@ -1,11 +1,11 @@
 import { Router, Response, Request, NextFunction } from 'express';
 import Controller from '@/utils/interfaces/controller.interface';
-import HttpException from '@/utils/exceptions/http.exceptions';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/user/user.validation';
 import UserService from './user.service';
 import User from './user.interface';
 import authenticated from '@/middleware/authenticated.middleware';
+import { NotFound } from '@/utils/exceptions/clientErrorResponse';
 
 class UserController implements Controller{
   public path = '/user';
@@ -77,9 +77,7 @@ class UserController implements Controller{
         res.status(201).json({ message: 'User created' });
       }
     } catch (error) {
-      if(error instanceof Error){
-        next(new HttpException(400, error.message));
-      }
+      next(error);
     }
   }
 
@@ -94,9 +92,7 @@ class UserController implements Controller{
       const token = await this.UserService.login(email, password);
       res.status(200).json({ access_token: token });
     } catch (error) {
-      if(error instanceof Error){
-        next(new HttpException(400, error.message));
-      }
+      next(error);
     }
   }
 
@@ -106,7 +102,7 @@ class UserController implements Controller{
     next: NextFunction
   ): Response | void {
     if(!req.user) {
-      return next(new HttpException(404, 'No logged in user'));
+      return next(new NotFound('No logged in user'));
     }
 
     res.status(200).send({ data: req.user });
@@ -135,8 +131,8 @@ class UserController implements Controller{
   ): Promise<Response | void> {
     try {
       const userId = req.user?._id;
+      // Only fields specified in joi schema will be in the request body,i.e {stripUnknown: true}
       const userData: Partial<User> = req.body;
-      // if userData.role || password? 401 forbidden
   
       const updatedUser = await this.UserService.updateUser(userId, userData);
       

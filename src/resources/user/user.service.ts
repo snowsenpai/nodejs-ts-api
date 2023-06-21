@@ -1,5 +1,6 @@
 import UserModel from "./user.model";
 import token from "@/utils/token";
+import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErrorResponse";
 
 class UserService {
   private user = UserModel;
@@ -13,27 +14,25 @@ class UserService {
   password: string,
   role: string
  ): Promise<boolean | Error> {
-  try {
     // try Joi.external to validate email before reaching controller
     // UserModel will be used directly, more db calls...
     const existingUser = await this.findbyEmail(email);
-    
+
     if (existingUser) {
-      throw new Error('User already exists');
+      throw new BadRequest('User already exists');
     }
 
-    await this.user.create({
+    const newUser = await this.user.create({
       name,
       email,
       password,
       role,
     });
-    
+    if(!newUser) {
+      throw new BadRequest('Could not create user');
+    }
+
     return true;
-  } catch (error: any) {
-    // TODO throw new DataBaseError()
-    throw new Error(error.message);
-  }
  }
 
   /**
@@ -43,21 +42,16 @@ class UserService {
     email: string,
     password: string
   ): Promise<string | Error> {
-    try {
-      const user = await this.user.findOne({ email });
+    const user = await this.user.findOne({ email });
 
-      if(!user){
-        throw new Error('Unable to find user with that email');
-      }
+    if(!user){
+      throw new NotFound('Unable to find user with that email');
+    }
 
-      if(await user.isValidPassword(password)) {
-        return token.createToken(user);
-      } else {
-        throw new Error('Wrong credentials');
-      }
-
-    } catch (error: any) {
-      throw new Error(error.message);
+    if(await user.isValidPassword(password)) {
+      return token.createToken(user);
+    } else {
+      throw new Unauthorized('Wrong credentials');
     }
   }
 
@@ -67,7 +61,7 @@ class UserService {
   public async findAllUsers() {
     const users = await this.user.find({}, '-password');
     if(!users){
-      throw new Error('Unable to find any user');
+      throw new NotFound('Unable to find any user');
     }
     return users;
   }
@@ -78,7 +72,7 @@ class UserService {
   public async findbyEmail(userEmail: string) {
     const user = await this.user.findOne({email: userEmail}, '-password').exec();
     if(!user){
-      throw new Error('Unable to find user with that email');
+      throw new NotFound('Unable to find user with that email');
     }
     return user;
   }
@@ -89,7 +83,7 @@ class UserService {
   public async findById(userId: string) {
     const user = await this.user.findById(userId, '-password');
     if(!user){
-      throw new Error('Unable to find user');
+      throw new NotFound('Unable to find user');
     }
     return user;
   }
@@ -98,9 +92,9 @@ class UserService {
    * Update a user
    */
   public async updateUser(userId: string, userData: object) {
-    const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
+    const user = await this.user.findByIdAndUpdate(userId, userData, { new: true }).select('-password');
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFound('User not found');
     }
     return user;
   }
@@ -111,7 +105,7 @@ class UserService {
   public async deleteUser(userId: string) {
     const user = await this.user.findByIdAndDelete(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFound('User not found');
     }
     return 'User deleted';
   }
@@ -122,7 +116,7 @@ class UserService {
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
     if (!user) {
-      throw new Error('User does not exist');
+      throw new NotFound('User does not exist');
     }
     const posts = await user.populate('posts');
 

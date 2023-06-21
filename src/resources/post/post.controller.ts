@@ -1,6 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import Controller from '@/utils/interfaces/controller.interface';
-import HttpException from '@/utils/exceptions/http.exceptions';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/post/post.validation';
 import PostService from '@/resources/post/post.service';
@@ -61,8 +60,8 @@ class PostController implements Controller {
       const post = await this.PostService.create(title, body, userId);
 
       res.status(201).json({ post });
-    } catch (error: any) {
-      next(new HttpException(400, error.message));
+    } catch (error) {
+      next(error);
     }
   };
 
@@ -76,8 +75,8 @@ class PostController implements Controller {
       const posts = await this.PostService.findAll();
 
       res.status(200).json({ posts: posts });
-    } catch (error: any) {
-      next(new HttpException(400, error.message));
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -98,8 +97,8 @@ class PostController implements Controller {
       post = await this.PostService.findOne(postId, creator);
 
       res.status(200).json({ post });
-    } catch (error: any) {
-      next(new HttpException(400, error.message));
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -117,8 +116,8 @@ class PostController implements Controller {
       const modifiedPost = await this.PostService.modifyPost(postId, postData, userId);
 
       res.status(201).json({ modifiedPost });
-    } catch (error: any) {
-      next(new HttpException(400, error.message));
+    } catch (error) {
+      next(error);
     }
   }
 
@@ -134,8 +133,8 @@ class PostController implements Controller {
       const message = await this.PostService.deletePost(postId, userId);
       
       res.status(200).json({ message: message });
-    } catch (error: any) {
-      next(new HttpException(400, error.message));
+    } catch (error) {
+      next(error);
     }
   }
 }
