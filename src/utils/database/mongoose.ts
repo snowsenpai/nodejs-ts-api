@@ -1,15 +1,16 @@
 import mongoose from 'mongoose';
+import logger from '../logger';
 
 const mongooseConnect = (): void => {
   const { MONGO_DATABASE, MONGO_PATH } = process.env;
 
-  console.log('Connecting to MongoDB...');
+  logger.info('Connecting to MongoDB...');
   mongoose.connect(`${MONGO_PATH}/${MONGO_DATABASE}`)
     .then(() => {
-      console.log('connected to MongoDB');
+      logger.info('connected to MongoDB');
     })
     .catch((error) => {
-      console.error('Failed to connect to MongoDB: ', error);
+      logger.error(error, 'Failed to connect to MongoDB:');
       handleReconnection();
     });
 }
@@ -18,7 +19,7 @@ const handleReconnection = (): void => {
   const reconectionInterval = 5000; //5 seconds
 
   setTimeout(() => {
-    console.log('Attempting to reconnect to MongoDb...');
+    logger.info('Attempting to reconnect to MongoDb...');
     mongooseConnect();
   }, reconectionInterval);
 }

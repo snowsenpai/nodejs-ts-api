@@ -48,7 +48,9 @@
     "jsonwebtoken": "^9.0.0",
     "module-alias": "^2.2.2",
     "mongoose": "^7.1.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "pino": "^8.14.1",
+    "pino-pretty": "^10.0.0"
   },
   "_moduleAliases": {
     "@/resources": "dist/resources",
