@@ -1,10 +1,18 @@
 import pino from "pino";
+import path from "path";
 
+//to create log dir on app start? - fs.mkdir(path, {recursive:true}, cb), for production
 const transport = pino.transport({
   targets: [
     {
-      target: 'pino/file',
-      options: { destination: `./logs/app.log` },
+      target: path.resolve('dist/utils/transport-stream.js'),
+      options: {
+        fileName: 'app.log',
+        destination: path.resolve('logs'),
+        interval: '7d',
+        compress: true,
+        size: '300K',
+      },
       level: 'info'
     },
     {
