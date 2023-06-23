@@ -71,9 +71,7 @@ class UserService {
    */
   public async findbyEmail(userEmail: string) {
     const user = await this.user.findOne({email: userEmail}, '-password').exec();
-    if(!user){
-      throw new NotFound('Unable to find user with that email');
-    }
+
     return user;
   }
 

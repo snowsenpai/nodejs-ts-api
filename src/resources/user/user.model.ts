@@ -2,6 +2,21 @@ import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import User from './user.interface';
 
+const OTPSChema = new Schema({
+  otp_enabled: {
+    type: Boolean,
+    default: false,
+  },
+  otp_verified: {
+    type: Boolean,
+    default: false,
+  },
+  otp_ascii: String,
+  otp_hex: String,
+  otp_base32: String,
+  otp_auth_url: String
+});
+
 const UserSchema = new Schema({
     name: {
       type: String,
@@ -20,6 +35,7 @@ const UserSchema = new Schema({
       type: String,
       required: true,
     },
+    two_factor: OTPSChema,
   }, {
     timestamps: true,
     toJSON: {
