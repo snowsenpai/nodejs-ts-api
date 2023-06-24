@@ -47,8 +47,15 @@ class AuthController implements Controller{
   ): Promise<Response | void> {
     try {
       const userId = req.user._id;
-      const { token } = req.body;
-      
+
+      const { base32_secret, otp_url } = await this.AuthService.generateOTP(userId);
+
+      this.writeQRCode(otp_url, res);
+
+      res.status(201).send({
+        bsae32: base32_secret,
+        otp_url
+      });
     } catch (error) {
       next(error);
     }
@@ -67,6 +74,9 @@ class AuthController implements Controller{
       const userId = req.user._id
       const { token } = req.body;
 
+      const result = await this.AuthService.verifyOTP(userId, token);
+
+      res.status(201).json({ result });
     } catch (error) {
       next(error);
     }
@@ -81,6 +91,9 @@ class AuthController implements Controller{
       const userId = req.user._id;
       const { token } = req.body;
 
+      const result = await this.AuthService.validateOTP(userId, token);
+
+      res.status(200).json({ result });
     } catch (error) {
       next(error);
     }
@@ -95,6 +108,7 @@ class AuthController implements Controller{
       const userId = req.user._id;
       const { token } = req.body;
 
+      const result = await this.AuthService.disabelOTP(userId, token);
     } catch (error) {
       next(error);
     }
