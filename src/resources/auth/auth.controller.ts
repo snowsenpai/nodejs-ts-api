@@ -11,6 +11,10 @@ class AuthController implements Controller{
   public router = Router();
   private AuthService = new AuthService();
 
+  constructor() {
+    this.initialiseRoutes();
+  }
+
   private initialiseRoutes(): void {
     this.router.post(
       `${this.path}/otp/generate`,

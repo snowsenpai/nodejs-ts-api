@@ -6,10 +6,6 @@ import UserModel from '../user/user.model';
 import logger from '@/utils/logger';
 import { Unauthorized } from '@/utils/exceptions/clientErrorResponse';
 
-const totp_issuer = process.env.APP_NAME;
-const totp_label = process.env.APP_LABEL;
-logger.info({totp_issuer, totp_label}, 'process.env varibles');
-
 class AuthService {
   public UserService = new UserService();
   public user = UserModel;
