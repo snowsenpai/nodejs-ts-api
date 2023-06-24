@@ -1,5 +1,4 @@
 import { Router, Response, Request, NextFunction } from 'express';
-import * as QRCOde from 'qrcode';
 import Controller from '@/utils/interfaces/controller.interface';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
@@ -52,21 +51,12 @@ class AuthController implements Controller{
     try {
       const userId = req.user._id;
 
-      const { base32_secret, otp_url } = await this.AuthService.generateOTP(userId);
+      const data = await this.AuthService.generateOTP(userId);
 
-      // this.writeQRCode(otp_url, res);
-
-      res.status(201).send({
-        bsae32: base32_secret,
-        otp_url
-      });
+      res.status(201).json(data);
     } catch (error) {
       next(error);
     }
-  }
-
-  private writeQRCode(data: string, res: Response) {
-    QRCOde.toFileStream(res, data);
   }
 
   private async verifyOTP(
@@ -113,6 +103,8 @@ class AuthController implements Controller{
       const { token } = req.body;
 
       const result = await this.AuthService.disabelOTP(userId, token);
+
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }

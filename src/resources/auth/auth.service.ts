@@ -1,14 +1,15 @@
 import crypto from 'crypto';
+import { Response } from 'express';
 import * as OTPAuth from 'otpauth';
+import * as QRCOde from 'qrcode';
+import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
 import UserService from "../user/user.service";
-import UserModel from '../user/user.model';
 import logger from '@/utils/logger';
 import { Unauthorized } from '@/utils/exceptions/clientErrorResponse';
 
 class AuthService {
   public UserService = new UserService();
-  public user = UserModel;
   
   /**
    * generateRandomBase32
@@ -95,7 +96,6 @@ class AuthService {
     const user = await this.UserService.findById(userId);
     const secret = user.otp_base32;
 
-
     let totp = this.generateTOTP(secret);
 
     let delta = totp.validate({ token, window: 1 });
@@ -111,30 +111,60 @@ class AuthService {
    * disabelOTP
    */
   public async disabelOTP(userId: string, token: string) {
-    const { otp_verified } = await this.verifyOTP(userId, token);
+    const user = await this.UserService.findById(userId);
+    const secret = user.otp_base32;
 
-    // if !otp_verified this.verifyOTP will throw an error
-    if(otp_verified) {
-      const user = await this.UserService.findById(userId);
+    let totp = this.generateTOTP(secret);
 
-      user.otp_enabled = false;
-      user.otp_verified = false;
-      user.otp_base32 = '';
-      user.otp_auth_url = '';
+    let delta = totp.validate({ token, window: 1 });
 
-      const updatedUser = await user.save();
+    if(delta === null) {
+      throw new Unauthorized('Token is invalid or user does not exist');
+    }
 
-      return {
-        otp_disabled: true,
-        user: {
-          id: updatedUser._id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          otp_enabled: updatedUser.otp_enabled
-        }
+    user.otp_enabled = false;
+    user.otp_verified = false;
+    user.otp_base32 = '';
+    user.otp_auth_url = '';
+
+    const updatedUser = await user.save();
+
+    return {
+      otp_disabled: true,
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        otp_enabled: updatedUser.otp_enabled
       }
     }
   }
+
+  /**
+   * otpStatus
+   */
+  public otpStatus(userId: string) {
+    // get user.otp_enabled
+    // throw 401 not enabled
+  }
+
+  /**
+   * generateQRCode
+   */
+  public async generateQRCode(userId: string, res: Response) {
+    // get user
+    // check if user.otp_enabled
+    // get user.otp_auth_url
+    const otp_auth_url = userId;
+    
+    const qrStream = new PassThrough();
+    await QRCOde.toFileStream(qrStream, otp_auth_url, {
+      width: 200
+    });
+    
+    qrStream.pipe(res);
+  }
+  //TODO qrcode logo || otp_auth_url logo, generateTOTP() options{ label: user.email }
 }
 
 export default AuthService;

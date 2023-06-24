@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const otpToken = Joi.object({
-  token: Joi.number().max(6).required()
+  token: Joi.string().min(6).required()
 });
 
 export default { otpToken };
