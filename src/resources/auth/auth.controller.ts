@@ -54,7 +54,7 @@ class AuthController implements Controller{
 
       const { base32_secret, otp_url } = await this.AuthService.generateOTP(userId);
 
-      this.writeQRCode(otp_url, res);
+      // this.writeQRCode(otp_url, res);
 
       res.status(201).send({
         bsae32: base32_secret,

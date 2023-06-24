@@ -35,7 +35,18 @@ const UserSchema = new Schema({
       type: String,
       required: true,
     },
-    two_factor: OTPSChema,
+    otp_enabled: {
+      type: Boolean,
+      default: false,
+    },
+    otp_verified: {
+      type: Boolean,
+      default: false,
+    },
+    otp_ascii: String,
+    otp_hex: String,
+    otp_base32: String,
+    otp_auth_url: String
   }, {
     timestamps: true,
     toJSON: {

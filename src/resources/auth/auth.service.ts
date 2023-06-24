@@ -50,8 +50,8 @@ class AuthService {
     logger.info({otp_url, base32_secret}, 'otp_url and base32_secret');
 
     // update user otp_auth_url and otp_base32
-    user.two_factor.otp_auth_url = otp_url;
-    user.two_factor.otp_base32 = base32_secret;
+    user.otp_auth_url = otp_url;
+    user.otp_base32 = base32_secret;
     await user.save();
 
     return { otp_url, base32_secret };
@@ -62,7 +62,7 @@ class AuthService {
    */
   public async verifyOTP(userId: string, token: string) {
     const user = await this.UserService.findById(userId);
-    const secret = user.two_factor.otp_base32;
+    const secret = user.otp_base32;
 
     let totp = this.generateTOTP(secret);
     
@@ -73,8 +73,8 @@ class AuthService {
     }
     
     // update user
-    user.two_factor.otp_enabled = true;
-    user.two_factor.otp_verified = true;
+    user.otp_enabled = true;
+    user.otp_verified = true;
     const updatedUser = await user.save();
 
     return {
@@ -83,7 +83,7 @@ class AuthService {
         id: updatedUser._id,
         name: updatedUser.name,
         email: updatedUser.email,
-        otp_enabled: updatedUser.two_factor.otp_enabled
+        otp_enabled: updatedUser.otp_enabled
       }
     }
   }
@@ -93,7 +93,7 @@ class AuthService {
    */
   public async validateOTP(userId: string, token: string) {
     const user = await this.UserService.findById(userId);
-    const secret = user.two_factor.otp_base32;
+    const secret = user.otp_base32;
 
 
     let totp = this.generateTOTP(secret);
@@ -117,10 +117,10 @@ class AuthService {
     if(otp_verified) {
       const user = await this.UserService.findById(userId);
 
-      user.two_factor.otp_enabled = false;
-      user.two_factor.otp_verified = false;
-      user.two_factor.otp_base32 = '';
-      user.two_factor.otp_auth_url = '';
+      user.otp_enabled = false;
+      user.otp_verified = false;
+      user.otp_base32 = '';
+      user.otp_auth_url = '';
 
       const updatedUser = await user.save();
 
@@ -130,7 +130,7 @@ class AuthService {
           id: updatedUser._id,
           name: updatedUser.name,
           email: updatedUser.email,
-          otp_enabled: updatedUser.two_factor.otp_enabled
+          otp_enabled: updatedUser.otp_enabled
         }
       }
     }
