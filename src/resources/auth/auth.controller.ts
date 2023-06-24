@@ -21,36 +21,83 @@ class AuthController implements Controller{
     this.router.post(
       `${this.path}/otp/verify`,
       authenticated,
+      validationMiddleware(validate.otpToken),
       this.verifyOTP.bind(this)
     );
 
     this.router.post(
       `${this.path}/otp/validate`,
       authenticated,
+      validationMiddleware(validate.otpToken),
       this.validateOTP.bind(this)
     );
 
     this.router.post(
       `${this.path}/otp/disable`,
       authenticated,
+      validationMiddleware(validate.otpToken),
       this.disableOTP.bind(this)
     );
   }
 
-  private async generateOTP() {
-    
+  private async generateOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const { token } = req.body;
+      
+    } catch (error) {
+      next(error);
+    }
   }
 
-  private async verifyOTP() {
-    
+  private writeQRCode(data: string, res: Response) {
+    QRCOde.toFileStream(res, data);
   }
 
-  private async validateOTP() {
-    
+  private async verifyOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id
+      const { token } = req.body;
+
+    } catch (error) {
+      next(error);
+    }
   }
 
-  private async disableOTP() {
-    
+  private async validateOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const { token } = req.body;
+
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async disableOTP(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const { token } = req.body;
+
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

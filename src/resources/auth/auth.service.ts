@@ -42,61 +42,53 @@ class AuthService {
    * generateOTP
    */
   public async generateOTP(userId: string) {
-    try {
-      const user = await this.UserService.findById(userId);
-      logger.info({user}, 'user in authservice');
-      
-      const base32_secret = this.generateRandomBase32();
+    const user = await this.UserService.findById(userId);
+    logger.info({user}, 'user in authservice');
 
-      // new time-based otp
-      let totp = this.generateTOTP(base32_secret);
+    const base32_secret = this.generateRandomBase32();
 
-      let otp_url = totp.toString();
-      logger.info({otp_url, base32_secret}, 'otp_url and base32_secret');
+    // new time-based otp
+    let totp = this.generateTOTP(base32_secret);
 
-      // update user otp_auth_url and otp_base32
-      user.two_factor.otp_auth_url = otp_url;
-      user.two_factor.otp_base32 = base32_secret;
-      await user.save();
+    let otp_url = totp.toString();
+    logger.info({otp_url, base32_secret}, 'otp_url and base32_secret');
 
-      return { otp_url, base32_secret };
-    } catch (error) {
-      throw error
-    }
+    // update user otp_auth_url and otp_base32
+    user.two_factor.otp_auth_url = otp_url;
+    user.two_factor.otp_base32 = base32_secret;
+    await user.save();
+
+    return { otp_url, base32_secret };
   }
 
   /**
    * verifyOTP
    */
   public async verifyOTP(userId: string, token: string) {
-    try {
-      const user = await this.UserService.findById(userId);
-      const secret = user.two_factor.otp_base32;
+    const user = await this.UserService.findById(userId);
+    const secret = user.two_factor.otp_base32;
 
-      let totp = this.generateTOTP(secret);
-      
-      let delta = totp.validate({ token });
+    let totp = this.generateTOTP(secret);
+    
+    let delta = totp.validate({ token });
 
-      if(delta === null) {
-        throw new Unauthorized('Token is invalid or user does not exist'); 
+    if(delta === null) {
+      throw new Unauthorized('Token is invalid or user does not exist'); 
+    }
+    
+    // update user
+    user.two_factor.otp_enabled = true;
+    user.two_factor.otp_verified = true;
+    const updatedUser = await user.save();
+
+    return {
+      otp_verified: true,
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        otp_enabled: updatedUser.two_factor.otp_enabled
       }
-      
-      // update user
-      user.two_factor.otp_enabled = true;
-      user.two_factor.otp_verified = true;
-      const updatedUser = await user.save();
-
-      return {
-        otp_verified: true,
-        user: {
-          id: updatedUser._id,
-          name: updatedUser.name,
-          email: updatedUser.email,
-          otp_enabled: updatedUser.two_factor.otp_enabled
-        }
-      }
-    } catch (error) {
-      throw error
     }
   }
 
@@ -104,23 +96,19 @@ class AuthService {
    * validateOTP
    */
   public async validateOTP(userId: string, token: string) {
-    try {
-      const user = await this.UserService.findById(userId);
-      const secret = user.two_factor.otp_base32;
+    const user = await this.UserService.findById(userId);
+    const secret = user.two_factor.otp_base32;
 
 
-      let totp = this.generateTOTP(secret);
-  
-      let delta = totp.validate({ token, window: 1 });
-  
-      if(delta === null) {
-        throw new Unauthorized('Token is invalid or user does not exist');
-      }
-      
-      return { otp_valid: true };
-    } catch (error) {
-      throw error;
+    let totp = this.generateTOTP(secret);
+
+    let delta = totp.validate({ token, window: 1 });
+
+    if(delta === null) {
+      throw new Unauthorized('Token is invalid or user does not exist');
     }
+
+    return { otp_valid: true };
   }
 
   /**

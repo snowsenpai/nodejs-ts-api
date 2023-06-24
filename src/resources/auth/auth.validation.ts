@@ -1,7 +1,7 @@
 import Joi from "joi";
 
-const otoGenerate = Joi.object({
-  token: Joi.string().required()
+const otpToken = Joi.object({
+  token: Joi.string().max(6).required()
 });
 
-export default { otoGenerate };
+export default { otpToken };
