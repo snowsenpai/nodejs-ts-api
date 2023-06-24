@@ -54,7 +54,7 @@ class PostController implements Controller {
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const userId = req.user?._id;
+      const userId = req.user._id;
       const { title, body } = req.body;
 
       const post = await this.PostService.create(title, body, userId);
@@ -109,7 +109,7 @@ class PostController implements Controller {
   ): Promise<Response | void> {
     try {
       const postId = req.params.id;
-      const userId = req.user?._id;
+      const userId = req.user._id;
 
       const postData: Partial<Post> = req.body;
 
@@ -128,7 +128,7 @@ class PostController implements Controller {
   ): Promise<Response | void> {
     try {
       const postId = req.params.id;
-      const userId = req.user?._id;
+      const userId = req.user._id;
   
       const message = await this.PostService.deletePost(postId, userId);
       

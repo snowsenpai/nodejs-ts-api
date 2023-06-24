@@ -130,7 +130,7 @@ class UserController implements Controller{
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const userId = req.user?._id;
+      const userId = req.user._id;
       // Only fields specified in joi schema will be in the request body,i.e {stripUnknown: true}
       const userData: Partial<User> = req.body;
   
@@ -164,7 +164,7 @@ class UserController implements Controller{
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const userId = req.user?._id;    
+      const userId = req.user._id;    
       const response = await this.UserService.deleteUser(userId);
   
       res.status(200).json({ response });
