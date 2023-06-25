@@ -41,7 +41,6 @@ class AuthService {
   */
   public async generateOTP(userId: string) {
     const user = await this.UserService.findById(userId);
-    logger.info({user}, 'user in authservice');
 
     const base32_secret = this.generateRandomBase32();
 
@@ -49,7 +48,6 @@ class AuthService {
     let totp = this.generateTOTP(base32_secret);
 
     let otp_url = totp.toString();
-    logger.info({otp_url, base32_secret}, 'otp_url and base32_secret');
 
     // update user otp_auth_url and otp_base32
     user.otp_auth_url = otp_url;
