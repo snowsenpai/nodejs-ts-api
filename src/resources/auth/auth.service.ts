@@ -24,6 +24,7 @@ class AuthService {
    * generateTOTP
    */
   public generateTOTP(secret: string) {
+    //TODO generateTOTP(secret, options?), options?:{ label: user.email, }
     let newTOTP = new OTPAuth.TOTP({
       issuer: process.env.APP_NAME,
       label: process.env.APP_LABEL,
@@ -37,7 +38,7 @@ class AuthService {
 
   /**
    * generateOTP
-   */
+  */
   public async generateOTP(userId: string) {
     const user = await this.UserService.findById(userId);
     logger.info({user}, 'user in authservice');
@@ -91,6 +92,8 @@ class AuthService {
 
   /**
    * validateOTP
+   * services can validate otp codes from user
+   * within a {options.duration} time fame
    */
   public async validateOTP(userId: string, token: string) {
     const user = await this.UserService.findById(userId);
@@ -141,30 +144,33 @@ class AuthService {
   }
 
   /**
-   * otpStatus
+   * otpData
    */
-  public otpStatus(userId: string) {
-    // get user.otp_enabled
-    // throw 401 not enabled
+  public async otpData(userId: string) {
+    const user = await this.UserService.findById(userId);
+    const enabled = user.otp_enabled;
+    if(!enabled) throw new Unauthorized('User otp not enabled');
+    
+    // based on users otp status return certain data
+    return {
+      otp_auth_url: user.otp_auth_url,
+      otp_base32: user.otp_base32
+    }
   }
 
   /**
    * generateQRCode
+   * services can send data in qrcode
+   * qr code is piped to the response object payment service
    */
-  public async generateQRCode(userId: string, res: Response) {
-    // get user
-    // check if user.otp_enabled
-    // get user.otp_auth_url
-    const otp_auth_url = userId;
-    
+  public async responseWithQRCode(data: string, res: Response) {
     const qrStream = new PassThrough();
-    await QRCOde.toFileStream(qrStream, otp_auth_url, {
+    await QRCOde.toFileStream(qrStream, data, {
       width: 200
     });
-    
+
     qrStream.pipe(res);
   }
-  //TODO qrcode logo || otp_auth_url logo, generateTOTP() options{ label: user.email }
 }
 
 export default AuthService;

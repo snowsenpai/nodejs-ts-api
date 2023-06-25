@@ -2,6 +2,10 @@ import UserModel from "./user.model";
 import token from "@/utils/token";
 import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErrorResponse";
 
+//*  UserModel should have required security(e.g pass word) and otp fields
+//*  UserService should have appropriate methods to mutate and validate a
+//*  retrived user object from the database using a unique identifier e.g
+//*  user.id; this available to other controllers via middleware req.user.id
 class UserService {
   private user = UserModel;
 
@@ -14,8 +18,6 @@ class UserService {
   password: string,
   role: string
  ): Promise<boolean | Error> {
-    // try Joi.external to validate email before reaching controller
-    // UserModel will be used directly, more db calls...
     const existingUser = await this.findbyEmail(email);
 
     if (existingUser) {
@@ -107,7 +109,7 @@ class UserService {
     }
     return 'User deleted';
   }
-  
+
   /**
    * Get all posts of a user
    */

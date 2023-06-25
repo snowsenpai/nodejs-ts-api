@@ -27,6 +27,7 @@ async function authenticatedMiddleware(
       return next(new Unauthorized());
     }
 
+    //TODO unselect sensitive user data
     const user = await UserModel.findById(payload.id)
       .select('-password')
       .exec();

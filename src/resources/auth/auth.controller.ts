@@ -15,6 +15,12 @@ class AuthController implements Controller{
   }
 
   private initialiseRoutes(): void {
+    this.router.get(
+      `${this.path}/otp/auth-qrcode`,
+      authenticated,
+      this.otpQRCode.bind(this)
+    );
+
     this.router.post(
       `${this.path}/otp/generate`,
       authenticated,
@@ -105,6 +111,23 @@ class AuthController implements Controller{
       const result = await this.AuthService.disabelOTP(userId, token);
 
       res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async otpQRCode(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      //ResourceController: get data to send using req.userid from ResourceService and userService, select only needed data from the found user 
+  
+      const { otp_auth_url } = await this.AuthService.otpData(userId);
+      //AuthSrevice: call auth service.resonse with qr code
+      this.AuthService.responseWithQRCode(otp_auth_url, res);
     } catch (error) {
       next(error);
     }
