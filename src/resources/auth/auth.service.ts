@@ -91,8 +91,7 @@ class AuthService {
   }
 
   /**
-   * validateOTP
-   * services can validate otp codes from user
+   * services can validate otp codes from user's authenticator app
    * within a {options.duration} time fame
    */
   public async validateOTP(userId: string, token: string) {
@@ -159,9 +158,9 @@ class AuthService {
   }
 
   /**
-   * generateQRCode
-   * services can send data in qrcode
-   * qr code is piped to the response object payment service
+   * send data as qrcode
+   * a qrcode fileStream is created and piped to the response object 
+   * e.g for a PaymentService
    */
   public async responseWithQRCode(data: string, res: Response) {
     const qrStream = new PassThrough();
