@@ -1,12 +1,13 @@
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 import { Response } from 'express';
 import * as OTPAuth from 'otpauth';
 import * as QRCOde from 'qrcode';
 import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
+import { hash, compare } from 'bcrypt';
 import UserService from "../user/user.service";
-import logger from '@/utils/logger';
 import { Unauthorized } from '@/utils/exceptions/clientErrorResponse';
+import { hashedRecoveryCodes } from './auth.types';
 
 class AuthService {
   public UserService = new UserService();
@@ -15,7 +16,7 @@ class AuthService {
    * generateRandomBase32
    */
   public generateRandomBase32() {
-    const buffer = crypto.randomBytes(15);
+    const buffer = randomBytes(15);
     const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
     return base32;
   }
@@ -77,6 +78,9 @@ class AuthService {
     user.otp_verified = true;
     const updatedUser = await user.save();
 
+    // generate recovery codes
+    // hash recovery codes
+    // save hasded codes to user doc
     return {
       otp_verified: true,
       user: {
@@ -166,6 +170,86 @@ class AuthService {
     });
 
     qrStream.pipe(res);
+  }
+
+  /**
+   * generateRandomString
+   */
+  public generateRandomString(length: number) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const characterCount = characters.length
+
+    const bytes = randomBytes(length);
+    let randomString = '';
+
+    for (let i = 0; i < length; i++) {
+      const randomIndex = bytes[i] % characterCount;
+      console.log('bytes[i] ', bytes[i]);
+      console.log('randomIndex ', randomIndex);
+
+      randomString += characters.charAt(randomIndex);
+    }
+
+    return randomString;
+  }
+
+  /**
+   * generateRandomStringArray
+   * Recovery codes for 2fa enabled accounts
+   */
+  public generateRecoveryCodes(length: number, count: number) {
+    const randomStrings = [];
+
+    for (let i = 0; i < count; i++) {
+      const randomString = this.generateRandomString(length);
+      randomStrings.push(randomString);
+    }
+
+    return randomStrings;
+  }
+
+  /**
+   * hashStrings
+   * hash recovery codes of user
+   */
+  public async hashRecoveryCodes(recoveryCodes: string[]) {
+    // await the result of the iterable code
+    const hashedCodes = await Promise.all(
+      // iterate over the array
+      recoveryCodes.map( async (code) => {
+        // hash each code and return an object with a 'used' property
+        const hasedCode = await hash(code, 7);
+        return {
+          hash: hasedCode,
+          used: false
+        }
+      })
+    );
+    return hashedCodes;
+  }
+
+  /**
+   * validateRecoveryCodes
+   * if no match is found will return `undefined`
+   */
+  public async validateRecoveryCodes(recoverCode: string, hashedCode: hashedRecoveryCodes) {
+    // const user = await this.UserService.findById(userId);
+    for (const code of hashedCode) {
+      const isMatch = await compare(recoverCode, code.hash);
+
+      // using `if(!isMatch)` will exit the loop fast if a        
+      // match is not found after the first iteration
+      if (isMatch) {
+        if (code.used) {
+          // throw 403
+          return {validCode: false, message: 'code already used'}
+        } else {
+          code.used = true;
+          // save updated code to users recoveryCodes
+          return {validCode: true, message: 'code valid'}
+        }
+      }
+    }
   }
 }
 
