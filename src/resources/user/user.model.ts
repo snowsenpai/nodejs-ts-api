@@ -46,7 +46,13 @@ const UserSchema = new Schema({
     otp_ascii: String,
     otp_hex: String,
     otp_base32: String,
-    otp_auth_url: String
+    otp_auth_url: String,
+    recoveryCodes: [
+      {
+        hash: String,
+        used: Boolean
+      }
+    ]
   }, {
     timestamps: true,
     toJSON: {

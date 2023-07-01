@@ -11,6 +11,10 @@ export default interface User extends Document {
   otp_hex: string;
   otp_base32: string;
   otp_auth_url: string;
+  recoveryCodes: {
+    hash: string,
+    used: boolean
+  }[]
 
   isValidPassword(password: string): Promise<Error | boolean>;
 }
