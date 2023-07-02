@@ -272,6 +272,11 @@ class AuthService {
     }
     return result;
   }
+
+  // if user has no access to auth app or recovery codes,
+  // send an email with a otp to validate their account ownership
+  // if code is valid, can disable their otp_status
+  // if user enables otp again, a new otp_auth_url and recovery codes will be given
 }
 
 export default AuthService;
