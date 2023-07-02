@@ -20,7 +20,7 @@ describe('Authentication middleware', () => {
   beforeEach(() => {
     req = {
       headers: {},
-      user: null,
+      user: undefined,
     };
     res = {};
     next = jest.fn();

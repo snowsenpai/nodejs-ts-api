@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import Controller from '@/utils/interfaces/controller.interface';
 import ErrorMiddleware from '@/middleware/error.middleware';
 import helmet from 'helmet';
+import logger from '@/utils/logger';
 
 class App {
   public express: Application;
@@ -42,7 +43,7 @@ class App {
   // TODO listen should recive a PORT param -> listen(port)
   public listen(): void {
     this.express.listen(this.port, () => {
-      console.log(`App listening on the port ${this.port}`);
+      logger.info(`App listening on the port ${this.port}`);
     });
   }
 }

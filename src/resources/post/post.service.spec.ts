@@ -12,6 +12,7 @@ describe('PostService', () => {
   let postService: PostService;
   let mockPostModel: jest.Mocked<typeof PostModel>;
 
+  const userId = 'userid';  
   const title = 'new post';
   const body = 'new test post body';
 
@@ -34,7 +35,7 @@ describe('PostService', () => {
       mockPostModel.create
       // @ts-ignore
       .mockResolvedValue(post);
-      const response = await postService.create(title, body);
+      const response = await postService.create(title, body, userId);
 
       expect(mockPostModel.create).toHaveBeenCalledWith({
         title, body
@@ -47,7 +48,7 @@ describe('PostService', () => {
       jest.spyOn(postService, 'create')
       .mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(postService.create(title, body)).rejects.toThrow(errorMessage);
+      await expect(postService.create(title, body, userId)).rejects.toThrow(errorMessage);
     });
   });
 });

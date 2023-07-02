@@ -14,4 +14,10 @@ const login = Joi.object({
   password: Joi.string().required(),
 });
 
-export default { register, login };
+const updateUser = Joi.object({
+  name: Joi.string().max(20),
+
+  email: Joi.string().email(),
+});
+
+export default { register, login, updateUser };
