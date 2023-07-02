@@ -6,7 +6,7 @@
  */
 
 /**
- * the `User` object | interface must staisfy these fields
+ * `User` object | interface should staisfy these fields
  */
 export type hashedRecoveryCodes = {
   hash: string,

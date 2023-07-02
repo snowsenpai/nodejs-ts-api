@@ -6,8 +6,7 @@ import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
 import UserService from "../user/user.service";
-import { Unauthorized } from '@/utils/exceptions/clientErrorResponse';
-import { hashedRecoveryCodes } from './auth.types';
+import { Unauthorized, Forbidden } from '@/utils/exceptions/clientErrorResponse';
 
 class AuthService {
   public UserService = new UserService();
@@ -24,11 +23,11 @@ class AuthService {
   /**
    * generateTOTP
    */
-  public generateTOTP(secret: string) {
+  public generateTOTP(secret: string, label?: string) {
     //TODO generateTOTP(secret, options?), options?:{ label: user.email, }
     let newTOTP = new OTPAuth.TOTP({
       issuer: process.env.APP_NAME,
-      label: process.env.APP_LABEL,
+      label: label || process.env.APP_LABEL,
       algorithm: 'SHA1',
       digits: 6,
       period: 30,
@@ -46,7 +45,7 @@ class AuthService {
     const base32_secret = this.generateRandomBase32();
 
     // new time-based otp
-    let totp = this.generateTOTP(base32_secret);
+    let totp = this.generateTOTP(base32_secret, user.email);
 
     let otp_url = totp.toString();
 
@@ -65,22 +64,30 @@ class AuthService {
     const user = await this.UserService.findById(userId);
     const secret = user.otp_base32;
 
-    let totp = this.generateTOTP(secret);
-    
+    let totp = this.generateTOTP(secret, user.email);
+
     let delta = totp.validate({ token });
 
     if(delta === null) {
       throw new Unauthorized('Token is invalid or user does not exist'); 
     }
-    
-    // update user
+
+    // update user data
     user.otp_enabled = true;
     user.otp_verified = true;
+    
+    // generate recovery codes
+    const codeLength = 8;
+    const recoveryCodesSize = 10;
+
+    const recoveryCodes = this.generateRecoveryCodes(codeLength, recoveryCodesSize);
+    // hash recovery codes
+    const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
+    // save hasded codes to user doc
+    user.recoveryCodes = hashedRecoveryCodes;
+
     const updatedUser = await user.save();
 
-    // generate recovery codes
-    // hash recovery codes
-    // save hasded codes to user doc
     return {
       otp_verified: true,
       user: {
@@ -88,7 +95,8 @@ class AuthService {
         name: updatedUser.name,
         email: updatedUser.email,
         otp_enabled: updatedUser.otp_enabled
-      }
+      },
+      recoveryCodes: recoveryCodes
     }
   }
 
@@ -99,7 +107,7 @@ class AuthService {
     const user = await this.UserService.findById(userId);
     const secret = user.otp_base32;
 
-    let totp = this.generateTOTP(secret);
+    let totp = this.generateTOTP(secret, user.email);
 
     let delta = totp.validate({ token, window: 1 });
 
@@ -117,7 +125,7 @@ class AuthService {
     const user = await this.UserService.findById(userId);
     const secret = user.otp_base32;
 
-    let totp = this.generateTOTP(secret);
+    let totp = this.generateTOTP(secret, user.email);
 
     let delta = totp.validate({ token, window: 1 });
 
@@ -148,7 +156,7 @@ class AuthService {
    */
   public async otpData(userId: string) {
     const user = await this.UserService.findById(userId);
-    const enabled = user.otp_enabled;
+    const enabled = user.otp_auth_url;
     if(!enabled) throw new Unauthorized('User otp not enabled');
     
     // based on users otp status return certain data
@@ -160,7 +168,7 @@ class AuthService {
 
   /**
    * send data as qrcode
-   * a qrcode fileStream is created and piped to the response object 
+   * a qrcode fileStream is created and piped to the response stream
    * e.g for a PaymentService
    */
   public async responseWithQRCode(data: string, res: Response) {
@@ -176,16 +184,14 @@ class AuthService {
    * generateRandomString
    */
   public generateRandomString(length: number) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    const characterCount = characters.length
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characterCount = characters.length;
 
     const bytes = randomBytes(length);
     let randomString = '';
 
     for (let i = 0; i < length; i++) {
       const randomIndex = bytes[i] % characterCount;
-      console.log('bytes[i] ', bytes[i]);
-      console.log('randomIndex ', randomIndex);
 
       randomString += characters.charAt(randomIndex);
     }
@@ -195,7 +201,8 @@ class AuthService {
 
   /**
    * generateRandomStringArray
-   * Recovery codes for 2fa enabled accounts
+   * generate recovery codes of size `count` for 2fa enabled accounts,
+   * each code has a `length`
    */
   public generateRecoveryCodes(length: number, count: number) {
     const randomStrings = [];
@@ -229,27 +236,41 @@ class AuthService {
   }
 
   /**
-   * validateRecoveryCodes
+   * validateRecoveryCode
    * if no match is found will return `undefined`
    */
-  public async validateRecoveryCodes(recoverCode: string, hashedCode: hashedRecoveryCodes) {
-    // const user = await this.UserService.findById(userId);
-    for (const code of hashedCode) {
+  public async validateRecoveryCode(userId: string, recoverCode: string) {
+    const user = await this.UserService.findById(userId);
+    const recoveryCodes = user.recoveryCodes;
+
+    for (const code of recoveryCodes) {
       const isMatch = await compare(recoverCode, code.hash);
 
-      // using `if(!isMatch)` will exit the loop fast if a        
-      // match is not found after the first iteration
+      // using `if(!isMatch) or if-else` will exit the loop        
+      // fast if a match is not found after first iteration
       if (isMatch) {
         if (code.used) {
-          // throw 403
-          return {validCode: false, message: 'code already used'}
+          throw new Forbidden('Code already used');
         } else {
           code.used = true;
-          // save updated code to users recoveryCodes
-          return {validCode: true, message: 'code valid'}
+          await user.save();
+          // TODO check db if the updated codes status is updated
+          return {validCode: true, message: 'valid code'};
         }
       }
     }
+  }
+
+  /**
+   * validCode
+   * handle a `undefined` cases from `validateRecoveryCode` method
+   */
+  public async validCode(userId: string, recoveryCode: string) {
+    const result = await this.validateRecoveryCode(userId, recoveryCode);
+    if (!result) {
+      throw new Forbidden('Code does not exist');
+    }
+    return result;
   }
 }
 

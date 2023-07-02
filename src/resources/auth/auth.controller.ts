@@ -47,6 +47,13 @@ class AuthController implements Controller{
       validationMiddleware(validate.otpToken),
       this.disableOTP.bind(this)
     );
+
+    this.router.post(
+      `${this.path}/verify/recovery-code`,
+      authenticated,
+      validationMiddleware(validate.recoveryCode),
+      this.validateRecoveryCode.bind(this)
+    )
   }
 
   private async generateOTP(
@@ -127,6 +134,23 @@ class AuthController implements Controller{
       const { otp_auth_url } = await this.AuthService.otpData(userId);
 
       this.AuthService.responseWithQRCode(otp_auth_url, res);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async validateRecoveryCode(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const { code } = req.body;
+  
+      const result = await this.AuthService.validCode(userId, code);
+
+      res.status(201).json(result)
     } catch (error) {
       next(error);
     }
