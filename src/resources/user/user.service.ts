@@ -1,4 +1,5 @@
 import UserModel from "./user.model";
+import EmailService from "../email/email.service";
 import token from "@/utils/token";
 import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErrorResponse";
 
@@ -8,6 +9,7 @@ import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErr
 //*  user.id; this available to other controllers via middleware req.user.id
 class UserService {
   private user = UserModel;
+  private EmailService = new EmailService();
 
   /**
    * Register a new user
@@ -33,6 +35,7 @@ class UserService {
     if(!newUser) {
       throw new BadRequest('Could not create user');
     }
+    this.EmailService.sendWelcomeEmail(email, name);
 
     return true;
  }
