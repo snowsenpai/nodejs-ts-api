@@ -1,5 +1,5 @@
 import * as nodemailer from 'nodemailer';
-import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { TMailOptions } from '../email.types';
 
 const user = process.env.APP_EMAIL!;
@@ -9,19 +9,19 @@ const CLIENT_SECRET = process.env.CLIENT_SECRET!;
 const REFRESH_TOKEN = process.env.REFRESH_TOKEN!;
 const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 
-const oauth2Client = new google.auth.OAuth2(
+const oAuth2Client = new OAuth2Client(
   CLIENT_ID,
   CLIENT_SECRET,
   REDIRECT_URI
 );
 
-oauth2Client.setCredentials({
+oAuth2Client.setCredentials({
   refresh_token: REFRESH_TOKEN
 });
 
 const gmail = async (options: TMailOptions) => {
   try {
-    const accessToken = await oauth2Client.getAccessToken();
+    const accessToken = await oAuth2Client.getAccessToken();
 
     const transport = nodemailer.createTransport({
       service: 'gmail',
@@ -36,7 +36,7 @@ const gmail = async (options: TMailOptions) => {
     });
 
     const mailOptions = {
-      from: options.from ?? `SnowSenpai <${process.env.APP_EMAIL}>`,
+      from: `SnowSenpai <${user}>`,
       ...options
     };
 
