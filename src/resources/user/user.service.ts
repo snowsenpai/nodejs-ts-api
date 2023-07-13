@@ -1,6 +1,7 @@
 import UserModel from "./user.model";
 import EmailService from "../email/email.service";
 import token from "@/utils/token";
+import { TokenData } from "@/utils/interfaces/token.interface";
 import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErrorResponse";
 
 //*  UserModel should have required security(e.g pass word) and otp fields
@@ -46,7 +47,7 @@ class UserService {
   public async login(
     email: string,
     password: string
-  ): Promise<string | Error> {
+  ): Promise<TokenData | Error> {
     const user = await this.user.findOne({ email });
 
     if(!user){
@@ -54,7 +55,7 @@ class UserService {
     }
 
     if(await user.isValidPassword(password)) {
-      return token.createToken(user);
+      return token.createToken({id: user._id});
     } else {
       throw new Unauthorized('Wrong credentials');
     }

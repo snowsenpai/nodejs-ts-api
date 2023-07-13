@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import token from '@/utils/token';
 import UserModel from '@/resources/user/user.model';
-import Token from '@/utils/interfaces/token.interface';
+import { Token } from '@/utils/interfaces/token.interface';
 import { Unauthorized, NotFound } from '@/utils/exceptions/clientErrorResponse';
 import jwt  from 'jsonwebtoken';
 
@@ -18,7 +18,7 @@ async function authenticatedMiddleware(
     }
 
     const accessToken = bearer.split('Bearer ')[1].trim();
-    
+
     const payload: Token | jwt.JsonWebTokenError = await token.verifyToken(
       accessToken
     );
@@ -27,7 +27,7 @@ async function authenticatedMiddleware(
       return next(new Unauthorized());
     }
 
-    //TODO unselect sensitive user data
+    //TODO unselect sensitive user data, interface of serialized user
     const user = await UserModel.findById(payload.id)
       .select('-password')
       .exec();

@@ -71,10 +71,13 @@ describe('User controller .api/user', () => {
       const loginSpy = jest.spyOn(userController['UserService'], 'login');
       const email = 'test@test.com';
       const password = 'testing';
+      const expiresIn = 360;
       const token = 'testToken1234';
+      const access_token = { expiresIn, token }
 
       req.body = { email, password };
-      loginSpy.mockResolvedValueOnce(token);
+      // @ts-ignore
+      loginSpy.mockResolvedValueOnce(access_token);
 
       await userController['login'](req as Request, res as Response, next);
 

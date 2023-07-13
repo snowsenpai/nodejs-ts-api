@@ -1,4 +1,5 @@
 import User from '@/resources/user/user.interface';
+// use a serialized user instead of the full user object
 
 declare global {
   namespace Express {
