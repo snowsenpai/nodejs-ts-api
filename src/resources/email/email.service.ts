@@ -1,5 +1,4 @@
 import sendGrid from "./providers/sendGrid";
-import gmail from "./providers/gmail";
 
 class EmailService {
   /**
@@ -9,9 +8,9 @@ class EmailService {
    * @returns boolean
    */
   public async sendWelcomeEmail(email: string, first_name: string) {
-    await gmail({
+    await sendGrid({
       to: email,
-      subject: 'Welome on board!',
+      subject: 'Welcome!',
       html: `
         <h2>Hi ${first_name},</h2> 
         <p>Your account has been sucessfully created, to access other services ensure you verify your email.</p>
