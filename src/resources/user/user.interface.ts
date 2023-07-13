@@ -5,6 +5,8 @@ export default interface User extends Document {
   name: string;
   password: string;
   role: string;
+  verified: boolean;
+  secret_token: string;
   otp_enabled: boolean;
   otp_verified: boolean;
   otp_ascii: string;

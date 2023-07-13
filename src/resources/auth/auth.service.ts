@@ -6,7 +6,7 @@ import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
 import UserService from "../user/user.service";
-import { Unauthorized, Forbidden } from '@/utils/exceptions/clientErrorResponse';
+import { Unauthorized, Forbidden, NotFound } from '@/utils/exceptions/clientErrorResponse';
 
 class AuthService {
   public UserService = new UserService();
@@ -80,7 +80,7 @@ class AuthService {
     const codeLength = 8;
     const recoveryCodesSize = 10;
 
-    const recoveryCodes = this.generateRecoveryCodes(codeLength, recoveryCodesSize);
+    const recoveryCodes = this.generateRandomStringArray(codeLength, recoveryCodesSize);
     // hash recovery codes
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
     // save hasded codes to user doc
@@ -184,15 +184,20 @@ class AuthService {
    * generateRandomString
    */
   public generateRandomString(length: number) {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const characters = process.env.SECRET_CHARACTERS!;
+    // number of characters available for selection
     const characterCount = characters.length;
 
+    // will return an ArrayBuffer
     const bytes = randomBytes(length);
     let randomString = '';
 
     for (let i = 0; i < length; i++) {
+      // value of the byte at index 'i' of buffer => bytes[i]
+      // randomIndex should be within the range of avalable characters
       const randomIndex = bytes[i] % characterCount;
 
+      // select corresponding character at randomindex and append to 'randomString'
       randomString += characters.charAt(randomIndex);
     }
 
@@ -204,13 +209,14 @@ class AuthService {
    * generate recovery codes of size `count` for 2fa enabled accounts,
    * each code has a `length`
    */
-  public generateRecoveryCodes(length: number, count: number) {
+  public generateRandomStringArray(length: number, count: number) {
     const randomStrings = [];
 
     for (let i = 0; i < count; i++) {
       const randomString = this.generateRandomString(length);
       randomStrings.push(randomString);
     }
+    // random string uniqueness, cache db?, do-while(generatedStrings.has(generatedString) && generatedSize < count)...
 
     return randomStrings;
   }
@@ -254,7 +260,7 @@ class AuthService {
         } else {
           code.used = true;
           await user.save();
-          // TODO check db if the updated codes status is updated
+
           return {validCode: true, message: 'valid code'};
         }
       }
@@ -273,6 +279,38 @@ class AuthService {
     return result;
   }
 
+  /**
+   * verifyEmail
+   */
+  public async verifyEmail(email: string) {
+    const user = await this.UserService.findbyEmail(email);
+
+    if (!user) {
+      throw new NotFound('user not found');
+    }
+
+    // call a method to generate a secret_token for a user
+    // save generated token to user's db
+    // encode a jwt for the secret and set an expiry date
+    // generate the auth 'url' containing the generated jwt and user._id and the api endpoint for processing
+    // user._id (a fall back to override saved secret_token if user dpesn't verify during the given duration)
+
+    // send email => user.email, user.name, url email service
+    // return {verification email sent}
+  }
+
+  // validateEmail method 
+  // param token, id
+  // verify token
+  // handle error, if jwt expires(find a way to check for time based expiration)
+  // use user._id form req.param to remove saved secret_token and update user
+  // if valid set user.verified to true and delete generated secret_token
+  // return {verification email}
+
+  // resetPassword
+  // mongooseSchema pre middleware for hashing password, if it will work for => user.pass = newpass; user.save();
+
+  // resetOtp method
   // if user has no access to auth app or recovery codes,
   // send an email with a otp to validate their account ownership
   // if code is valid, can disable their otp_status
