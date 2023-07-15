@@ -7,8 +7,8 @@ import {
 
 /**
  * 
- * @param length length of string
- * @returns string
+ * @param length number of characters
+ * @returns string of random alphanumeric characters
  */
 function generateRandomString(length: number) {
   const characters = process.env.SECRET_CHARACTERS!;
@@ -19,7 +19,7 @@ function generateRandomString(length: number) {
   let randomString = '';
 
   for (let i = 0; i < length; i++) {
-    // get the octect at position 'i' in the buffer using index ooperator buf[i]
+    // get the octect at position 'i' in the buffer using index operator buf[i]
     // range is between 0 and 255
     // randomIndex should be within the range of avalable characters
     const randomIndex = buf[i] % characterCount;
@@ -50,8 +50,9 @@ function randomStringArray(length: number, count: number) {
 }
 
 // encryption and decryption
-const plain_key = (process.env.SECRET_KEY!).normalize('NFC');
-const plain_iv = (process.env.SECRET_IV!).normalize('NFC');
+// normalize strings before passing to crypto apis
+const plain_key = (process.env.SECRET_KEY!).normalize(); //if no arg is passed default 'NFC'
+const plain_iv = (process.env.SECRET_IV!).normalize();
 const algorithm = 'aes-256-cbc';
 
 // 32 bytes secret_key
@@ -69,11 +70,11 @@ const secret_iv = createHash('sha512')
 
 /**
  * Encrypt data
- * @param data utf08 encoded string
+ * @param data utf-8 encoded string
  * @returns a hexadecimal string
  */
 function encryptData(data: string) {
-  data.normalize('NFC');
+  data.normalize();
 
   const cipher = createCipheriv(algorithm, secret_key, secret_iv);
 

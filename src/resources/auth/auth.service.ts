@@ -240,7 +240,7 @@ class AuthService {
 
   /**
    * validCode
-   * handle a `undefined` cases from `validateRecoveryCode` method
+   * handle `undefined` case from `validateRecoveryCode` method
    */
   public async validCode(userId: string, recoveryCode: string) {
     const result = await this.validateRecoveryCode(userId, recoveryCode);
@@ -276,14 +276,14 @@ class AuthService {
     const encryptedUserEmail = encryptData(user.email);
     // when validating email should be decryted
 
-    // deployment: could be full domain or api sub domain
-    const appDomain = process.env.APP_DOMAIN || 'http:localhost:3000'
+    // in production could be full domain or api sub domain
+    const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000'
     // https: //appName.com/api/auth/validate/email/:email/:token req.param => email, token
     const verificationURL = `${appDomain}/api/auth/validate/email/${encryptedUserEmail}/${emailToken}`
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.name, verificationURL)
 
-    const message = 'Verification verification link has been sent to your email';
+    const message = 'A verification link has been sent to your email';
     return message;
   }
 
