@@ -7,6 +7,12 @@ import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
 import UserService from "../user/user.service";
 import { Unauthorized, Forbidden, NotFound } from '@/utils/exceptions/clientErrorResponse';
+import { 
+  encryptData,
+  decryptData,
+  generateRandomString,
+  randomStringArray
+} from '@/utils/crypto_helpers';
 
 class AuthService {
   public UserService = new UserService();
@@ -15,6 +21,8 @@ class AuthService {
    * generateRandomBase32
    */
   public generateRandomBase32() {
+    // keep using hi-base32 or write cusom fn?
+    //TODO verify TOTP.secret, for encodeing type and bytesize if any
     const buffer = randomBytes(15);
     const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
     return base32;
@@ -24,7 +32,6 @@ class AuthService {
    * generateTOTP
    */
   public generateTOTP(secret: string, label?: string) {
-    //TODO generateTOTP(secret, options?), options?:{ label: user.email, }
     let newTOTP = new OTPAuth.TOTP({
       issuer: process.env.APP_NAME,
       label: label || process.env.APP_LABEL,
@@ -80,7 +87,7 @@ class AuthService {
     const codeLength = 8;
     const recoveryCodesSize = 10;
 
-    const recoveryCodes = this.generateRandomStringArray(codeLength, recoveryCodesSize);
+    const recoveryCodes = randomStringArray(codeLength, recoveryCodesSize);
     // hash recovery codes
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
     // save hasded codes to user doc
@@ -96,7 +103,7 @@ class AuthService {
         email: updatedUser.email,
         otp_enabled: updatedUser.otp_enabled
       },
-      recoveryCodes: recoveryCodes
+      recoveryCodes: updatedUser.recoveryCodes
     }
   }
 
@@ -153,13 +160,15 @@ class AuthService {
 
   /**
    * otpData
+   * get user's otp data if enabled
    */
   public async otpData(userId: string) {
     const user = await this.UserService.findById(userId);
+    // after generateOTP() auth_url will be defined
     const enabled = user.otp_auth_url;
     if(!enabled) throw new Unauthorized('User otp not enabled');
-    
-    // based on users otp status return certain data
+
+    // based on users otp status return otp data
     return {
       otp_auth_url: user.otp_auth_url,
       otp_base32: user.otp_base32
@@ -181,56 +190,15 @@ class AuthService {
   }
 
   /**
-   * generateRandomString
-   */
-  public generateRandomString(length: number) {
-    const characters = process.env.SECRET_CHARACTERS!;
-    // number of characters available for selection
-    const characterCount = characters.length;
-
-    // will return an ArrayBuffer
-    const bytes = randomBytes(length);
-    let randomString = '';
-
-    for (let i = 0; i < length; i++) {
-      // value of the byte at index 'i' of buffer => bytes[i]
-      // randomIndex should be within the range of avalable characters
-      const randomIndex = bytes[i] % characterCount;
-
-      // select corresponding character at randomindex and append to 'randomString'
-      randomString += characters.charAt(randomIndex);
-    }
-
-    return randomString;
-  }
-
-  /**
-   * generateRandomStringArray
-   * generate recovery codes of size `count` for 2fa enabled accounts,
-   * each code has a `length`
-   */
-  public generateRandomStringArray(length: number, count: number) {
-    const randomStrings = [];
-
-    for (let i = 0; i < count; i++) {
-      const randomString = this.generateRandomString(length);
-      randomStrings.push(randomString);
-    }
-    // random string uniqueness, cache db?, do-while(generatedStrings.has(generatedString) && generatedSize < count)...
-
-    return randomStrings;
-  }
-
-  /**
    * hashStrings
-   * hash recovery codes of user
+   * hash an array of random strings as recovery codes of user
    */
   public async hashRecoveryCodes(recoveryCodes: string[]) {
     // await the result of the iterable code
     const hashedCodes = await Promise.all(
       // iterate over the array
       recoveryCodes.map( async (code) => {
-        // hash each code and return an object with a 'used' property
+        // hash each code and return an object with a 'used' property for each hash
         const hasedCode = await hash(code, 7);
         return {
           hash: hasedCode,

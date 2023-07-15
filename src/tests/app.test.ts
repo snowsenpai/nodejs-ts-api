@@ -108,13 +108,17 @@ describe('Api base /api endpoint', () => {
     
     describe('/login', () => {
       it('should return an access_token for a registered user', async () => {
+        const jwtToken = {
+          token: 'login token',
+          expiresIn: 10
+        }
         const userServiceMock = jest.spyOn(userController['UserService'], 'login')
-        .mockResolvedValue('login token');
+        .mockResolvedValue(jwtToken);
 
         const { statusCode, body } = await request(app).post('/api/user/login').send(userLogin);
         
         expect(statusCode).toBe(200);
-        expect(body).toEqual({access_token: 'login token'});
+        expect(body).toEqual({access_token: jwtToken});
         expect(userServiceMock).toHaveBeenCalledWith(userLogin.email, userLogin.password);
       });
     });
