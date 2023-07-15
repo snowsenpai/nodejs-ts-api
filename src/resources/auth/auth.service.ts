@@ -6,7 +6,9 @@ import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
 import UserService from "../user/user.service";
-import { Unauthorized, Forbidden, NotFound } from '@/utils/exceptions/clientErrorResponse';
+import EmailService from '../email/email.service';
+import token from '@/utils/token';
+import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/clientErrorResponse';
 import { 
   encryptData,
   decryptData,
@@ -16,6 +18,7 @@ import {
 
 class AuthService {
   public UserService = new UserService();
+  private EmailService = new EmailService();
   
   /**
    * generateRandomBase32
@@ -250,27 +253,54 @@ class AuthService {
   /**
    * verifyEmail
    */
-  public async verifyEmail(email: string) {
-    const user = await this.UserService.findbyEmail(email);
+  public async verifyEmail(userId: string) {
+    // id should come from req.user._id
+    const user = await this.UserService.findById(userId);
+    // findById method handles null error
 
-    if (!user) {
-      throw new NotFound('user not found');
+    if (user.verified) {
+      throw new BadRequest('User is already verified');
     }
 
-    // call a method to generate a secret_token for a user
-    // save generated token to user's db
-    // encode a jwt for the secret and set an expiry date
-    // generate the auth 'url' containing the generated jwt and user._id and the api endpoint for processing
-    // user._id (a fall back to override saved secret_token if user dpesn't verify during the given duration)
+    const lengthOfSecretToken = 120;
+    const secret_token = generateRandomString(lengthOfSecretToken);
 
-    // send email => user.email, user.name, url email service
-    // return {verification email sent}
+    // set generated secret_token to user.secret_token and save updated user
+    user.secret_token = secret_token;
+    const updatedUser = await user.save();
+
+    // when testing can use lower duration
+    const tokenExiry = 60 * 60; // seconds in an hour
+    const emailToken = token.createToken({ secret: secret_token }, tokenExiry);
+
+    const encryptedUserEmail = encryptData(user.email);
+    // when validating email should be decryted
+
+    // deployment: could be full domain or api sub domain
+    const appDomain = process.env.APP_DOMAIN || 'http:localhost:3000'
+    // https: //appName.com/api/auth/validate/email/:email/:token req.param => email, token
+    const verificationURL = `${appDomain}/api/auth/validate/email/${encryptedUserEmail}/${emailToken}`
+
+    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.name, verificationURL)
+
+    const message = 'Verification verification link has been sent to your email';
+    return message;
   }
 
+  /**
+   * validateEmail
+   * @param email encrypted `hex` string
+   * @param token jwt `Token`
+   * @param userId req.user._id
+   */
+  public validateEmail(email: string, token: string, userId: string) {
+    
+  }
   // validateEmail method 
   // param token, id
   // verify token
-  // handle error, if jwt expires(find a way to check for time based expiration)
+  // handle error, if jwt expires('jwt' link expired or broken)
+  // user.email (a fall back to override saved secret_token if user dpesn't verify during the given duration)
   // use user._id form req.param to remove saved secret_token and update user
   // if valid set user.verified to true and delete generated secret_token
   // return {verification email}

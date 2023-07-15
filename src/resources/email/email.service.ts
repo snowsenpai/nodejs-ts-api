@@ -16,7 +16,6 @@ class EmailService {
         <p>Your account has been sucessfully created, to access other services ensure you verify your email.</p>
       `
     });
-    return true; 
   }
 
   /**
@@ -36,10 +35,9 @@ class EmailService {
       <p>Use this <a href="${url}">link</a> to verify your email, </p>
       <h3>${url}</h3>
       <br>
-      <p>Link will expire after 10 minutes</p>
+      <p>Link will expire after 1 hour</p>
       `
     });
-    return true;
   }
 }
 
