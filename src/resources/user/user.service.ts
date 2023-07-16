@@ -21,7 +21,7 @@ class UserService {
   password: string,
   role: string
  ): Promise<boolean | Error> {
-    const existingUser = await this.findbyEmail(email);
+    const existingUser = await this.findByEmail(email);
 
     if (existingUser) {
       throw new BadRequest('User already exists');
@@ -75,7 +75,7 @@ class UserService {
   /**
    * Find a user by email
    */
-  public async findbyEmail(userEmail: string) {
+  public async findByEmail(userEmail: string) {
     const user = await this.user.findOne({email: userEmail}, '-password').exec();
 
     return user;

@@ -5,9 +5,11 @@ import * as QRCOde from 'qrcode';
 import { PassThrough } from 'stream';
 import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
+import { JsonWebTokenError } from 'jsonwebtoken';
 import UserService from "../user/user.service";
 import EmailService from '../email/email.service';
 import token from '@/utils/token';
+import { Token } from '@/utils/interfaces/token.interface';
 import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/clientErrorResponse';
 import { 
   encryptData,
@@ -289,21 +291,50 @@ class AuthService {
 
   /**
    * validateEmail
-   * @param email encrypted `hex` string
-   * @param token jwt `Token`
-   * @param userId req.user._id
+   * @param encryptedEmail encrypted `hex` string
+   * @param emailToken jwt `Token`
    */
-  public validateEmail(email: string, token: string, userId: string) {
-    
+  public async validateEmail(encryptedEmail: string, emailToken: string) {
+    const payload: Token | JsonWebTokenError = await token.verifyToken(emailToken);
+
+    // if jsonwebtoken, jwt is either expired, malformed or fake
+    if (payload instanceof JsonWebTokenError) {
+      throw new BadRequest('Verification failed, possibly link is invalid or expired');
+    }
+
+    // decrypt userEmail
+    const unverifiedUserEmail = decryptData(encryptedEmail);
+
+    // find a user with the decrypted email
+    const existingUser = await this.UserService.findByEmail(unverifiedUserEmail);
+
+    // useful if block? 
+    // if a false hex is decrypted, findByEmail will throw a db error
+    if (!existingUser) {
+      throw new NotFound('User with that email does not exist')
+    }
+
+    const validUserSecert = existingUser.secret_token;
+    const recievedSecret = payload.secret;
+
+    // recived secret must equal to original secret generated and stored
+    // if not equal then recived string might be malformed or fake
+    if (recievedSecret !== validUserSecert) {
+      throw new Forbidden('Verification failed, possibly invalid')
+    }
+
+    existingUser.verified = true;
+    existingUser.secret_token = '';
+
+    const verifiedUser = await existingUser.save();
+
+    const message = 'Your email account has been verified';
+    return {
+      message,
+      verified_user: verifiedUser.verified,
+      email: verifiedUser.email
+    }
   }
-  // validateEmail method 
-  // param token, id
-  // verify token
-  // handle error, if jwt expires('jwt' link expired or broken)
-  // user.email (a fall back to override saved secret_token if user dpesn't verify during the given duration)
-  // use user._id form req.param to remove saved secret_token and update user
-  // if valid set user.verified to true and delete generated secret_token
-  // return {verification email}
 
   // resetPassword
   // mongooseSchema pre middleware for hashing password, if it will work for => user.pass = newpass; user.save();
