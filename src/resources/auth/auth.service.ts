@@ -26,7 +26,7 @@ class AuthService {
    * generateRandomBase32
    */
   public generateRandomBase32() {
-    // keep using hi-base32 or write cusom fn?
+    // keep using hi-base32 or write custom fn?
     //TODO verify TOTP.secret, for encodeing type and bytesize if any
     const buffer = randomBytes(15);
     const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
@@ -297,19 +297,23 @@ class AuthService {
   public async validateEmail(encryptedEmail: string, emailToken: string) {
     const payload: Token | JsonWebTokenError = await token.verifyToken(emailToken);
 
-    // if jsonwebtoken, jwt is either expired, malformed or fake
+    const errorMesage = 'Verification failed, possibly link is invalid or expired';
+
+    // if jsonwebtokenError, jwt is either expired, malformed or fake
     if (payload instanceof JsonWebTokenError) {
-      throw new BadRequest('Verification failed, possibly link is invalid or expired');
+      throw new BadRequest(errorMesage);
     }
 
-    // decrypt userEmail
+    // decrypt userEmail    
+    // if a false(fake) hex is passed to decryptData, fn returns nothing but typeof is 'string', 
+    //TODO handle errors in crypto_helper fns
     const unverifiedUserEmail = decryptData(encryptedEmail);
 
     // find a user with the decrypted email
     const existingUser = await this.UserService.findByEmail(unverifiedUserEmail);
 
-    // useful if block? 
-    // if a false hex is decrypted, findByEmail will throw a db error
+    // useful if block? if an invalid hex is passed, error will be handled
+    // depends on chances of an attacker cracking secrets and keys used
     if (!existingUser) {
       throw new NotFound('User with that email does not exist')
     }
@@ -318,9 +322,9 @@ class AuthService {
     const recievedSecret = payload.secret;
 
     // recived secret must equal to original secret generated and stored
-    // if not equal then recived string might be malformed or fake
+    // if not equal then recived secret might be malformed or fake
     if (recievedSecret !== validUserSecert) {
-      throw new Forbidden('Verification failed, possibly invalid')
+      throw new BadRequest(errorMesage)
     }
 
     existingUser.verified = true;
@@ -328,9 +332,9 @@ class AuthService {
 
     const verifiedUser = await existingUser.save();
 
-    const message = 'Your email account has been verified';
+    const sucessMessage = 'Your email account has been verified';
     return {
-      message,
+      sucessMessage,
       verified_user: verifiedUser.verified,
       email: verifiedUser.email
     }
