@@ -21,6 +21,17 @@ class AuthController implements Controller{
       this.otpQRCode.bind(this)
     );
 
+    this.router.get(
+      `${this.path}/verify/email`,
+      authenticated,
+      this.verifyEmail.bind(this)
+    );
+
+    this.router.get(
+      `${this.path}/validate/email/:encryptedEmail/:emailToken`,
+      this.validateEmail.bind(this)
+    );
+
     this.router.post(
       `${this.path}/otp/generate`,
       authenticated,
@@ -153,6 +164,37 @@ class AuthController implements Controller{
       res.status(201).json(result)
     } catch (error) {
       next(error);
+    }
+  }
+
+  private async verifyEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void>{
+    try {
+      const userId = req.user._id;
+      const message = await this.AuthService.verifyEmail(userId);
+
+      res.status(201).json({message});
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  private async validateEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { encryptedEmail, emailToken } = req.params;
+
+      const data = await this.AuthService.validateEmail(encryptedEmail, emailToken);
+
+      res.status(201).json(data)
+    } catch (error) {
+      next(error)
     }
   }
 }

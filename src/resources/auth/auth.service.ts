@@ -273,9 +273,9 @@ class AuthService {
 
     // when testing can use lower duration
     const tokenExiry = 60 * 60; // seconds in an hour
-    const emailToken = token.createToken({ secret: secret_token }, tokenExiry);
+    const emailToken = (token.createToken({ secret: secret_token }, tokenExiry)).token;
 
-    const encryptedUserEmail = encryptData(user.email);
+    const encryptedUserEmail = encryptData(updatedUser.email);
     // when validating email should be decryted
 
     // in production could be full domain or api sub domain
@@ -304,23 +304,28 @@ class AuthService {
       throw new BadRequest(errorMesage);
     }
 
-    // decrypt userEmail    
-    // if a false(fake) hex is passed to decryptData, fn returns nothing but typeof is 'string', 
+    // decrypt encryptedEmail  
+    // if a false(fake) hex is passed to decryptData, fn returns nothing but typeof is 'string'
     //TODO handle errors in crypto_helper fns
     const unverifiedUserEmail = decryptData(encryptedEmail);
 
     // find a user with the decrypted email
     const existingUser = await this.UserService.findByEmail(unverifiedUserEmail);
 
-    // useful if block? if an invalid hex is passed, error will be handled
-    // depends on chances of an attacker cracking secrets and keys used
+    // useful if block?
+    // depends on chances of an attacker cracking secret and key used in encryption
     if (!existingUser) {
       throw new NotFound('User with that email does not exist')
     }
 
+    const activeVerifiedUser = existingUser.verified;
     const validUserSecert = existingUser.secret_token;
     const recievedSecret = payload.secret;
 
+    // if user already verified
+    if (activeVerifiedUser && validUserSecert === '') {
+      throw new BadRequest('User is already verified');
+    }
     // recived secret must equal to original secret generated and stored
     // if not equal then recived secret might be malformed or fake
     if (recievedSecret !== validUserSecert) {
@@ -328,13 +333,13 @@ class AuthService {
     }
 
     existingUser.verified = true;
+    // 'delete' generated secret from user documnet
     existingUser.secret_token = '';
 
     const verifiedUser = await existingUser.save();
 
-    const sucessMessage = 'Your email account has been verified';
     return {
-      sucessMessage,
+      sucess_message: 'Your email account has been verified',
       verified_user: verifiedUser.verified,
       email: verifiedUser.email
     }
