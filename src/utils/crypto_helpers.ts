@@ -5,6 +5,7 @@ import {
   createHash,
 } from 'crypto';
 
+// TODO Error handling, throw (not to descriptive error messages)
 /**
  * 
  * @param length number of characters
@@ -67,7 +68,7 @@ const secret_iv = createHash('sha512')
   .digest('hex')
   .substring(0, 16)
 
-
+// TODO DRY: refactor to accomodate multiple return formats and input
 /**
  * Encrypt data
  * @param data utf-8 encoded string
@@ -85,6 +86,9 @@ function encryptData(data: string) {
   return encryptedData;
 }
 
+// TODO DRY: refactor to accomodate multiple return formats and input formats
+// cypto.d.ts ln 262-265 touch crypto_helper.types.ts
+// input format must be the same as output format returned from encrypData() for every decryption 
 /**
  * 
  * @param data hexadecimal string
@@ -100,9 +104,36 @@ function decryptData(data: string) {
   return decryptedData;
 }
 
+// DRY
+function encodeBase64(data: string) {
+  data.normalize();
+
+  const cipher = createCipheriv(algorithm, secret_key, secret_iv);
+
+  let encodedData = cipher.update(data, 'utf8', 'base64');
+
+  encodedData += cipher.final('base64');
+
+  return encodedData;
+}
+
+// DRY
+function decodeBase64(data: string) {
+  const decipher = createDecipheriv(algorithm, secret_key, secret_iv);
+
+  let decodedData = decipher.update(data, 'base64', 'utf-8');
+
+  decodedData += decipher.final('utf-8');
+
+  return decodedData;
+}
+// TODO basic less secure encryption (i.e no algorithm or secret) e.g for sending binary data as bas64
+
 export {
   encryptData, 
   decryptData,
   generateRandomString,
-  randomStringArray
+  randomStringArray,
+  encodeBase64,
+  decodeBase64
 }

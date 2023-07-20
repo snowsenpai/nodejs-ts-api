@@ -4,6 +4,7 @@ import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
 import AuthService from './auth.service';
 import authenticated from '@/middleware/authenticated.middleware';
+import passwordReset from '@/middleware/password_reset.middleware';
 
 class AuthController implements Controller{
   public path = '/auth';
@@ -30,6 +31,26 @@ class AuthController implements Controller{
     this.router.get(
       `${this.path}/validate/email/:encryptedEmail/:emailToken`,
       this.validateEmail.bind(this)
+    );
+
+    this.router.get(
+      `${this.path}/password-reset-request`,
+      authenticated,
+      this.passwordResetRequest.bind(this)
+    );
+
+    this.router.get(
+      `${this.path}/validate/password-reset-request/:encryptedEmail/:passwordToken`,
+      authenticated,
+      this.validatePasswordReset.bind(this)
+    );
+
+    this.router.post(
+      `${this.path}/reset-password`,
+      authenticated,
+      passwordReset,
+      validationMiddleware(validate.resetPassword),
+      this.resetPassword.bind(this)
     );
 
     this.router.post(
@@ -192,9 +213,59 @@ class AuthController implements Controller{
 
       const data = await this.AuthService.validateEmail(encryptedEmail, emailToken);
 
-      res.status(201).json(data)
+      res.status(201).json(data);
     } catch (error) {
       next(error)
+    }
+  }
+
+  private async passwordResetRequest(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+
+      const message = await this.AuthService.passwordResetRequest(userId);
+
+      res.status(201).json(message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async validatePasswordReset(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { encryptedEmail, passwordToken } = req.params;
+
+      const data = await this.AuthService.validatePasswordReset(encryptedEmail, passwordToken);
+
+      res.status(201).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async resetPassword(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { newPassword } = req.body;
+      const userId = req.user._id;
+      const passwordToken = req.password_reset_secret;
+
+      const data = await this.AuthService.resetPassword(userId, passwordToken, newPassword);
+
+      res.status(201).json(data);
+    } catch (error) {
+      next(error);
     }
   }
 }

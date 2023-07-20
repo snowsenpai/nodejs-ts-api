@@ -5,6 +5,7 @@ declare global {
   namespace Express {
     export interface Request {
       user: User;
+      password_reset_secret: string;
     }
   }
 }

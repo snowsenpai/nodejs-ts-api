@@ -15,7 +15,8 @@ import {
   encryptData,
   decryptData,
   generateRandomString,
-  randomStringArray
+  randomStringArray,
+  encodeBase64
 } from '@/utils/crypto_helpers';
 
 class AuthService {
@@ -272,8 +273,8 @@ class AuthService {
     const updatedUser = await user.save();
 
     // when testing can use lower duration
-    const tokenExiry = 60 * 60; // seconds in an hour
-    const emailToken = (token.createToken({ secret: secret_token }, tokenExiry)).token;
+    const tokenExpiry = 60 * 60; // seconds in an hour
+    const emailToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
 
     const encryptedUserEmail = encryptData(updatedUser.email);
     // when validating email should be decryted
@@ -323,7 +324,8 @@ class AuthService {
     const recievedSecret = payload.secret;
 
     // if user already verified
-    if (activeVerifiedUser && validUserSecert === '') {
+    // TODO no need to check for empty string
+    if (activeVerifiedUser || validUserSecert === '') {
       throw new BadRequest('User is already verified');
     }
     // recived secret must equal to original secret generated and stored
@@ -345,8 +347,115 @@ class AuthService {
     }
   }
 
-  // resetPassword
-  // mongooseSchema pre middleware for hashing password, if it will work for => user.pass = newpass; user.save();
+  /**
+   * passwordResetRequest
+   */
+  public async passwordResetRequest(userId: string) {
+    const user = await this.UserService.findById(userId);
+
+    if (!user.verified) {
+      throw new Forbidden('Only verified users can reset their password');
+    }
+
+    const secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH);
+    const secret_token = generateRandomString(secretTokenLength);
+
+    user.secret_token = secret_token;
+    user.password_reset_request = true;
+    const updatedUser = await user.save();
+
+    const encryptedEmail = encryptData(updatedUser.email);
+
+    const tokenExpiry = 60 * 60; // one hour
+    const passwordToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+
+    // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
+    const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
+    const passwordResetURL = `${appDomain}/api/auth/verify/password-reset-request/${encryptedEmail}/${passwordToken}`;
+
+    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.name, passwordResetURL);
+
+    const message = 'Password reset email has been sent';
+    return { message };
+  }
+
+  /**
+   * validatePasswordReset
+   */
+  public async validatePasswordReset(encryptedEmail: string, passwordToken: string) {
+    const payload: Token | JsonWebTokenError = await token.verifyToken(passwordToken);
+
+    const errorMessage = 'Failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
+
+    if (payload instanceof JsonWebTokenError) {
+      throw new BadRequest(errorMessage);
+    }
+
+    const usersEmail = decryptData(encryptedEmail);
+
+    const user = await this.UserService.findByEmail(usersEmail);
+
+    if (!user) {
+      throw new NotFound('User with that email does not exist');
+    }
+
+    if (!user.password_reset_request) {
+      throw new BadRequest('User made no request to reset password');
+    }
+
+    const recievedSecret = payload.secret;
+    const validUserSecert = user.secret_token;
+
+    if (recievedSecret !== validUserSecert) {
+      throw new BadRequest(errorMessage);
+    }
+
+    user.grant_password_reset = true;
+    const updatedUser = await user.save();
+
+    const base64SecretToken = encodeBase64(recievedSecret);
+
+    return {
+      grant_password_reset: updatedUser.grant_password_reset,
+      base64_secret_token: base64SecretToken
+    }
+  }
+
+  /**
+   * resetPassword
+   */
+  public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
+    const user = await this.UserService.findById(userId);
+
+    const errorMessage = 'Password reset failed, user not verified, has no permission to reset password or invalid credentials';
+
+    if (!user.verified || !user.grant_password_reset || !user.password_reset_request) {
+      throw new BadRequest(errorMessage);
+    }
+
+    if (passwordToken !== user.secret_token) {
+      throw new BadRequest(errorMessage);
+    }
+
+    const existingPassword = await user.isValidPassword(newPassword);
+
+    // new password should not be old password
+    if (existingPassword) {
+      throw new BadRequest('Invalid password, try a different password');
+    }
+
+    // update user password and reset 
+    user.password = newPassword;
+    user.password_reset_request = false;
+    user.grant_password_reset = false;
+    user.secret_token = '';
+
+    await user.save();
+
+    return {
+      successful_password_reset: true
+    }
+  }
 
   // resetOtp method
   // if user has no access to auth app or recovery codes,

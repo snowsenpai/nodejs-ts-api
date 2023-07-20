@@ -15,6 +15,7 @@ const UserSchema = new Schema({
     },
     password: {
       type: String,
+      required: true,
     },
     role: {
       type: String,
@@ -25,6 +26,14 @@ const UserSchema = new Schema({
       default: false,
     },
     secret_token: String,
+    password_reset_request: {
+      type: Boolean,
+      default: false
+    },
+    grant_password_reset: {
+      type: Boolean,
+      default: false
+    },
     otp_enabled: {
       type: Boolean,
       default: false,
