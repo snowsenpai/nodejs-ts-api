@@ -50,10 +50,10 @@ class EmailService {
       html: `
       <h2>Hi ${first_name},</h2>
       <p>We recived a request to reset your password, use this <a href="${url}" target="_blank">link</a> to approve the request.</p> 
-      <p>Button not working? Paste the following link into ypur browser:</p>
+      <p>Button not working? Paste the following link into your browser:</p>
       <p>${url}</p>
-      <p>For your security, the reset password link will expire after 1 hour</p>
-      <p>If you belive that this request is suspicious, please contatct our <a href="#">support team</a></p>
+      <p>For your security, the reset password link will expire after 1 hour.</p>
+      <p>If you belive that this request is suspicious, please contatct our <a href="#">support team</a>.</p>
       `
     });
   }

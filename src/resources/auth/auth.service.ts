@@ -265,6 +265,7 @@ class AuthService {
       throw new BadRequest('User is already verified');
     }
 
+    // TODO use secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH)
     const lengthOfSecretToken = 120;
     const secret_token = generateRandomString(lengthOfSecretToken);
 
@@ -371,7 +372,7 @@ class AuthService {
 
     // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
-    const passwordResetURL = `${appDomain}/api/auth/verify/password-reset-request/${encryptedEmail}/${passwordToken}`;
+    const passwordResetURL = `${appDomain}/api/auth/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.name, passwordResetURL);
 
@@ -437,8 +438,7 @@ class AuthService {
       throw new BadRequest(errorMessage);
     }
 
-    const existingPassword = await user.isValidPassword(newPassword);
-
+    const existingPassword = await this.UserService.hasValidPassword(user.email, newPassword);
     // new password should not be old password
     if (existingPassword) {
       throw new BadRequest('Invalid password, try a different password');

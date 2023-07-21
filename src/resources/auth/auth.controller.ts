@@ -41,7 +41,6 @@ class AuthController implements Controller{
 
     this.router.get(
       `${this.path}/validate/password-reset-request/:encryptedEmail/:passwordToken`,
-      authenticated,
       this.validatePasswordReset.bind(this)
     );
 
