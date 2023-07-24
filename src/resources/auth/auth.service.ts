@@ -252,7 +252,7 @@ class AuthService {
     }
     return result;
   }
-
+// TODO user strict boolean checks in guard clause, obj.var === false <= !obj.var
   /**
    * verifyEmail
    */
@@ -457,11 +457,31 @@ class AuthService {
     }
   }
 
-  // resetOtp method
-  // if user has no access to auth app or recovery codes,
-  // send an email with a otp to validate their account ownership
-  // if code is valid, can disable their otp_status
-  // if user enables otp again, a new otp_auth_url and recovery codes will be given
+  /**
+   * cancelPasswordReset
+   */
+  public async cancelPasswordReset(userId: string, passwordToken: string) {
+    const user = await this.UserService.findById(userId);
+
+    const errorMesage = 'Failed to cancel password reset, user might not have permisson to reset password';
+
+    if (user.password_reset_request === false) {
+      throw new Forbidden(errorMesage);
+    }
+    if (user.grant_password_reset === false) {
+      throw new Forbidden(errorMesage);
+    }
+    if (passwordToken !== user.secret_token) {
+      throw new Forbidden(errorMesage);
+    }
+    
+    user.password_reset_request = false;
+    user.grant_password_reset = false;
+    user.secret_token = '';
+    await user.save();
+
+    return { password_reset_canceled: true }
+  }
 }
 
 export default AuthService;

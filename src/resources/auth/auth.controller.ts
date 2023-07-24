@@ -44,6 +44,13 @@ class AuthController implements Controller{
       this.validatePasswordReset.bind(this)
     );
 
+    this.router.get(
+      `${this.path}/cancel-password-reset`,
+      authenticated,
+      passwordReset,
+      this.cancelPasswordReset.bind(this)
+    );
+
     this.router.post(
       `${this.path}/reset-password`,
       authenticated,
@@ -263,6 +270,23 @@ class AuthController implements Controller{
       const data = await this.AuthService.resetPassword(userId, passwordToken, newPassword);
 
       res.status(201).json(data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async cancelPasswordReset(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const passwordToken = req.password_reset_secret;
+
+      const result = await this.AuthService.cancelPasswordReset(userId, passwordToken);
+
+      res.status(201).json(result);
     } catch (error) {
       next(error);
     }
