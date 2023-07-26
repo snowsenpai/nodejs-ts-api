@@ -251,21 +251,18 @@ class AuthService {
     }
     return result;
   }
-// TODO user strict boolean checks in guard clause, obj.var === false <= !obj.var
+
   /**
    * verifyEmail
    */
   public async verifyEmail(userId: string) {
-    // id should come from req.user._id
     const user = await this.UserService.findById(userId);
-    // findById method handles null error
 
     if (user.verified) {
       throw new BadRequest('User is already verified');
     }
 
-    // TODO use secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH)
-    const lengthOfSecretToken = 120;
+    const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
     const secret_token = generateRandomString(lengthOfSecretToken);
 
     // set generated secret_token to user.secret_token and save updated user
@@ -352,7 +349,7 @@ class AuthService {
   public async passwordResetRequest(userId: string) {
     const user = await this.UserService.findById(userId);
 
-    if (!user.verified) {
+    if (user.verified === false) {
       throw new Forbidden('Only verified users can reset their password');
     }
 
@@ -400,7 +397,7 @@ class AuthService {
       throw new NotFound('User with that email does not exist');
     }
 
-    if (!user.password_reset_request) {
+    if (user.password_reset_request === false) {
       throw new BadRequest('User made no request to reset password');
     }
 
@@ -430,7 +427,7 @@ class AuthService {
 
     const errorMessage = 'Password reset failed, user not verified, has no permission to reset password or invalid credentials';
 
-    if (!user.verified || !user.grant_password_reset || !user.password_reset_request) {
+    if (user.verified === false || user.grant_password_reset === false || user.password_reset_request === false) {
       throw new BadRequest(errorMessage);
     }
 
@@ -441,7 +438,7 @@ class AuthService {
     const existingPassword = await this.UserService.hasValidPassword(user.email, newPassword);
     // new password should not be old password
     if (existingPassword) {
-      throw new BadRequest('Invalid password, try a different password');
+      throw new BadRequest('Unacceptable password');
     }
 
     // update user password and reset verification fields
