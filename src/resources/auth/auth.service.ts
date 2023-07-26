@@ -274,11 +274,11 @@ class AuthService {
 
     // when testing can use lower duration
     const tokenExpiry = 60 * 60; // seconds in an hour
-    const emailToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
-    //TODO encrypt jwt? make token in url less obvious as being a jwt
+    const emailJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    const emailToken = encryptData(emailJWT, 'utf-8', 'hex');
 
     const encryptedUserEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
-    // when validating email should be decryted
+    // when validating emailToken should be decryted to get the emailjwt
 
     // in production could be full domain or api sub domain
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000'
@@ -297,7 +297,8 @@ class AuthService {
    * @param emailToken jwt `Token`
    */
   public async validateEmail(encryptedEmail: string, emailToken: string) {
-    const payload: Token | JsonWebTokenError = await token.verifyToken(emailToken);
+    const emailJWT = decryptData(emailToken, 'hex', 'utf-8');
+    const payload: Token | JsonWebTokenError = await token.verifyToken(emailJWT);
 
     const errorMesage = 'Verification failed, possibly link is invalid or expired';
 
@@ -365,8 +366,8 @@ class AuthService {
     const encryptedEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
-    // TODO encrypt jwt passwordToken as base64?
-    const passwordToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    const passwordJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    const passwordToken = encryptData(passwordJWT, 'utf-8', 'hex');
 
     // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
@@ -382,7 +383,8 @@ class AuthService {
    * validatePasswordReset
    */
   public async validatePasswordReset(encryptedEmail: string, passwordToken: string) {
-    const payload: Token | JsonWebTokenError = await token.verifyToken(passwordToken);
+    const passwordJWT = decryptData(passwordToken, 'hex', 'utf-8');
+    const payload: Token | JsonWebTokenError = await token.verifyToken(passwordJWT);
 
     const errorMessage = 'Failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
 
