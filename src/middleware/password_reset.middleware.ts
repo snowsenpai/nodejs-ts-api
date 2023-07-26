@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { decodeBase64 } from '@/utils/crypto_helpers';
+import { decryptData } from '@/utils/crypto_helpers';
 import { Unauthorized, BadRequest } from '@/utils/exceptions/clientErrorResponse';
 
 function passwordReset(
@@ -16,7 +16,7 @@ function passwordReset(
 
     const base64PasswordToken = basic.split('Basic ')[1].trim();
 
-    const passwordToken = decodeBase64(base64PasswordToken);
+    const passwordToken = decryptData(base64PasswordToken, 'base64', 'utf-8');
     const expectedTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH)
 
     if (passwordToken.length !== expectedTokenLength) {

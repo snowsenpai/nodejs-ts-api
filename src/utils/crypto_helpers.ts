@@ -4,8 +4,9 @@ import {
   createDecipheriv,
   createHash,
 } from 'crypto';
+import { Encoding } from './types/crypto_helpers.types';
+import logger from './logger';
 
-// TODO Error handling, throw (not to descriptive error messages)
 /**
  * 
  * @param length number of characters
@@ -68,65 +69,59 @@ const secret_iv = createHash('sha512')
   .digest('hex')
   .substring(0, 16)
 
-// TODO DRY: refactor to accomodate multiple return formats and input
 /**
- * Encrypt data
- * @param data utf-8 encoded string
- * @returns a hexadecimal string
- */
-function encryptData(data: string) {
-  data.normalize();
-
-  const cipher = createCipheriv(algorithm, secret_key, secret_iv);
-
-  let encryptedData = cipher.update(data, 'utf-8', 'hex');
-
-  encryptedData += cipher.final('hex');
-
-  return encryptedData;
-}
-
-// TODO DRY: refactor to accomodate multiple return formats and input formats
-// cypto.d.ts ln 262-265 touch crypto_helper.types.ts
-// input format must be the same as output format returned from encrypData() for every decryption 
-/**
+ * `data` argument is a string with a specified `inputEncoding`.
  * 
- * @param data hexadecimal string
- * @returns original utf-8 string
+ * The `outputEncoding` specifies the output format of the enciphered data, 
+ * a string using the specified encoding is returned
+ * @param data
+ * @param inputEncoding The `encoding` of the data
+ * @param outputEncoding the `encoding` of the return value
  */
-function decryptData(data: string) {
-  const decipher = createDecipheriv(algorithm, secret_key, secret_iv);
-
-  let decryptedData = decipher.update(data, 'hex', 'utf-8');
-
-  decryptedData += decipher.final('utf-8');
-
-  return decryptedData;
+function encryptData(data: string, inputEncoding: Encoding, outputEncoding: Encoding) {
+  try {
+    data.normalize();
+  
+    const cipher = createCipheriv(algorithm, secret_key, secret_iv);
+  
+    let encryptedData = cipher.update(data, inputEncoding, outputEncoding);
+  
+    encryptedData += cipher.final(outputEncoding);
+  
+    return encryptedData;
+  } catch (error) {
+    logger.error(error, 'Encryption error');
+    throw new Error('Invalid data type or format');
+  }
 }
 
-// DRY
-function encodeBase64(data: string) {
-  data.normalize();
-
-  const cipher = createCipheriv(algorithm, secret_key, secret_iv);
-
-  let encodedData = cipher.update(data, 'utf8', 'base64');
-
-  encodedData += cipher.final('base64');
-
-  return encodedData;
+/**
+ * `data` argument is a string with a specified `inputEncoding`.
+ * 
+ * The `outputEncoding` specifies the output format of the enciphered data, 
+ * a string using the specified encoding is returned
+ * 
+ * given certain scenarios, `inputEncoding` must be the same as `outputEncoding` 
+ * used when encrypting data
+ * @param data
+ * @param inputEncoding
+ * @param outputEncoding
+ */
+function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Encoding) {
+  try {
+    const decipher = createDecipheriv(algorithm, secret_key, secret_iv);
+  
+    let decryptedData = decipher.update(data, inputEncoding, outputEncoding);
+  
+    decryptedData += decipher.final(outputEncoding);
+  
+    return decryptedData;
+  } catch (error) {
+    logger.error(error, 'Decryption error');
+    throw new Error('Invalid data type or format');
+  }
 }
 
-// DRY
-function decodeBase64(data: string) {
-  const decipher = createDecipheriv(algorithm, secret_key, secret_iv);
-
-  let decodedData = decipher.update(data, 'base64', 'utf-8');
-
-  decodedData += decipher.final('utf-8');
-
-  return decodedData;
-}
 // TODO basic less secure encryption (i.e no algorithm or secret) e.g for sending binary data as bas64
 
 export {
@@ -134,6 +129,4 @@ export {
   decryptData,
   generateRandomString,
   randomStringArray,
-  encodeBase64,
-  decodeBase64
 }

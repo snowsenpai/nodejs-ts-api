@@ -15,8 +15,7 @@ import {
   encryptData,
   decryptData,
   generateRandomString,
-  randomStringArray,
-  encodeBase64
+  randomStringArray
 } from '@/utils/crypto_helpers';
 
 class AuthService {
@@ -276,8 +275,9 @@ class AuthService {
     // when testing can use lower duration
     const tokenExpiry = 60 * 60; // seconds in an hour
     const emailToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    //TODO encrypt jwt? make token in url less obvious as being a jwt
 
-    const encryptedUserEmail = encryptData(updatedUser.email);
+    const encryptedUserEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
     // when validating email should be decryted
 
     // in production could be full domain or api sub domain
@@ -306,10 +306,7 @@ class AuthService {
       throw new BadRequest(errorMesage);
     }
 
-    // decrypt encryptedEmail  
-    // if a false(fake) hex is passed to decryptData, fn returns nothing but typeof is 'string'
-    //TODO handle errors in crypto_helper fns
-    const unverifiedUserEmail = decryptData(encryptedEmail);
+    const unverifiedUserEmail = decryptData(encryptedEmail, 'hex', 'utf-8');
 
     // find a user with the decrypted email
     const existingUser = await this.UserService.findByEmail(unverifiedUserEmail);
@@ -365,9 +362,10 @@ class AuthService {
     user.password_reset_request = true;
     const updatedUser = await user.save();
 
-    const encryptedEmail = encryptData(updatedUser.email);
+    const encryptedEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
+    // TODO encrypt jwt passwordToken as base64?
     const passwordToken = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
 
     // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
@@ -392,7 +390,7 @@ class AuthService {
       throw new BadRequest(errorMessage);
     }
 
-    const usersEmail = decryptData(encryptedEmail);
+    const usersEmail = decryptData(encryptedEmail, 'hex', 'utf-8');
 
     const user = await this.UserService.findByEmail(usersEmail);
 
@@ -414,7 +412,7 @@ class AuthService {
     user.grant_password_reset = true;
     const updatedUser = await user.save();
 
-    const base64SecretToken = encodeBase64(recievedSecret);
+    const base64SecretToken = encryptData(recievedSecret, 'utf-8', 'base64');
 
     return {
       grant_password_reset: updatedUser.grant_password_reset,
@@ -444,7 +442,7 @@ class AuthService {
       throw new BadRequest('Invalid password, try a different password');
     }
 
-    // update user password and reset 
+    // update user password and reset verification fields
     user.password = newPassword;
     user.password_reset_request = false;
     user.grant_password_reset = false;
@@ -463,18 +461,16 @@ class AuthService {
   public async cancelPasswordReset(userId: string, passwordToken: string) {
     const user = await this.UserService.findById(userId);
 
-    const errorMesage = 'Failed to cancel password reset, user might not have permisson to reset password';
-
     if (user.password_reset_request === false) {
-      throw new Forbidden(errorMesage);
+      throw new Forbidden('Password reset request not recived');
     }
     if (user.grant_password_reset === false) {
-      throw new Forbidden(errorMesage);
+      throw new Forbidden('Password reset permission not granted');
     }
     if (passwordToken !== user.secret_token) {
-      throw new Forbidden(errorMesage);
+      throw new Forbidden('Invalid credentials');
     }
-    
+
     user.password_reset_request = false;
     user.grant_password_reset = false;
     user.secret_token = '';
