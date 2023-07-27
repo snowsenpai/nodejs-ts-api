@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 import { decryptData } from '@/utils/crypto_helpers';
-import { Unauthorized, BadRequest } from '@/utils/exceptions/clientErrorResponse';
+import userModel from '@/resources/user/user.model';
+import { Unauthorized, BadRequest, Forbidden } from '@/utils/exceptions/clientErrorResponse';
 
-function passwordReset(
+async function passwordReset(
   req: Request,
   res: Response,
   next: NextFunction
-): Response | void {
+): Promise<Response | void> {
   try {
     const basic = String(req.headers.password_token);
 
@@ -16,14 +17,20 @@ function passwordReset(
 
     const base64PasswordToken = basic.split('Basic ')[1].trim();
 
-    const passwordToken = decryptData(base64PasswordToken, 'base64', 'utf-8');
-    const expectedTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH)
+    const recivedToken = decryptData(base64PasswordToken, 'base64', 'utf-8');
 
-    if (passwordToken.length !== expectedTokenLength) {
-      throw new BadRequest('Invalid credentials');
+    const user = await userModel.findOne({ secret_token: recivedToken });
+    // token is invalid, or deleted (v2: use a cache for secrets blacklist or refresh encryption key and iv?)
+    if (!user) {
+      throw new BadRequest('Invalid token');
+    }
+    //TODO useful if block? think through possible code flow
+    // user making request for reset must be equal to user found using secret
+    if (req.user._id !== user._id) {
+      throw new Forbidden("Access denied, reseting other user's password is forbidden");
     }
 
-    req.password_reset_secret = passwordToken;
+    req.password_reset_secret = recivedToken;
     return next();
   } catch (error) {
     return next(error);
