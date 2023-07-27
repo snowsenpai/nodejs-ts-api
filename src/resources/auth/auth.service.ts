@@ -54,6 +54,10 @@ class AuthService {
   public async generateOTP(userId: string) {
     const user = await this.UserService.findById(userId);
 
+    if (user.verified === false) {
+      throw new Forbidden('Only verified users can enable OTP')
+    }
+
     const base32_secret = this.generateRandomBase32();
 
     // new time-based otp
@@ -234,7 +238,7 @@ class AuthService {
           code.used = true;
           await user.save();
 
-          return {validCode: true, message: 'valid code'};
+          return {valid_code: recoverCode, message: 'valid code'};
         }
       }
     }
