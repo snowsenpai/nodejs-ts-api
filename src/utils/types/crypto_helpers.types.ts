@@ -1,5 +1,5 @@
-// ref @types/node: cypto.d.ts ln 262-265
-type BinaryToTextEncoding = 'base64' | 'base64url' | 'hex' | 'binary';
-type CharacterEncoding = 'utf-8';
-type LegacyCharacterEncoding = 'ascii' | 'binary' | 'ucs-2';
+// ref @types/node: cypto.d.ts
+export type BinaryToTextEncoding = 'base64' | 'base64url' | 'hex';
+export type CharacterEncoding = 'utf-8';
+export type LegacyCharacterEncoding = 'ascii';
 export type Encoding = BinaryToTextEncoding | CharacterEncoding | LegacyCharacterEncoding;

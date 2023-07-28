@@ -4,7 +4,8 @@ import {
   createDecipheriv,
   createHash,
 } from 'crypto';
-import { Encoding } from './types/crypto_helpers.types';
+import { encode } from 'hi-base32';
+import { BinaryToTextEncoding, Encoding } from './types/crypto_helpers.types';
 import logger from './logger';
 
 /**
@@ -35,6 +36,17 @@ function generateRandomString(length: number) {
 
 /**
  * 
+ * @param size number of characters to return
+ * @returns 
+ */
+function generateRandomBase32(size: number) {
+  const buffer = randomBytes(size);
+  const base32 = encode(buffer).substring(0, size);
+  return base32;
+}
+
+/**
+ * 
  * @param length the length of each string
  * @param count number of strings to return
  * @returns string[ ]
@@ -49,6 +61,53 @@ function randomStringArray(length: number, count: number) {
   // random string uniqueness, cache db?, do-while(generatedStrings.has(generatedString) && generatedSize < count)...
 
   return randomStrings;
+}
+
+/**
+ * `data` argument is a string with a specified `inputEncoding`.
+ * 
+ * The `outputEncoding` specifies the output format of the encoded data, 
+ * a string using the specified encoding is returned
+ * @param data 
+ * @param inputEncoding 
+ * @param outputEncoding 
+ * @returns 
+ */
+function encodeData(data: string, inputEncoding: Encoding, outputEncoding: BinaryToTextEncoding) {
+  const buffer = Buffer.from(data, inputEncoding);
+  const encodedeData = buffer.toString(outputEncoding);
+  return encodedeData;
+}
+
+/**
+ * `data` argument is a string with a specified `inputEncoding`.
+ * 
+ * The `outputEncoding` specifies the output format of the encoded data, 
+ * a string using the specified encoding is returned
+ * 
+ * given certain scenarios, `inputEncoding` must be the same as `outputEncoding` 
+ * used when encoding data
+ * @param data 
+ * @param inputEncoding 
+ * @param outputEncoding 
+ * @returns 
+ */
+function decodeData(data: string, inputEncoding: BinaryToTextEncoding, outputEncoding: Encoding) {
+  const buffer = Buffer.from(data, inputEncoding);
+  const decodedData = buffer.toString(outputEncoding);
+  return decodedData;
+}
+
+/**
+ * 
+ * @param size number of characters to return
+ * @param outputEncoding format of returned string
+ * @returns 
+ */
+function randomEndcoding(size: number, outputEncoding: BinaryToTextEncoding) {
+  const buffer = randomBytes(size);
+  const randomEncodedString = buffer.toString(outputEncoding).substring(0, size);
+  return randomEncodedString;
 }
 
 // encryption and decryption
@@ -122,11 +181,13 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
   }
 }
 
-// TODO basic less secure encryption (i.e no algorithm or secret) e.g for sending binary data as bas64
-
 export {
   encryptData, 
   decryptData,
   generateRandomString,
   randomStringArray,
+  generateRandomBase32,
+  encodeData,
+  decodeData,
+  randomEndcoding
 }

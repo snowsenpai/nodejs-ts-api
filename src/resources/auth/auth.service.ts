@@ -1,9 +1,7 @@
-import { randomBytes } from 'crypto';
 import { Response } from 'express';
 import * as OTPAuth from 'otpauth';
 import * as QRCOde from 'qrcode';
 import { PassThrough } from 'stream';
-import { encode } from 'hi-base32';
 import { hash, compare } from 'bcrypt';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import UserService from "../user/user.service";
@@ -11,27 +9,11 @@ import EmailService from '../email/email.service';
 import token from '@/utils/token';
 import { Token } from '@/utils/interfaces/token.interface';
 import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/clientErrorResponse';
-import { 
-  encryptData,
-  decryptData,
-  generateRandomString,
-  randomStringArray
-} from '@/utils/crypto_helpers';
+import * as cryptoHelper from '@/utils/crypto_helpers';
 
 class AuthService {
   public UserService = new UserService();
   private EmailService = new EmailService();
-  
-  /**
-   * generateRandomBase32
-   */
-  public generateRandomBase32() {
-    // keep using hi-base32 or write custom fn?
-    //TODO verify TOTP.secret, for encodeing type and bytesize if any
-    const buffer = randomBytes(15);
-    const base32 = encode(buffer).replace(/=/g, "").substring(0, 24);
-    return base32;
-  }
 
   /**
    * generateTOTP
@@ -58,7 +40,7 @@ class AuthService {
       throw new Forbidden('Only verified users can enable OTP')
     }
 
-    const base32_secret = this.generateRandomBase32();
+    const base32_secret = cryptoHelper.generateRandomBase32(24);
 
     // new time-based otp
     let totp = this.generateTOTP(base32_secret, user.email);
@@ -96,7 +78,7 @@ class AuthService {
     const codeLength = 8;
     const recoveryCodesSize = 10;
 
-    const recoveryCodes = randomStringArray(codeLength, recoveryCodesSize);
+    const recoveryCodes = cryptoHelper.randomStringArray(codeLength, recoveryCodesSize);
     // hash recovery codes
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
     // save hasded codes to user doc
@@ -267,7 +249,7 @@ class AuthService {
     }
 
     const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secret_token = generateRandomString(lengthOfSecretToken);
+    const secret_token = cryptoHelper.generateRandomString(lengthOfSecretToken);
 
     // set generated secret_token to user.secret_token and save updated user
     user.secret_token = secret_token;
@@ -276,9 +258,9 @@ class AuthService {
     // when testing can use lower duration
     const tokenExpiry = 60 * 60; // seconds in an hour
     const emailJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
-    const emailToken = encryptData(emailJWT, 'utf-8', 'hex');
+    const emailToken = cryptoHelper.encryptData(emailJWT, 'utf-8', 'hex');
 
-    const encryptedUserEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
+    const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
     // when validating emailToken should be decryted to get the emailjwt
 
     // in production could be full domain or api sub domain
@@ -298,7 +280,7 @@ class AuthService {
    * @param emailToken jwt `Token`
    */
   public async validateEmail(encryptedEmail: string, emailToken: string) {
-    const emailJWT = decryptData(emailToken, 'hex', 'utf-8');
+    const emailJWT = cryptoHelper.decryptData(emailToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(emailJWT);
 
     const errorMesage = 'Verification failed, possibly link is invalid or expired';
@@ -308,7 +290,7 @@ class AuthService {
       throw new BadRequest(errorMesage);
     }
 
-    const unverifiedUserEmail = decryptData(encryptedEmail, 'hex', 'utf-8');
+    const unverifiedUserEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
 
     // find a user with the decrypted email
     const existingUser = await this.UserService.findByEmail(unverifiedUserEmail);
@@ -352,17 +334,17 @@ class AuthService {
     }
 
     const secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secret_token = generateRandomString(secretTokenLength);
+    const secret_token = cryptoHelper.generateRandomString(secretTokenLength);
 
     user.secret_token = secret_token;
     user.password_reset_request = true;
     const updatedUser = await user.save();
 
-    const encryptedEmail = encryptData(updatedUser.email, 'utf-8', 'hex');
+    const encryptedEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
     const passwordJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
-    const passwordToken = encryptData(passwordJWT, 'utf-8', 'hex');
+    const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
 
     // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
@@ -378,7 +360,7 @@ class AuthService {
    * validatePasswordReset
    */
   public async validatePasswordReset(encryptedEmail: string, passwordToken: string) {
-    const passwordJWT = decryptData(passwordToken, 'hex', 'utf-8');
+    const passwordJWT = cryptoHelper.decryptData(passwordToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(passwordJWT);
 
     const errorMessage = 'Failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
@@ -387,7 +369,7 @@ class AuthService {
       throw new BadRequest(errorMessage);
     }
 
-    const usersEmail = decryptData(encryptedEmail, 'hex', 'utf-8');
+    const usersEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
 
     const user = await this.UserService.findByEmail(usersEmail);
 
@@ -409,7 +391,7 @@ class AuthService {
     user.grant_password_reset = true;
     const updatedUser = await user.save();
 
-    const base64SecretToken = encryptData(recievedSecret, 'utf-8', 'base64');
+    const base64SecretToken = cryptoHelper.encryptData(recievedSecret, 'utf-8', 'base64');
 
     return {
       grant_password_reset: updatedUser.grant_password_reset,
