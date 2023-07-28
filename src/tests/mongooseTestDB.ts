@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// TODO use an test database, memory server fails to start
 
 // for Db related tests...
 // run beforeAll

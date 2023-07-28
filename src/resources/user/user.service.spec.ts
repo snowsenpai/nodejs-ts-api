@@ -44,8 +44,7 @@ describe('UserService', () => {
       });
     });
     
-    it('should throw an error if register fails', async () => {
-      //TODO check the message passed to new DataBaseError()
+    it('should throw an error if register fails', async () => { 
       const errorMessage = 'Failed to register user';
       mockUserModel.create.mockRejectedValueOnce(new Error(errorMessage));
 

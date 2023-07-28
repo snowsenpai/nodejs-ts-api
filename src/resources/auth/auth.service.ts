@@ -319,15 +319,9 @@ class AuthService {
       throw new NotFound('User with that email does not exist')
     }
 
-    const activeVerifiedUser = existingUser.verified;
     const validUserSecert = existingUser.secret_token;
     const recievedSecret = payload.secret;
 
-    // if user already verified
-    // TODO no need to check for empty string
-    if (activeVerifiedUser || validUserSecert === '') {
-      throw new BadRequest('User is already verified');
-    }
     // recived secret must equal to original secret generated and stored
     // if not equal then recived secret might be malformed or fake
     if (recievedSecret !== validUserSecert) {

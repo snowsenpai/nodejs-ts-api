@@ -11,8 +11,6 @@ function errorMiddleware(
   const status = error.status || 500;
   let message = error.message;
   if (status === 500) {
-    // TODO if 500, email an admin
-    // add public admin email or support email to message or frontend handles that?
     message = 'Something went wrong';
     logger.error(error);
   }
