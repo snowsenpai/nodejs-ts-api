@@ -27,9 +27,8 @@ async function authenticatedMiddleware(
       return next(new Unauthorized());
     }
 
-    //TODO unselect sensitive user data, interface of serialized user
     const user = await UserModel.findById(payload.id)
-      .select('-password')
+      .select(['-password', '-secret_token', '-recovery_codes', '-otp_base32', '-otp_auth_url'])
       .exec();
 
     if (!user) {

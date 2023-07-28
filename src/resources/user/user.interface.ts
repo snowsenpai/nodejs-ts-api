@@ -15,7 +15,7 @@ export default interface User extends Document {
   otp_hex: string;
   otp_base32: string;
   otp_auth_url: string;
-  recoveryCodes: {
+  recovery_codes: {
     hash: string,
     used: boolean
   }[]

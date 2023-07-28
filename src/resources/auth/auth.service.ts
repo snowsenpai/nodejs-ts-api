@@ -82,7 +82,7 @@ class AuthService {
     // hash recovery codes
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
     // save hasded codes to user doc
-    user.recoveryCodes = hashedRecoveryCodes;
+    user.recovery_codes = hashedRecoveryCodes;
 
     const updatedUser = await user.save();
 
@@ -94,7 +94,7 @@ class AuthService {
         email: updatedUser.email,
         otp_enabled: updatedUser.otp_enabled
       },
-      recoveryCodes: updatedUser.recoveryCodes
+      recoveryCodes: updatedUser.recovery_codes
     }
   }
 
@@ -206,7 +206,7 @@ class AuthService {
    */
   public async validateRecoveryCode(userId: string, recoverCode: string) {
     const user = await this.UserService.findById(userId);
-    const recoveryCodes = user.recoveryCodes;
+    const recoveryCodes = user.recovery_codes;
 
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoverCode, code.hash);

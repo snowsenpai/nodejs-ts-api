@@ -46,7 +46,7 @@ const UserSchema = new Schema({
     otp_hex: String,
     otp_base32: String,
     otp_auth_url: String,
-    recoveryCodes: [
+    recovery_codes: [
       {
         hash: String,
         used: Boolean
