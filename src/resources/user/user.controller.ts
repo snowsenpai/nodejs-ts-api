@@ -82,7 +82,7 @@ class UserController implements Controller{
     if(!req.user) {
       return next(new NotFound('No logged in user'));
     }
-    const user = req.user.populate('full_name')
+    const user = req.user;
     res.status(200).json(user);
   };
 
@@ -113,7 +113,7 @@ class UserController implements Controller{
       const userData: Partial<User> = req.body;
   
       const updatedUser = await this.UserService.updateUser(userId, userData);
-      
+
       res.status(201).json({ updatedUser });
     } catch (error) {
       next(error);

@@ -22,7 +22,7 @@ class AuthService {
     email: string,
     password: string
   ): Promise<TokenData | Error> {
-    const user = await this.UserService.findByEmail(email);
+    const user = await this.UserService.getFullUserByEmail(email);
 
     const validPassword = await user.isValidPassword(password);
 

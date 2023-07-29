@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const register = Joi.object({
-  fistName: Joi.string().max(20).required(),
+  firstName: Joi.string().max(20).required(),
 
   lastName: Joi.string().max(20).required(),
 

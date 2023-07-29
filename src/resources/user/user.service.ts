@@ -46,7 +46,7 @@ class UserService {
    * Find all users
    */
   public async findAllUsers() {
-    const users = await this.user.find({}).populate('full_name');
+    const users = await this.user.find({});
     if(!users){
       throw new NotFound('Unable to find any user');
     }
@@ -84,7 +84,7 @@ class UserService {
    * Find a user by id
    */
   public async findById(userId: string) {
-    const user = await this.user.findById(userId).populate('full_name');
+    const user = await this.user.findById(userId);
     if(!user){
       throw new NotFound('Unable to find user');
     }
