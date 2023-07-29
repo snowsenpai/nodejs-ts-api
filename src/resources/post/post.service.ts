@@ -33,15 +33,13 @@ class PostService {
    * Find a single post, `creator` option determines if the creator field in a post should be populated
    * by the full creator document (excluding password)
    */
-  public async findOne(id: string, creator?: any) {
+  public async findOne(id: string, creator?: string) {
     const post = await this.post.findById(id);
     if (!post) {
       throw new NotFound('post not found');
     }
     if (creator === 'true') {
-      // if creator is populated, creator field will be the full doc, post.creator.toString() !== userId.toString() wil not work
-      // toString() wont work on creator field
-      return await post.populate('creator', '-password');
+      return await post.populate('creator');
     }
     return post;
   }

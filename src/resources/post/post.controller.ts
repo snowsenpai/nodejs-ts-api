@@ -89,15 +89,14 @@ class PostController implements Controller {
       const postId = req.params.id;
       const creator = req.query.creator;
 
-      // TODO review logic
       let post;
-      if (!creator && creator !== 'true') {
+      if (creator && creator === 'true') {
+        post = await this.PostService.findOne(postId, creator);
+      } else {
         post = await this.PostService.findOne(postId);
       }
 
-      post = await this.PostService.findOne(postId, creator);
-
-      res.status(200).json({ post });
+      res.status(200).json(post);
     } catch (error) {
       next(error);
     }
