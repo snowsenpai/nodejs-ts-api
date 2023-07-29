@@ -1,7 +1,9 @@
 import Joi from "joi";
 
 const register = Joi.object({
-  name: Joi.string().max(20).required(),
+  fistName: Joi.string().max(20).required(),
+
+  lastName: Joi.string().max(20).required(),
 
   email: Joi.string().email().required(),
 
@@ -9,9 +11,9 @@ const register = Joi.object({
 });
 
 const updateUser = Joi.object({
-  name: Joi.string().max(20),
+  firstName: Joi.string().max(20),
 
-  email: Joi.string().email(),
+  lastName: Joi.string().max(20),
 });
 
 export default { register, updateUser };

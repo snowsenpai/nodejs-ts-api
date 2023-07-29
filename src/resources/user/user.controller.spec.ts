@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import UserController from './user.controller';
 import HttpException from '@/utils/exceptions/http.exceptions';
+import User from './user.interface';
 
 describe('User controller .api/user', () => {
   let userController: UserController;
@@ -66,58 +67,61 @@ describe('User controller .api/user', () => {
     });
   });
 
-  describe('login', () => {
-    it('should call UserService login method and return 200 with token',async () => {
-      const loginSpy = jest.spyOn(userController['UserService'], 'login');
-      const email = 'test@test.com';
-      const password = 'testing';
-      const expiresIn = 360;
-      const token = 'testToken1234';
-      const access_token = { expiresIn, token }
+  // login logic moved to auth resource
+  // describe('login', () => {
+  //   it('should call UserService login method and return 200 with token',async () => {
+  //     const loginSpy = jest.spyOn(userController['UserService'], 'login');
+  //     const email = 'test@test.com';
+  //     const password = 'testing';
+  //     const expiresIn = 360;
+  //     const token = 'testToken1234';
+  //     const access_token = { expiresIn, token }
 
-      req.body = { email, password };
-      // @ts-ignore
-      loginSpy.mockResolvedValueOnce(access_token);
+  //     req.body = { email, password };
+  //     // @ts-ignore
+  //     loginSpy.mockResolvedValueOnce(access_token);
 
-      await userController['login'](req as Request, res as Response, next);
+  //     await userController['login'](req as Request, res as Response, next);
 
-      expect(loginSpy).toHaveBeenCalledWith(email, password);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ access_token: token });
-      expect(next).not.toHaveBeenCalled();
-    });
+  //     expect(loginSpy).toHaveBeenCalledWith(email, password);
+  //     expect(res.status).toHaveBeenCalledWith(200);
+  //     expect(res.json).toHaveBeenCalledWith({ access_token: token });
+  //     expect(next).not.toHaveBeenCalled();
+  //   });
 
-    it('should call next with HttpException if an error occurs',async () => {
-      const errorMessage = 'Somethind went wrong';
-      jest.spyOn(userController['UserService'], 'login')
-      .mockRejectedValueOnce(new HttpException(400, errorMessage));
+  //   it('should call next with HttpException if an error occurs',async () => {
+  //     const errorMessage = 'Somethind went wrong';
+  //     jest.spyOn(userController['UserService'], 'login')
+  //     .mockRejectedValueOnce(new HttpException(400, errorMessage));
 
-      const next = jest.fn();
+  //     const next = jest.fn();
 
-      req.body = {
-        email: '',
-        password: ''
-      };
-      await userController['login'](req as Request, res as Response, next);
+  //     req.body = {
+  //       email: '',
+  //       password: ''
+  //     };
+  //     await userController['login'](req as Request, res as Response, next);
 
-      const [arg] = next.mock.calls[0];
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.any(HttpException));
-      expect(arg).toBeInstanceOf(HttpException);
-      expect(arg.status).toBe(400);
-      expect(arg.message).toBe(errorMessage);
-    });
-  });
+  //     const [arg] = next.mock.calls[0];
+  //     expect(res.status).not.toHaveBeenCalled();
+  //     expect(res.json).not.toHaveBeenCalled();
+  //     expect(next).toHaveBeenCalledWith(expect.any(HttpException));
+  //     expect(arg).toBeInstanceOf(HttpException);
+  //     expect(arg.status).toBe(400);
+  //     expect(arg.message).toBe(errorMessage);
+  //   });
+  // });
 
   describe('getUser', () => {
     it('should return 200 with user data if user exist in req', () => {
       const user = {
-        id: 1,
-        name: 'Uncle test',
-        email: 'test@test.com'
+        _id: 1,
+        first_name: 'John',
+        last_name: 'Smith',
+        email: 'test@gmail.com'
       }
-      const req = {
+      const req: Partial<Request> = {
+        // @ts-ignore
         user
       }
 

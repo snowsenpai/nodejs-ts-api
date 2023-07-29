@@ -109,7 +109,7 @@ class AuthService {
       otp_verified: true,
       user: {
         id: updatedUser._id,
-        name: updatedUser.name,
+        first_name: updatedUser.first_name,
         email: updatedUser.email,
         otp_enabled: updatedUser.otp_enabled
       },
@@ -161,7 +161,7 @@ class AuthService {
       otp_disabled: true,
       user: {
         id: updatedUser._id,
-        name: updatedUser.name,
+        first_name: updatedUser.first_name,
         email: updatedUser.email,
         otp_enabled: updatedUser.otp_enabled
       }
@@ -257,6 +257,7 @@ class AuthService {
     return result;
   }
 
+  // TODO updateEmail logic
   /**
    * verifyEmail
    */
@@ -287,7 +288,7 @@ class AuthService {
     // https: //appName.com/api/auth/validate/email/:email/:token req.param => email, token
     const verificationURL = `${appDomain}/api/auth/validate/email/${encryptedUserEmail}/${emailToken}`
 
-    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.name, verificationURL)
+    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.first_name, verificationURL)
 
     const message = 'A verification link has been sent to your email';
     return message;
@@ -369,7 +370,7 @@ class AuthService {
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
     const passwordResetURL = `${appDomain}/api/auth/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
 
-    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.name, passwordResetURL);
+    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.first_name, passwordResetURL);
 
     const message = 'Password reset email has been sent';
     return { message };

@@ -59,17 +59,16 @@ class UserController implements Controller{
     next: NextFunction
   ): Promise<Response | void> {
     try {
-      const { name, email, password } = req.body;
-      const user = await this.UserService.register(
-        name,
+      const { firstName, lastName, email, password } = req.body;
+      const message = await this.UserService.register(
+        firstName,
+        lastName,
         email,
         password,
-        'user'
       );
 
-      if (user) {
-        res.status(201).json({ message: 'User created' });
-      }
+      res.status(201).json(message);
+      
     } catch (error) {
       next(error);
     }
@@ -83,8 +82,8 @@ class UserController implements Controller{
     if(!req.user) {
       return next(new NotFound('No logged in user'));
     }
-
-    res.status(200).send({ data: req.user });
+    const user = req.user.populate('full_name')
+    res.status(200).json(user);
   };
 
   private async findUser(
@@ -146,7 +145,7 @@ class UserController implements Controller{
       const userId = req.user._id;    
       const response = await this.UserService.deleteUser(userId);
   
-      res.status(200).json({ response });
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

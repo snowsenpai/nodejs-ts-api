@@ -3,7 +3,11 @@ import bcrypt from 'bcrypt';
 import User from './user.interface';
 
 const UserSchema = new Schema({
-    name: {
+    first_name: {
+      type: String,
+      required: true,
+    },
+    last_name: {
       type: String,
       required: true,
     },
@@ -46,8 +50,6 @@ const UserSchema = new Schema({
       type: Boolean,
       default: false,
     },
-    otp_ascii: String,
-    otp_hex: String,
     otp_base32: {
       type: String,
       select: false,
@@ -67,6 +69,10 @@ const UserSchema = new Schema({
     }
   }
 );
+
+UserSchema.virtual('full_name').get(function() {
+  return `${this.first_name} ${this.last_name}`;
+});
 
 UserSchema.virtual('posts', {
   ref: 'Post',

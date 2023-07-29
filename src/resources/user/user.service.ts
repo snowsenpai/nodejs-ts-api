@@ -15,19 +15,21 @@ class UserService {
    * Register a new user
   */
  public async register(
-  name: string,
+  first_name: string,
+  last_name: string,
   email: string,
-  password: string,
-  role: string
- ): Promise<boolean | Error> {
+  password: string
+ ) {
     const existingUser = await this.user.findOne({ email: email });
 
     if (existingUser) {
       throw new BadRequest('User already exists');
     }
+    const role = 'user';
 
     const newUser = await this.user.create({
-      name,
+      first_name,
+      last_name,
       email,
       password,
       role,
@@ -35,16 +37,16 @@ class UserService {
     if(!newUser) {
       throw new BadRequest('Could not create user');
     }
-    this.EmailService.sendWelcomeEmail(email, name);
+    this.EmailService.sendWelcomeEmail(email, first_name);
 
-    return true;
+    return { message: 'User created' };
  }
 
   /**
    * Find all users
    */
   public async findAllUsers() {
-    const users = await this.user.find({});
+    const users = await this.user.find({}).populate('full_name');
     if(!users){
       throw new NotFound('Unable to find any user');
     }
@@ -82,7 +84,7 @@ class UserService {
    * Find a user by id
    */
   public async findById(userId: string) {
-    const user = await this.user.findById(userId);
+    const user = await this.user.findById(userId).populate('full_name');
     if(!user){
       throw new NotFound('Unable to find user');
     }
@@ -136,7 +138,7 @@ class UserService {
     if (!user) {
       throw new NotFound('User not found');
     }
-    return 'User deleted';
+    return { message:'User deleted' };
   }
 
   /**

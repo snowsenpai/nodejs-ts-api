@@ -54,47 +54,48 @@ describe('UserService', () => {
     });
   });
 
-  describe('login', () => {
-    it('should generate a token for a valid user', async () => {
-      const mockUser = {
-        isValidPassword: jest.fn().mockResolvedValue(true),
-      }
-      mockUserModel.findOne.mockResolvedValue(mockUser);
+  // login logic moved to auth resource
+  // describe('login', () => {
+  //   it('should generate a token for a valid user', async () => {
+  //     const mockUser = {
+  //       isValidPassword: jest.fn().mockResolvedValue(true),
+  //     }
+  //     mockUserModel.findOne.mockResolvedValue(mockUser);
       
 
-      const result = await userService.login(email, password);
+  //     const result = await userService.login(email, password);
 
-      expect(mockUserModel.findOne).toHaveBeenCalledWith({email});
-      expect(mockUser.isValidPassword).toHaveBeenCalledWith(password);
-      expect(token.createToken).toHaveBeenCalledWith(mockUser);
-      expect(result).toBe('mockedToken');
-    });
+  //     expect(mockUserModel.findOne).toHaveBeenCalledWith({email});
+  //     expect(mockUser.isValidPassword).toHaveBeenCalledWith(password);
+  //     expect(token.createToken).toHaveBeenCalledWith(mockUser);
+  //     expect(result).toBe('mockedToken');
+  //   });
 
-    it('should throw an error for invalid credentials', async () => {
-      const mockUser = {
-        isValidPassword: jest.fn().mockResolvedValue(false),
-      }
-      mockUserModel.findOne.mockResolvedValue(mockUser);
+  //   it('should throw an error for invalid credentials', async () => {
+  //     const mockUser = {
+  //       isValidPassword: jest.fn().mockResolvedValue(false),
+  //     }
+  //     mockUserModel.findOne.mockResolvedValue(mockUser);
 
-      const errorMessage = 'Wrong credentials';
+  //     const errorMessage = 'Wrong credentials';
 
-      await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
+  //     await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
 
-    });
+  //   });
 
-    it('should throw an error if user not found', async () => {
-      mockUserModel.findOne.mockResolvedValue(null);
+  //   it('should throw an error if user not found', async () => {
+  //     mockUserModel.findOne.mockResolvedValue(null);
 
-      const errorMessage = 'Unable to find user with that email';
+  //     const errorMessage = 'Unable to find user with that email';
 
-      await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
-    });
+  //     await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
+  //   });
 
-    it('should throw an error if login fails', async () => {
-      const errorMessage = 'Database error';
-      mockUserModel.findOne.mockRejectedValueOnce(new Error(errorMessage));
+  //   it('should throw an error if login fails', async () => {
+  //     const errorMessage = 'Database error';
+  //     mockUserModel.findOne.mockRejectedValueOnce(new Error(errorMessage));
 
-      await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
-    });
-  });
+  //     await expect(userService.login(email, password)).rejects.toThrow(errorMessage);
+  //   });
+  // });
 });

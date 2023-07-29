@@ -11,7 +11,6 @@ class App {
   public express: Application;
   public port: number;
 
-  // remove port arg, move to listen() method
   constructor(controllers: Controller[], port: number) {
     this.express = express();
     this.port = port;
@@ -40,7 +39,6 @@ class App {
     this.express.use(ErrorMiddleware);
   }
 
-  // TODO listen should recive a PORT param -> listen(port)
   public listen(): void {
     this.express.listen(this.port, () => {
       logger.info(`App listening on the port ${this.port}`);
