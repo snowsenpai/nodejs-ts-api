@@ -8,16 +8,10 @@ const register = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
-const login = Joi.object({
-  email: Joi.string().required(),
-
-  password: Joi.string().required(),
-});
-
 const updateUser = Joi.object({
   name: Joi.string().max(20),
 
   email: Joi.string().email(),
 });
 
-export default { register, login, updateUser };
+export default { register, updateUser };

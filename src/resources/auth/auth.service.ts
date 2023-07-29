@@ -7,13 +7,32 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import UserService from "../user/user.service";
 import EmailService from '../email/email.service';
 import token from '@/utils/token';
-import { Token } from '@/utils/interfaces/token.interface';
+import { Token, TokenData } from '@/utils/interfaces/token.interface';
 import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/clientErrorResponse';
 import * as cryptoHelper from '@/utils/crypto_helpers';
 
 class AuthService {
   public UserService = new UserService();
   private EmailService = new EmailService();
+
+  /**
+   * Attempt to login a user
+   */
+  public async login(
+    email: string,
+    password: string
+  ): Promise<TokenData | Error> {
+    const user = await this.UserService.findByEmail(email);
+
+    const validPassword = await user.isValidPassword(password);
+
+    if (validPassword === false) {
+      throw new Unauthorized('Wrong credentials');
+    }
+    const access_token = token.createToken({id: user._id});
+
+    return access_token;
+  }
 
   /**
    * generateTOTP

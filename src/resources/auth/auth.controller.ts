@@ -52,6 +52,12 @@ class AuthController implements Controller{
     );
 
     this.router.post(
+      `${this.path}/login`,
+      validationMiddleware(validate.login),
+      this.login.bind(this)
+    );
+
+    this.router.post(
       `${this.path}/reset-password`,
       authenticated,
       passwordReset,
@@ -92,6 +98,22 @@ class AuthController implements Controller{
       validationMiddleware(validate.recoveryCode),
       this.validateRecoveryCode.bind(this)
     )
+  }
+
+  private async login (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const { email, password } = req.body;
+
+      const access_token = await this.AuthService.login(email, password);
+
+      res.status(200).json(access_token);
+    } catch (error) {
+      next(error);
+    }
   }
 
   private async generateOTP(

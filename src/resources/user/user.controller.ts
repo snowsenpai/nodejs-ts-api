@@ -39,12 +39,6 @@ class UserController implements Controller{
       this.register.bind(this)
     );
 
-    this.router.post(
-      `${this.path}/login`,
-      validationMiddleware(validate.login),
-      this.login.bind(this)
-    );
-
     this.router.patch(
       `${this.path}`,
       authenticated,
@@ -76,21 +70,6 @@ class UserController implements Controller{
       if (user) {
         res.status(201).json({ message: 'User created' });
       }
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async login (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const { email, password } = req.body;
-
-      const token = await this.UserService.login(email, password);
-      res.status(200).json({ access_token: token });
     } catch (error) {
       next(error);
     }
