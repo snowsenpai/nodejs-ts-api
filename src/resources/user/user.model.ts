@@ -16,6 +16,7 @@ const UserSchema = new Schema({
     password: {
       type: String,
       required: true,
+      select: false,
     },
     role: {
       type: String,
@@ -25,7 +26,10 @@ const UserSchema = new Schema({
       type: Boolean,
       default: false,
     },
-    secret_token: String,
+    secret_token: {
+      type: String,
+      select: false,
+    },
     password_reset_request: {
       type: Boolean,
       default: false
@@ -44,14 +48,18 @@ const UserSchema = new Schema({
     },
     otp_ascii: String,
     otp_hex: String,
-    otp_base32: String,
-    otp_auth_url: String,
-    recovery_codes: [
-      {
-        hash: String,
-        used: Boolean
-      }
-    ]
+    otp_base32: {
+      type: String,
+      select: false,
+    },
+    otp_auth_url: {
+      type: String,
+      select: false,
+    },
+    recovery_codes: {
+      type: [{ hash: String, used: Boolean }],
+      select: false,
+    }
   }, {
     timestamps: true,
     toJSON: {

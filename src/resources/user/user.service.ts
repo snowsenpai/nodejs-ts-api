@@ -11,6 +11,7 @@ import { BadRequest, NotFound, Unauthorized } from "@/utils/exceptions/clientErr
 class UserService {
   private user = UserModel;
   private EmailService = new EmailService();
+  private sensitiveUserFields = ['+password', '+secret_token', '+otp_base32', '+otp_auth_url', '+recovery_codes'];
 
   /**
    * Register a new user
@@ -21,7 +22,7 @@ class UserService {
   password: string,
   role: string
  ): Promise<boolean | Error> {
-    const existingUser = await this.findByEmail(email);
+    const existingUser = await this.user.findOne({ email: email });
 
     if (existingUser) {
       throw new BadRequest('User already exists');
@@ -48,11 +49,7 @@ class UserService {
     email: string,
     password: string
   ): Promise<TokenData | Error> {
-    const user = await this.user.findOne({ email });
-
-    if(!user){
-      throw new NotFound('Unable to find user with that email');
-    }
+    const user = await this.findByEmail(email);
 
     if(await user.isValidPassword(password)) {
       return token.createToken({id: user._id});
@@ -65,7 +62,7 @@ class UserService {
    * Find all users
    */
   public async findAllUsers() {
-    const users = await this.user.find({}, '-password');
+    const users = await this.user.find({});
     if(!users){
       throw new NotFound('Unable to find any user');
     }
@@ -76,7 +73,11 @@ class UserService {
    * Find a user by email
    */
   public async findByEmail(userEmail: string) {
-    const user = await this.user.findOne({email: userEmail}, '-password').exec();
+    const user = await this.user.findOne({email: userEmail}).exec();
+
+    if (!user) {
+      throw new NotFound('User does not exist');
+    }
 
     return user;
   }
@@ -99,7 +100,7 @@ class UserService {
    * Find a user by id
    */
   public async findById(userId: string) {
-    const user = await this.user.findById(userId, '-password');
+    const user = await this.user.findById(userId);
     if(!user){
       throw new NotFound('Unable to find user');
     }
@@ -107,10 +108,38 @@ class UserService {
   }
 
   /**
+   * getFullUSerById
+   * 
+   * for authentication process
+   */
+  public async getFullUSerById(userId: string) {
+    const user = await this.user.findById(userId).select(this.sensitiveUserFields);
+
+    if (!user) {
+      throw new NotFound('User not found');
+    }
+    return user;
+  }
+
+  /**
+   * getFullUserByEmail
+   * 
+   * for authentication process
+   */
+  public async getFullUserByEmail(userEmail: string) {
+    const user = await this.user.findOne({ email: userEmail }).select(this.sensitiveUserFields);
+
+    if (!user) {
+      throw new NotFound('User not found');
+    }
+    return user;    
+  }
+
+  /**
    * Update a user
    */
   public async updateUser(userId: string, userData: object) {
-    const user = await this.user.findByIdAndUpdate(userId, userData, { new: true }).select('-password');
+    const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
     if (!user) {
       throw new NotFound('User not found');
     }

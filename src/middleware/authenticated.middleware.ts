@@ -27,9 +27,8 @@ async function authenticatedMiddleware(
       return next(new Unauthorized());
     }
 
-    const user = await UserModel.findById(payload.id)
-      .select(['-password', '-secret_token', '-recovery_codes', '-otp_base32', '-otp_auth_url'])
-      .exec();
+    // no lean queries, posts virtual field
+    const user = await UserModel.findById(payload.id).exec();
 
     if (!user) {
       return next(new NotFound('User not found'));

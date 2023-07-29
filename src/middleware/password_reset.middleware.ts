@@ -24,11 +24,6 @@ async function passwordReset(
     if (!user) {
       throw new BadRequest('Invalid token');
     }
-    //TODO useful if block? think through possible code flow
-    // user making request for reset must be equal to user found using secret
-    if (req.user._id !== user._id) {
-      throw new Forbidden("Access denied, reseting other user's password is forbidden");
-    }
 
     req.password_reset_secret = recivedToken;
     return next();
