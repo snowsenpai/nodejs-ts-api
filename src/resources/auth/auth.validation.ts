@@ -1,7 +1,7 @@
 import Joi from "joi";
 
 const login = Joi.object({
-  email: Joi.string().required(),
+  email: Joi.string().email().required(),
 
   password: Joi.string().required(),
 });
@@ -18,4 +18,8 @@ const resetPassword = Joi.object({
   newPassword: Joi.string().min(6).required()
 });
 
-export default { login, otpToken, recoveryCode, resetPassword };
+const updateEmail = Joi.object({
+  newEmail: Joi.string().email().required()
+});
+
+export default { login, otpToken, recoveryCode, resetPassword, updateEmail };

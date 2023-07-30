@@ -82,7 +82,7 @@ class UserService {
    * 
    * for authentication process
    */
-  public async getFullUSerById(userId: string) {
+  public async getFullUserById(userId: string) {
     const user = await this.user.findById(userId).select(this.sensitiveUserFields);
 
     if (!user) {

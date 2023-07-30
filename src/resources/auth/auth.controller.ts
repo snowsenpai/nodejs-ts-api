@@ -97,7 +97,14 @@ class AuthController implements Controller{
       authenticated,
       validationMiddleware(validate.recoveryCode),
       this.validateRecoveryCode.bind(this)
-    )
+    );
+
+    this.router.patch(
+      `${this.path}/update-email`,
+      authenticated,
+      validationMiddleware(validate.updateEmail),
+      this.updateEmail.bind(this)
+    );
   }
 
   private async login (
@@ -307,6 +314,24 @@ class AuthController implements Controller{
       const passwordToken = req.passwordResetSecret;
 
       const result = await this.AuthService.cancelPasswordReset(userId, passwordToken);
+
+      res.status(201).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  private async updateEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> {
+    try {
+      const userId = req.user._id;
+      const oldEmail = req.user.email;
+      const { newEmail } = req.body;
+
+      const result = await this.AuthService.updateEmail(userId, oldEmail, newEmail);
 
       res.status(201).json(result);
     } catch (error) {

@@ -181,7 +181,7 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
   }
 }
 
-export {
+export default {
   encryptData, 
   decryptData,
   generateRandomString,
