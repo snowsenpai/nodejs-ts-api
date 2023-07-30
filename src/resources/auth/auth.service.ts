@@ -315,12 +315,6 @@ class AuthService {
     // find a user with the decrypted email
     const existingUser = await this.UserService.getFullUserByEmail(unverifiedUserEmail);
 
-    // useful if block?
-    // depends on chances of an attacker cracking secret and key used in encryption
-    if (!existingUser) {
-      throw new NotFound('User with that email does not exist')
-    }
-
     const validUserSecert = existingUser.secretToken;
     const recievedSecret = payload.secret;
 
@@ -393,10 +387,6 @@ class AuthService {
 
     const user = await this.UserService.getFullUserByEmail(usersEmail);
 
-    if (!user) {
-      throw new NotFound('User with that email does not exist');
-    }
-
     if (user.passwordResetRequest === false) {
       throw new BadRequest('User made no request to reset password');
     }
@@ -435,7 +425,7 @@ class AuthService {
       throw new BadRequest(errorMessage);
     }
 
-    const existingPassword = await this.UserService.hasValidPassword(user.email, newPassword);
+    const existingPassword = await user.isValidPassword(newPassword);
     // new password should not be old password
     if (existingPassword) {
       throw new BadRequest('Unacceptable password');

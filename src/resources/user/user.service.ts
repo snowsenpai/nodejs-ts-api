@@ -67,20 +67,6 @@ class UserService {
   }
 
   /**
-   * context: directly checking user.isValidPassword from the user object returned by ofthe service methods
-   * will result in `this.password` being `undefined`, even if the password is included in the object
-   */
-  public async hasValidPassword(userEmail: string, password: string) {
-    const user = await this.user.findOne({email: userEmail});
-
-    if (!user) {
-      throw new NotFound('User does not exist');
-    }
-
-    return await user.isValidPassword(password);
-  }
-
-  /**
    * Find a user by id
    */
   public async findById(userId: string) {
