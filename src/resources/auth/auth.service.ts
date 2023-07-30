@@ -8,7 +8,7 @@ import UserService from "../user/user.service";
 import EmailService from '../email/email.service';
 import token from '@/utils/token';
 import { Token, TokenData } from '@/utils/interfaces/token.interface';
-import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/clientErrorResponse';
+import { Unauthorized, Forbidden, NotFound, BadRequest } from '@/utils/exceptions/client_error';
 import * as cryptoHelper from '@/utils/crypto_helpers';
 
 class AuthService {
@@ -29,9 +29,9 @@ class AuthService {
     if (validPassword === false) {
       throw new Unauthorized('Wrong credentials');
     }
-    const access_token = token.createToken({id: user._id});
+    const accessToken = token.createToken({id: user._id});
 
-    return access_token;
+    return accessToken;
   }
 
   /**
@@ -59,19 +59,19 @@ class AuthService {
       throw new Forbidden('Only verified users can enable OTP')
     }
 
-    const base32_secret = cryptoHelper.generateRandomBase32(24);
+    const base32Secret = cryptoHelper.generateRandomBase32(24);
 
     // new time-based otp
-    let totp = this.generateTOTP(base32_secret, user.email);
+    let totp = this.generateTOTP(base32Secret, user.email);
 
-    let otp_url = totp.toString();
+    let otpUrl = totp.toString();
 
-    // update user otp_auth_url and otp_base32
-    user.otp_auth_url = otp_url;
-    user.otp_base32 = base32_secret;
+    // update user otpAuthUrl and otpBase32
+    user.otpAuthUrl = otpUrl;
+    user.otpBase32 = base32Secret;
     await user.save();
 
-    return { otp_url, base32_secret };
+    return { otpUrl, base32Secret };
   }
 
   /**
@@ -79,7 +79,7 @@ class AuthService {
    */
   public async verifyOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUSerById(userId);
-    const secret = user.otp_base32;
+    const secret = user.otpBase32;
 
     let totp = this.generateTOTP(secret, user.email);
 
@@ -90,8 +90,8 @@ class AuthService {
     }
 
     // update user data
-    user.otp_enabled = true;
-    user.otp_verified = true;
+    user.otpEnabled = true;
+    user.otpVerified = true;
     
     // generate recovery codes
     const codeLength = 8;
@@ -101,19 +101,19 @@ class AuthService {
     // hash recovery codes
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
     // save hasded codes to user doc
-    user.recovery_codes = hashedRecoveryCodes;
+    user.recoveryCodes = hashedRecoveryCodes;
 
     const updatedUser = await user.save();
 
     return {
-      otp_verified: true,
+      otpVerified: true,
       user: {
         id: updatedUser._id,
-        first_name: updatedUser.first_name,
+        firstName: updatedUser.firstName,
         email: updatedUser.email,
-        otp_enabled: updatedUser.otp_enabled
+        otpEnabled: updatedUser.otpEnabled
       },
-      recoveryCodes: updatedUser.recovery_codes
+      recoveryCodes: updatedUser.recoveryCodes
     }
   }
 
@@ -122,7 +122,7 @@ class AuthService {
    */
   public async validateOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUSerById(userId);
-    const secret = user.otp_base32;
+    const secret = user.otpBase32;
 
     let totp = this.generateTOTP(secret, user.email);
 
@@ -132,7 +132,7 @@ class AuthService {
       throw new Unauthorized('Token is invalid or user does not exist');
     }
 
-    return { otp_valid: true };
+    return { otpValid: true };
   }
 
   /**
@@ -140,7 +140,7 @@ class AuthService {
    */
   public async disabelOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUSerById(userId);
-    const secret = user.otp_base32;
+    const secret = user.otpBase32;
 
     let totp = this.generateTOTP(secret, user.email);
 
@@ -150,20 +150,20 @@ class AuthService {
       throw new Unauthorized('Token is invalid or user does not exist');
     }
 
-    user.otp_enabled = false;
-    user.otp_verified = false;
-    user.otp_base32 = '';
-    user.otp_auth_url = '';
+    user.otpEnabled = false;
+    user.otpVerified = false;
+    user.otpBase32 = '';
+    user.otpAuthUrl = '';
 
     const updatedUser = await user.save();
 
     return {
-      otp_disabled: true,
+      otpDisabled: true,
       user: {
         id: updatedUser._id,
-        first_name: updatedUser.first_name,
+        firstName: updatedUser.firstName,
         email: updatedUser.email,
-        otp_enabled: updatedUser.otp_enabled
+        otpEnabled: updatedUser.otpEnabled
       }
     }
   }
@@ -174,14 +174,14 @@ class AuthService {
    */
   public async otpData(userId: string) {
     const user = await this.UserService.getFullUSerById(userId);
-    // after generateOTP() auth_url will be defined
-    const enabled = user.otp_auth_url;
+    // after generateOTP() authUrl will be defined
+    const enabled = user.otpAuthUrl;
     if(!enabled) throw new Unauthorized('User otp not enabled');
 
     // based on users otp status return otp data
     return {
-      otp_auth_url: user.otp_auth_url,
-      otp_base32: user.otp_base32
+      otpAuthUrl: user.otpAuthUrl,
+      otpBase32: user.otpBase32
     }
   }
 
@@ -225,7 +225,7 @@ class AuthService {
    */
   public async validateRecoveryCode(userId: string, recoverCode: string) {
     const user = await this.UserService.getFullUSerById(userId);
-    const recoveryCodes = user.recovery_codes;
+    const recoveryCodes = user.recoveryCodes;
 
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoverCode, code.hash);
@@ -239,7 +239,7 @@ class AuthService {
           code.used = true;
           await user.save();
 
-          return {valid_code: recoverCode, message: 'valid code'};
+          return {validCode: recoverCode, message: 'valid code'};
         }
       }
     }
@@ -269,15 +269,15 @@ class AuthService {
     }
 
     const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secret_token = cryptoHelper.generateRandomString(lengthOfSecretToken);
+    const secretToken = cryptoHelper.generateRandomString(lengthOfSecretToken);
 
-    // set generated secret_token to user.secret_token and save updated user
-    user.secret_token = secret_token;
+    // set generated secretToken to user.secretToken and save updated user
+    user.secretToken = secretToken;
     const updatedUser = await user.save();
 
     // when testing can use lower duration
     const tokenExpiry = 60 * 60; // seconds in an hour
-    const emailJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    const emailJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
     const emailToken = cryptoHelper.encryptData(emailJWT, 'utf-8', 'hex');
 
     const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
@@ -288,7 +288,7 @@ class AuthService {
     // https: //appName.com/api/auth/validate/email/:email/:token req.param => email, token
     const verificationURL = `${appDomain}/api/auth/validate/email/${encryptedUserEmail}/${emailToken}`
 
-    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.first_name, verificationURL)
+    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
     const message = 'A verification link has been sent to your email';
     return message;
@@ -321,7 +321,7 @@ class AuthService {
       throw new NotFound('User with that email does not exist')
     }
 
-    const validUserSecert = existingUser.secret_token;
+    const validUserSecert = existingUser.secretToken;
     const recievedSecret = payload.secret;
 
     // recived secret must equal to original secret generated and stored
@@ -332,13 +332,13 @@ class AuthService {
 
     existingUser.verified = true;
     // 'delete' generated secret from user documnet
-    existingUser.secret_token = '';
+    existingUser.secretToken = '';
 
     const verifiedUser = await existingUser.save();
 
     return {
-      sucess_message: 'Your email account has been verified',
-      verified_user: verifiedUser.verified,
+      sucessMessage: 'Your email account has been verified',
+      verifiedUser: verifiedUser.verified,
       email: verifiedUser.email
     }
   }
@@ -354,23 +354,23 @@ class AuthService {
     }
 
     const secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secret_token = cryptoHelper.generateRandomString(secretTokenLength);
+    const secretToken = cryptoHelper.generateRandomString(secretTokenLength);
 
-    user.secret_token = secret_token;
-    user.password_reset_request = true;
+    user.secretToken = secretToken;
+    user.passwordResetRequest = true;
     const updatedUser = await user.save();
 
     const encryptedEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
-    const passwordJWT = (token.createToken({ secret: secret_token }, tokenExpiry)).token;
+    const passwordJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
     const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
 
     // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
     const appDomain = process.env.APP_DOMAIN || 'http://localhost:3000';
     const passwordResetURL = `${appDomain}/api/auth/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
 
-    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.first_name, passwordResetURL);
+    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 
     const message = 'Password reset email has been sent';
     return { message };
@@ -397,25 +397,25 @@ class AuthService {
       throw new NotFound('User with that email does not exist');
     }
 
-    if (user.password_reset_request === false) {
+    if (user.passwordResetRequest === false) {
       throw new BadRequest('User made no request to reset password');
     }
 
     const recievedSecret = payload.secret;
-    const validUserSecert = user.secret_token;
+    const validUserSecert = user.secretToken;
 
     if (recievedSecret !== validUserSecert) {
       throw new BadRequest(errorMessage);
     }
 
-    user.grant_password_reset = true;
+    user.grantPasswordReset = true;
     const updatedUser = await user.save();
 
     const base64SecretToken = cryptoHelper.encryptData(recievedSecret, 'utf-8', 'base64');
 
     return {
-      grant_password_reset: updatedUser.grant_password_reset,
-      base64_secret_token: base64SecretToken
+      grantPasswordReset: updatedUser.grantPasswordReset,
+      base64SecretToken
     }
   }
 
@@ -427,11 +427,11 @@ class AuthService {
 
     const errorMessage = 'Password reset failed, user not verified, has no permission to reset password or invalid credentials';
 
-    if (user.verified === false || user.grant_password_reset === false || user.password_reset_request === false) {
+    if (user.verified === false || user.grantPasswordReset === false || user.passwordResetRequest === false) {
       throw new BadRequest(errorMessage);
     }
 
-    if (passwordToken !== user.secret_token) {
+    if (passwordToken !== user.secretToken) {
       throw new BadRequest(errorMessage);
     }
 
@@ -443,14 +443,14 @@ class AuthService {
 
     // update user password and reset verification fields
     user.password = newPassword;
-    user.password_reset_request = false;
-    user.grant_password_reset = false;
-    user.secret_token = '';
+    user.passwordResetRequest = false;
+    user.grantPasswordReset = false;
+    user.secretToken = '';
 
     await user.save();
 
     return {
-      successful_password_reset: true
+      successfulPasswordReset: true
     }
   }
 
@@ -460,22 +460,22 @@ class AuthService {
   public async cancelPasswordReset(userId: string, passwordToken: string) {
     const user = await this.UserService.getFullUSerById(userId);
 
-    if (user.password_reset_request === false) {
+    if (user.passwordResetRequest === false) {
       throw new Forbidden('Password reset request not recived');
     }
-    if (user.grant_password_reset === false) {
+    if (user.grantPasswordReset === false) {
       throw new Forbidden('Password reset permission not granted');
     }
-    if (passwordToken !== user.secret_token) {
+    if (passwordToken !== user.secretToken) {
       throw new Forbidden('Invalid credentials');
     }
 
-    user.password_reset_request = false;
-    user.grant_password_reset = false;
-    user.secret_token = '';
+    user.passwordResetRequest = false;
+    user.grantPasswordReset = false;
+    user.secretToken = '';
     await user.save();
 
-    return { password_reset_canceled: true }
+    return { passwordResetCanceled: true }
   }
 }
 

@@ -37,14 +37,14 @@ const userPayload = {
   __v: 0
 }
 
-let access_token: string;
+let accessToken: string;
 
 describe('Api base /api endpoint', () => {
   beforeAll(async () => {
     await connectDB();
 
     const { body } = await request(app).post('/api/user/login').send(userLogin);
-    access_token = body.access_token;
+    accessToken = body.accessToken;
   });
 
   afterAll(async () => {
@@ -77,7 +77,7 @@ describe('Api base /api endpoint', () => {
     });
 
     it('should return a user object for an authenticated user', async () => {
-      const { statusCode, body } = await request(app).get('/api/user').set('Authorization', `Bearer ${access_token}`);
+      const { statusCode, body } = await request(app).get('/api/user').set('Authorization', `Bearer ${accessToken}`);
 
       expect(statusCode).toBe(200);
       expect(body).toEqual({ data: userPayload});
@@ -108,7 +108,7 @@ describe('Api base /api endpoint', () => {
     
     // login logic moved to auth resource
     // describe('/login', () => {
-    //   it('should return an access_token for a registered user', async () => {
+    //   it('should return an accessToken for a registered user', async () => {
     //     const jwtToken = {
     //       token: 'login token',
     //       expiresIn: 10
@@ -119,7 +119,7 @@ describe('Api base /api endpoint', () => {
     //     const { statusCode, body } = await request(app).post('/api/auth/login').send(userLogin);
         
     //     expect(statusCode).toBe(200);
-    //     expect(body).toEqual({access_token: jwtToken});
+    //     expect(body).toEqual({accessToken: jwtToken});
     //     expect(userServiceMock).toHaveBeenCalledWith(userLogin.email, userLogin.password);
     //   });
     // });

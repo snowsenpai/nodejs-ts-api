@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import token from '@/utils/token';
 import UserModel from '@/resources/user/user.model';
 import { Token } from '@/utils/interfaces/token.interface';
-import { Unauthorized, NotFound } from '@/utils/exceptions/clientErrorResponse';
+import { Unauthorized, NotFound } from '@/utils/exceptions/client_error';
 import jwt  from 'jsonwebtoken';
 
 async function authenticatedMiddleware(

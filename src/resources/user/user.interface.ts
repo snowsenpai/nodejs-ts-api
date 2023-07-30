@@ -2,19 +2,20 @@ import { Document } from 'mongoose';
 
 export default interface User extends Document {
   email: string;
-  first_name: string;
-  last_name: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
   password: string;
   role: string;
   verified: boolean;
-  secret_token: string;
-  password_reset_request: boolean;
-  grant_password_reset: boolean;
-  otp_enabled: boolean;
-  otp_verified: boolean;
-  otp_base32: string;
-  otp_auth_url: string;
-  recovery_codes: {
+  secretToken: string;
+  passwordResetRequest: boolean;
+  grantPasswordReset: boolean;
+  otpEnabled: boolean;
+  otpVerified: boolean;
+  otpBase32: string;
+  otpAuthUrl: string;
+  recoveryCodes: {
     hash: string,
     used: boolean
   }[]

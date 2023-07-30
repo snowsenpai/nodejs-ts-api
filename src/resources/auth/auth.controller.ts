@@ -108,9 +108,9 @@ class AuthController implements Controller{
     try {
       const { email, password } = req.body;
 
-      const access_token = await this.AuthService.login(email, password);
+      const accessToken = await this.AuthService.login(email, password);
 
-      res.status(200).json(access_token);
+      res.status(200).json(accessToken);
     } catch (error) {
       next(error);
     }
@@ -191,9 +191,9 @@ class AuthController implements Controller{
     try {
       const userId = req.user._id;
 
-      const { otp_auth_url } = await this.AuthService.otpData(userId);
+      const { otpAuthUrl } = await this.AuthService.otpData(userId);
 
-      this.AuthService.responseWithQRCode(otp_auth_url, res);
+      this.AuthService.responseWithQRCode(otpAuthUrl, res);
     } catch (error) {
       next(error);
     }
@@ -287,7 +287,7 @@ class AuthController implements Controller{
     try {
       const { newPassword } = req.body;
       const userId = req.user._id;
-      const passwordToken = req.password_reset_secret;
+      const passwordToken = req.passwordResetSecret;
 
       const data = await this.AuthService.resetPassword(userId, passwordToken, newPassword);
 
@@ -304,7 +304,7 @@ class AuthController implements Controller{
   ): Promise<Response | void> {
     try {
       const userId = req.user._id;
-      const passwordToken = req.password_reset_secret;
+      const passwordToken = req.passwordResetSecret;
 
       const result = await this.AuthService.cancelPasswordReset(userId, passwordToken);
 

@@ -1,6 +1,6 @@
 import UserModel from "./user.model";
 import EmailService from "../email/email.service";
-import { BadRequest, NotFound } from "@/utils/exceptions/clientErrorResponse";
+import { BadRequest, NotFound } from "@/utils/exceptions/client_error";
 
 //*  UserModel should have required security(e.g pass word) and otp fields
 //*  UserService should have appropriate methods to mutate and validate a
@@ -9,14 +9,14 @@ import { BadRequest, NotFound } from "@/utils/exceptions/clientErrorResponse";
 class UserService {
   private user = UserModel;
   private EmailService = new EmailService();
-  private sensitiveUserFields = ['+password', '+secret_token', '+otp_base32', '+otp_auth_url', '+recovery_codes'];
+  private sensitiveUserFields = ['+password', '+secretToken', '+otpBase32', '+otpAuthUrl', '+recoveryCodes'];
 
   /**
    * Register a new user
   */
  public async register(
-  first_name: string,
-  last_name: string,
+  firstName: string,
+  lastName: string,
   email: string,
   password: string
  ) {
@@ -28,8 +28,8 @@ class UserService {
     const role = 'user';
 
     const newUser = await this.user.create({
-      first_name,
-      last_name,
+      firstName,
+      lastName,
       email,
       password,
       role,
@@ -37,7 +37,7 @@ class UserService {
     if(!newUser) {
       throw new BadRequest('Could not create user');
     }
-    this.EmailService.sendWelcomeEmail(email, first_name);
+    this.EmailService.sendWelcomeEmail(email, firstName);
 
     return { message: 'User created' };
  }

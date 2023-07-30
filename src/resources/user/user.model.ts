@@ -3,11 +3,11 @@ import bcrypt from 'bcrypt';
 import User from './user.interface';
 
 const UserSchema = new Schema({
-    first_name: {
+    firstName: {
       type: String,
       required: true,
     },
-    last_name: {
+    lastName: {
       type: String,
       required: true,
     },
@@ -30,35 +30,35 @@ const UserSchema = new Schema({
       type: Boolean,
       default: false,
     },
-    secret_token: {
+    secretToken: {
       type: String,
       select: false,
     },
-    password_reset_request: {
+    passwordResetRequest: {
       type: Boolean,
       default: false
     },
-    grant_password_reset: {
+    grantPasswordReset: {
       type: Boolean,
       default: false
     },
-    otp_enabled: {
+    otpEnabled: {
       type: Boolean,
       default: false,
     },
-    otp_verified: {
+    otpVerified: {
       type: Boolean,
       default: false,
     },
-    otp_base32: {
+    otpBase32: {
       type: String,
       select: false,
     },
-    otp_auth_url: {
+    otpAuthUrl: {
       type: String,
       select: false,
     },
-    recovery_codes: {
+    recoveryCodes: {
       type: [{ hash: String, used: Boolean }],
       select: false,
     }
@@ -70,8 +70,8 @@ const UserSchema = new Schema({
   }
 );
 
-UserSchema.virtual('full_name').get(function() {
-  return `${this.first_name} ${this.last_name}`;
+UserSchema.virtual('fullName').get(function() {
+  return `${this.firstName} ${this.lastName}`;
 });
 
 UserSchema.virtual('posts', {

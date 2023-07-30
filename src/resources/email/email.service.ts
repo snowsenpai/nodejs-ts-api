@@ -4,15 +4,15 @@ class EmailService {
   /**
    * Send a welcome mail to new users
    * @param email user's email
-   * @param first_name user's first name
+   * @param firstName user's first name
    * @returns boolean
    */
-  public async sendWelcomeEmail(email: string, first_name: string) {
+  public async sendWelcomeEmail(email: string, firstName: string) {
     await sendGrid({
       to: email,
       subject: 'Welcome!',
       html: `
-        <h2>Hi ${first_name},</h2> 
+        <h2>Hi ${firstName},</h2> 
         <p>Your account has been sucessfully created, to access other services ensure you verify your email.</p>
       `
     });
@@ -21,17 +21,17 @@ class EmailService {
   /**
    * Send verification email
    * @param email user's email
-   * @param first_name user's first name
+   * @param firstName user's first name
    * @param url verification url
    * @returns boolean
    */
-  public async sendVerifyMail(email: string, first_name: string, url: string) {
+  public async sendVerifyMail(email: string, firstName: string, url: string) {
     await sendGrid({
       to: email,
       subject: 'Verify your email address',
       text: 'to access all our services',
       html: `
-      <h2>Hi ${first_name},</h2> 
+      <h2>Hi ${firstName},</h2> 
       <p>Use this <a href="${url}" target="_blank">link</a> to verify your email.</p>
       <p>Button not working? Paste the following link into ypur browser:</p>
       <p>${url}</p>
@@ -43,12 +43,12 @@ class EmailService {
   /**
    * sendPasswordResetMail
    */
-  public async sendPasswordResetMail(email: string, first_name: string, url: string) {
+  public async sendPasswordResetMail(email: string, firstName: string, url: string) {
     await sendGrid({
       to: email,
       subject: 'Verify password reset request',
       html: `
-      <h2>Hi ${first_name},</h2>
+      <h2>Hi ${firstName},</h2>
       <p>We recived a request to reset your password, use this <a href="${url}" target="_blank">link</a> to approve the request.</p> 
       <p>Button not working? Paste the following link into your browser:</p>
       <p>${url}</p>

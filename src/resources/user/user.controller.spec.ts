@@ -75,17 +75,17 @@ describe('User controller .api/user', () => {
   //     const password = 'testing';
   //     const expiresIn = 360;
   //     const token = 'testToken1234';
-  //     const access_token = { expiresIn, token }
+  //     const accessToken = { expiresIn, token }
 
   //     req.body = { email, password };
   //     // @ts-ignore
-  //     loginSpy.mockResolvedValueOnce(access_token);
+  //     loginSpy.mockResolvedValueOnce(accessToken);
 
   //     await userController['login'](req as Request, res as Response, next);
 
   //     expect(loginSpy).toHaveBeenCalledWith(email, password);
   //     expect(res.status).toHaveBeenCalledWith(200);
-  //     expect(res.json).toHaveBeenCalledWith({ access_token: token });
+  //     expect(res.json).toHaveBeenCalledWith({ accessToken: token });
   //     expect(next).not.toHaveBeenCalled();
   //   });
 
@@ -116,8 +116,8 @@ describe('User controller .api/user', () => {
     it('should return 200 with user data if user exist in req', () => {
       const user = {
         _id: 1,
-        first_name: 'John',
-        last_name: 'Smith',
+        firstName: 'John',
+        lastName: 'Smith',
         email: 'test@gmail.com'
       }
       const req: Partial<Request> = {

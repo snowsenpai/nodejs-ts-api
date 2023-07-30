@@ -5,7 +5,7 @@ import validate from '@/resources/user/user.validation';
 import UserService from './user.service';
 import User from './user.interface';
 import authenticated from '@/middleware/authenticated.middleware';
-import { NotFound } from '@/utils/exceptions/clientErrorResponse';
+import { NotFound } from '@/utils/exceptions/client_error';
 
 class UserController implements Controller{
   public path = '/user';
