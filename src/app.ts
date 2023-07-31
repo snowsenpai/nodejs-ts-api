@@ -14,12 +14,12 @@ class App {
     this.express = express();
     this.port = port;
 
-    this.initialiseMiddleware();
-    this.initialiseControllers(apiRoutes);
-    this.initialiseErrorHandling();
+    this.initializeMiddleware();
+    this.initializeControllers(apiRoutes);
+    this.initializeErrorHandling();
   }
 
-  private initialiseMiddleware(): void {
+  private initializeMiddleware(): void {
     this.express.use(helmet());
     this.express.use(cors());
     this.express.use(morgan('dev'));
@@ -28,13 +28,13 @@ class App {
     this.express.use(compression());
   }
 
-  private initialiseControllers(apiRoutes: Router[]): void {
+  private initializeControllers(apiRoutes: Router[]): void {
     apiRoutes.forEach((apiRoute: Router) => {
       this.express.use('/api', apiRoute);
     });
   }
 
-  private initialiseErrorHandling(): void {
+  private initializeErrorHandling(): void {
     this.express.use(ErrorMiddleware);
   }
 

@@ -12,10 +12,9 @@ const sendGrid = async (options: TMailOptions) => {
       ...options
     };
 
-    const result = await sgMail.send(mailOptions);
-    return result;
+    await sgMail.send(mailOptions);
   } catch (error) {
-    return error;
+    throw error;
   }
 };
 
