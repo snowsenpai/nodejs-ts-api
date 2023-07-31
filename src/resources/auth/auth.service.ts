@@ -6,10 +6,10 @@ import { hash, compare } from 'bcrypt';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import UserService from "../user/user.service";
 import EmailService from '../email/email.service';
-import token from '@/utils/token';
+import token from '@/utils/token.util';
 import { Token, TokenData } from '@/utils/interfaces/token.interface';
-import { Unauthorized, Forbidden, BadRequest } from '@/utils/exceptions/client_error';
-import cryptoHelper from '@/utils/crypto_helpers';
+import { Unauthorized, Forbidden, BadRequest } from '@/utils/exceptions/client-errors.utils';
+import cryptoHelper from '@/utils/crypto-helpers.util';
 
 class AuthService {
   public UserService = new UserService();

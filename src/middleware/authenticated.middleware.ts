@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import token from '@/utils/token';
+import token from '@/utils/token.util';
 import UserModel from '@/resources/user/user.model';
 import { Token } from '@/utils/interfaces/token.interface';
-import { Unauthorized, NotFound } from '@/utils/exceptions/client_error';
+import { Unauthorized, NotFound } from '@/utils/exceptions/client-errors.utils';
 import jwt  from 'jsonwebtoken';
 
 async function authenticatedMiddleware(

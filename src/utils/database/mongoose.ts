@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import logger from '../logger';
+import logger from '../logger.util';
 
 const mongooseConnect = (): void => {
   const { MONGO_DATABASE, MONGO_PATH } = process.env;

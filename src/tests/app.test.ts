@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import request from 'supertest';
 import App from '../app';
-import { connectDB, closeDB } from './mongooseTestDB';
+import { connectDB, closeDB } from '../utils/database/mongoose-test.util';
 import apiRoutes from '@/resources/index'
 
 const app = new App(apiRoutes, 3000).express;  

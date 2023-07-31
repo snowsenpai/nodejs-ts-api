@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import authenticatedMiddleware from './authenticated.middleware';
 import UserModel from '@/resources/user/user.model';
-import HttpException from '@/utils/exceptions/http.exceptions';
-import token from '@/utils/token';
+import HttpException from '@/utils/exceptions/http.exception';
+import token from '@/utils/token.util';
 
 jest.mock('../utils/token.ts');
 

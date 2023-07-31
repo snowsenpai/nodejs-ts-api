@@ -1,4 +1,4 @@
-import CustomHttpException from "./custom.httpException";
+import CustomHttpException from "./custom.exception";
 
 export class BadRequest extends CustomHttpException{
   constructor(customMessage?: string) {

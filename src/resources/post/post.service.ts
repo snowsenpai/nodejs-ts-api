@@ -1,6 +1,6 @@
 import PostModel from "./post.model";
 import Post from "./post.interface";
-import { NotFound, BadRequest, Forbidden } from "@/utils/exceptions/client_error";
+import { NotFound, BadRequest, Forbidden } from "@/utils/exceptions/client-errors.utils";
 
 class PostService {
   private post = PostModel;

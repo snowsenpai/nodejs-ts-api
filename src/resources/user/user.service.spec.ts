@@ -1,4 +1,4 @@
-import token from "@/utils/token";
+import token from "@/utils/token.util";
 
 // Mock token.createToken
 jest.mock('../../utils/token');

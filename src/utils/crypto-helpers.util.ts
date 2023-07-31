@@ -5,8 +5,8 @@ import {
   createHash,
 } from 'crypto';
 import { encode } from 'hi-base32';
-import { BinaryToTextEncoding, Encoding } from './types/crypto_helpers.types';
-import logger from './logger';
+import { BinaryToTextEncoding, Encoding } from './types/crypto-helpers.types';
+import logger from './logger.util';
 
 /**
  * 

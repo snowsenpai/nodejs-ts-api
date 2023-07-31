@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import UserController from './user.controller';
-import HttpException from '@/utils/exceptions/http.exceptions';
+import HttpException from '@/utils/exceptions/http.exception';
 import User from './user.interface';
 
 describe('User controller .api/user', () => {

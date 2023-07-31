@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-
 // for Db related tests...
 // run beforeAll
 const connectDB = async () => {

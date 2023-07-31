@@ -1,6 +1,6 @@
 import UserModel from "./user.model";
 import EmailService from "../email/email.service";
-import { BadRequest, NotFound } from "@/utils/exceptions/client_error";
+import { BadRequest, NotFound } from "@/utils/exceptions/client-errors.utils";
 
 //*  UserModel should have required security(e.g pass word) and otp fields
 //*  UserService should have appropriate methods to mutate and validate a

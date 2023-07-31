@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import PostController from './post.controller';
 import PostService from './post.service';
-import HttpException from '@/utils/exceptions/http.exceptions';
+import HttpException from '@/utils/exceptions/http.exception';
 
 describe('PostController', () => {
   let postController: object;

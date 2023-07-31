@@ -1,4 +1,4 @@
-import HttpException from "./http.exceptions";
+import HttpException from "./http.exception";
 
 class CustomHttpException extends HttpException{
   /**

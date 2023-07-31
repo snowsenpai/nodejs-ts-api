@@ -2,7 +2,7 @@ import { Router } from "express";
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
 import authenticated from '@/middleware/authenticated.middleware';
-import passwordReset from '@/middleware/password_reset.middleware';
+import passwordReset from '@/middleware/password-reset.middleware';
 import AuthController from "./auth.controller";
 
 const authController = AuthController;

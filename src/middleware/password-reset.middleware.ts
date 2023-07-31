@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import cryptoHelper from '@/utils/crypto_helpers';
+import cryptoHelper from '@/utils/crypto-helpers.util';
 import userModel from '@/resources/user/user.model';
-import { Unauthorized, BadRequest } from '@/utils/exceptions/client_error';
+import { Unauthorized, BadRequest } from '@/utils/exceptions/client-errors.utils';
 
 async function passwordReset(
   req: Request,

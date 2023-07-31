@@ -4,7 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import ErrorMiddleware from '@/middleware/error.middleware';
 import helmet from 'helmet';
-import logger from '@/utils/logger';
+import logger from '@/utils/logger.util';
 
 class App {
   public express: Application;

@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 import UserService from './user.service';
 import User from './user.interface';
-import { NotFound } from '@/utils/exceptions/client_error';
+import { NotFound } from '@/utils/exceptions/client-errors.utils';
 
 const userService = new UserService();
 
