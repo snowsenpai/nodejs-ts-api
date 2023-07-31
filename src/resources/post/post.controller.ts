@@ -1,54 +1,11 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import Controller from '@/utils/interfaces/controller.interface';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from '@/resources/post/post.validation';
+import { Request, Response, NextFunction } from 'express';
 import PostService from '@/resources/post/post.service';
 import Post from './post.interface';
-import authenticated from '@/middleware/authenticated.middleware';
 
-class PostController implements Controller {
-  public path = '/posts';
-  public router = Router();
+class PostController {
   private PostService = new PostService();
 
-  constructor() {
-    this.initializeRoutes();
-  }
-
-  // * /api/posts: GET, POST, DELETE ...
-  private initializeRoutes(): void {
-    this.router.get(
-      this.path,
-      this.getAllPosts.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/:id`,
-      this.getPostById.bind(this)
-    );
-
-    this.router.post(
-      this.path,
-      authenticated,
-      validationMiddleware(validate.create),
-      this.create.bind(this)
-    );
-    
-    this.router.patch(
-      `${this.path}/:id`,
-      authenticated,
-      validationMiddleware(validate.modify),
-      this.modifyPost.bind(this)
-    );
-
-    this.router.delete(
-      `${this.path}/:id`,
-      authenticated,
-      this.deletePost.bind(this)
-    );
-  }
-
-  private async create (
+  public async create (
     req: Request,
     res: Response,
     next: NextFunction
@@ -102,7 +59,7 @@ class PostController implements Controller {
     }
   }
 
-  private async modifyPost (
+  public async modifyPost (
     req: Request,
     res: Response,
     next: NextFunction
@@ -121,7 +78,7 @@ class PostController implements Controller {
     }
   }
 
-  private async deletePost (
+  public async deletePost (
     req: Request,
     res: Response,
     next: NextFunction

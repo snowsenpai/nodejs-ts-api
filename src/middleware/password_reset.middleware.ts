@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { decryptData } from '@/utils/crypto_helpers';
+import cryptoHelper from '@/utils/crypto_helpers';
 import userModel from '@/resources/user/user.model';
 import { Unauthorized, BadRequest } from '@/utils/exceptions/client_error';
 
@@ -17,7 +17,7 @@ async function passwordReset(
 
     const base64PasswordToken = basic.split('Basic ')[1].trim();
 
-    const recivedToken = decryptData(base64PasswordToken, 'base64', 'utf-8');
+    const recivedToken = cryptoHelper.decryptData(base64PasswordToken, 'base64', 'utf-8');
 
     const user = await userModel.findOne({ secretToken: recivedToken });
     // token is invalid, or deleted (v2: use a cache for secrets blacklist or refresh encryption key and iv?)

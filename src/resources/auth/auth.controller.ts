@@ -1,113 +1,10 @@
-import { Router, Response, Request, NextFunction } from 'express';
-import Controller from '@/utils/interfaces/controller.interface';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from '@/resources/auth/auth.validation';
+import { Response, Request, NextFunction } from 'express';
 import AuthService from './auth.service';
-import authenticated from '@/middleware/authenticated.middleware';
-import passwordReset from '@/middleware/password_reset.middleware';
 
-class AuthController implements Controller{
-  public path = '/auth';
-  public router = Router();
+class AuthController {
   private AuthService = new AuthService();
 
-  constructor() {
-    this.initialiseRoutes();
-  }
-
-  private initialiseRoutes(): void {
-    this.router.get(
-      `${this.path}/otp/auth-qrcode`,
-      authenticated,
-      this.otpQRCode.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/verify/email`,
-      authenticated,
-      this.verifyEmail.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/validate/email/:encryptedEmail/:emailToken`,
-      this.validateEmail.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/password-reset-request`,
-      authenticated,
-      this.passwordResetRequest.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/validate/password-reset-request/:encryptedEmail/:passwordToken`,
-      this.validatePasswordReset.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/cancel-password-reset`,
-      authenticated,
-      passwordReset,
-      this.cancelPasswordReset.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/login`,
-      validationMiddleware(validate.login),
-      this.login.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/reset-password`,
-      authenticated,
-      passwordReset,
-      validationMiddleware(validate.resetPassword),
-      this.resetPassword.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/generate`,
-      authenticated,
-      this.generateOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/verify`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.verifyOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/validate`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.validateOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/disable`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.disableOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/verify/recovery-code`,
-      authenticated,
-      validationMiddleware(validate.recoveryCode),
-      this.validateRecoveryCode.bind(this)
-    );
-
-    this.router.patch(
-      `${this.path}/update-email`,
-      authenticated,
-      validationMiddleware(validate.updateEmail),
-      this.updateEmail.bind(this)
-    );
-  }
-
-  private async login (
+  public async login (
     req: Request,
     res: Response,
     next: NextFunction
@@ -123,7 +20,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async generateOTP(
+  public async generateOTP(
     req: Request,
     res: Response,
     next: NextFunction
@@ -139,7 +36,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async verifyOTP(
+  public async verifyOTP(
     req: Request,
     res: Response,
     next: NextFunction
@@ -156,7 +53,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async validateOTP(
+  public async validateOTP(
     req: Request,
     res: Response,
     next: NextFunction
@@ -173,7 +70,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async disableOTP(
+  public async disableOTP(
     req: Request,
     res: Response,
     next: NextFunction
@@ -190,7 +87,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async otpQRCode(
+  public async otpQRCode(
     req: Request,
     res: Response,
     next: NextFunction
@@ -206,7 +103,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async validateRecoveryCode(
+  public async validateRecoveryCode(
     req: Request,
     res: Response,
     next: NextFunction
@@ -223,7 +120,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async verifyEmail(
+  public async verifyEmail(
     req: Request,
     res: Response,
     next: NextFunction
@@ -238,7 +135,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async validateEmail(
+  public async validateEmail(
     req: Request,
     res: Response,
     next: NextFunction
@@ -254,7 +151,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async passwordResetRequest(
+  public async passwordResetRequest(
     req: Request,
     res: Response,
     next: NextFunction
@@ -270,7 +167,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async validatePasswordReset(
+  public async validatePasswordReset(
     req: Request,
     res: Response,
     next: NextFunction
@@ -286,7 +183,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async resetPassword(
+  public async resetPassword(
     req: Request,
     res: Response,
     next: NextFunction
@@ -304,7 +201,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async cancelPasswordReset(
+  public async cancelPasswordReset(
     req: Request,
     res: Response,
     next: NextFunction
@@ -321,7 +218,7 @@ class AuthController implements Controller{
     }
   }
 
-  private async updateEmail(
+  public async updateEmail(
     req: Request,
     res: Response,
     next: NextFunction

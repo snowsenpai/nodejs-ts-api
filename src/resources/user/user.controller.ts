@@ -1,59 +1,12 @@
-import { Router, Response, Request, NextFunction } from 'express';
-import Controller from '@/utils/interfaces/controller.interface';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from '@/resources/user/user.validation';
+import { Response, Request, NextFunction } from 'express';
 import UserService from './user.service';
 import User from './user.interface';
-import authenticated from '@/middleware/authenticated.middleware';
 import { NotFound } from '@/utils/exceptions/client_error';
 
-class UserController implements Controller{
-  public path = '/user';
-  public router = Router();
+class UserController {
   private UserService = new UserService();
 
-  constructor(){
-    this.initialiseRoutes();
-  }
-
-  private initialiseRoutes(): void {
-    this.router.get(
-      this.path,
-      authenticated,
-      this.getUser
-    );
-
-    this.router.get(
-      `${this.path}/:id`,
-      this.findUser.bind(this)
-    );
-
-    this.router.get(
-      `${this.path}/:id/posts`,
-      this.userPost.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/register`,
-      validationMiddleware(validate.register),
-      this.register.bind(this)
-    );
-
-    this.router.patch(
-      `${this.path}`,
-      authenticated,
-      validationMiddleware(validate.updateUser),
-      this.updateUser.bind(this)
-    );
-
-    this.router.delete(
-      this.path,
-      authenticated,
-      this.deleteUser.bind(this)
-    );
-  }
-
-  private async register (
+  public async register (
     req: Request,
     res: Response,
     next: NextFunction
@@ -74,7 +27,7 @@ class UserController implements Controller{
     }
   }
 
-  private getUser (
+  public getUser (
     req: Request,
     res: Response,
     next: NextFunction
@@ -86,7 +39,7 @@ class UserController implements Controller{
     res.status(200).json(user);
   };
 
-  private async findUser(
+  public async findUser(
     req: Request,
     res: Response,
     next: NextFunction
@@ -102,7 +55,7 @@ class UserController implements Controller{
     }
   }
 
-  private async updateUser(
+  public async updateUser(
     req: Request,
     res: Response,
     next: NextFunction
@@ -120,7 +73,7 @@ class UserController implements Controller{
     }
   }
 
-  private async userPost(
+  public async userPost(
     req: Request,
     res: Response,
     next: NextFunction
@@ -136,7 +89,7 @@ class UserController implements Controller{
     }
   }
 
-  private async deleteUser(
+  public async deleteUser(
     req: Request,
     res: Response,
     next: NextFunction
