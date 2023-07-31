@@ -54,7 +54,7 @@ describe('UserService', () => {
     });
   });
 
-  // login logic moved to auth resource
+  // FIX: login logic moved to auth resource
   // describe('login', () => {
   //   it('should generate a token for a valid user', async () => {
   //     const mockUser = {

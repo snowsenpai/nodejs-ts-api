@@ -4,39 +4,39 @@ import validate from '@/resources/post/post.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import PostController from './post.controller';
 
-const postController = new PostController();
+const postController = PostController;
 const postRouter = Router();
 
 const basePath = '/posts';
 
 postRouter.get(
   basePath,
-  postController.getAllPosts.bind(postController)
+  postController.getAllPosts
 );
 
 postRouter.get(
   `${basePath}/:id`,
-  postController.getPostById.bind(postController)
+  postController.getPostById
 );
 
 postRouter.post(
   basePath,
   authenticated,
   validationMiddleware(validate.create),
-  postController.create.bind(postController)
+  postController.create
 );
 
 postRouter.patch(
   `${basePath}/:id`,
   authenticated,
   validationMiddleware(validate.modify),
-  postController.modifyPost.bind(postController)
+  postController.modifyPost
 );
 
 postRouter.delete(
   `${basePath}/:id`,
   authenticated,
-  postController.deletePost.bind(postController)
+  postController.deletePost
 );
 
 export default postRouter;

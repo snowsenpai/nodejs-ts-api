@@ -4,7 +4,7 @@ import validate from '@/resources/user/user.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import UserController from "./user.controller";
 
-const userController = new UserController();
+const userController = UserController;
 const userRouter = Router();
 
 const basePath = '/user';
@@ -17,31 +17,31 @@ userRouter.get(
 
 userRouter.get(
   `${basePath}/:id`,
-  userController.findUser.bind(userController)
+  userController.findUser
 );
 
 userRouter.get(
   `${basePath}/:id/posts`,
-  userController.userPost.bind(userController)
+  userController.userPost
 );
 
 userRouter.post(
   `${basePath}/register`,
   validationMiddleware(validate.register),
-  userController.register.bind(userController)
+  userController.register
 );
 
 userRouter.patch(
   `${basePath}`,
   authenticated,
   validationMiddleware(validate.updateUser),
-  userController.updateUser.bind(userController)
+  userController.updateUser
 );
 
 userRouter.delete(
   basePath,
   authenticated,
-  userController.deleteUser.bind(userController)
+  userController.deleteUser
 );
 
-export default userRouter
+export default userRouter;

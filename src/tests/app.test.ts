@@ -79,7 +79,7 @@ describe('Api base /api endpoint', () => {
       expect(body).toEqual({ data: userPayload});
     });
 
-    // API routing moved to seperate module, spying on controller's service should be done in unit tests
+    // FIX: API routing moved to seperate module, spying on controller's service should be done in unit tests
     // describe('/register', () => {
     //   it('should register a new user and return a success message', async () => {
     //     const userServiceMock = jest.spyOn(userController['UserService'], 'register')
@@ -103,7 +103,7 @@ describe('Api base /api endpoint', () => {
     //   });
     // });
     
-    // login logic moved to auth resource
+    // FIX: login logic moved to auth resource
     // describe('/login', () => {
     //   it('should return an accessToken for a registered user', async () => {
     //     const jwtToken = {
