@@ -1,7 +1,7 @@
 import { Router } from "express";
 import validationMiddleware from "@/middleware/validation.middleware";
 import validate from './tag.validation';
-import tagContoller from "./tag.contoller";
+import tagContoller from "./tag.controller";
 
 const tagRouter = Router();
 const basePath = '/tags';
