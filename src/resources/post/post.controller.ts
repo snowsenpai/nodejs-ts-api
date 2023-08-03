@@ -11,9 +11,9 @@ async function create (
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
-    const { title, body } = req.body;
+    const { title, body, tags } = req.body;
 
-    const post = await postService.create(title, body, userId);
+    const post = await postService.create(title, body, userId, tags);
 
     res.status(201).json({ post });
   } catch (error) {

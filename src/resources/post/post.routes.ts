@@ -4,6 +4,7 @@ import validate from '@/resources/post/post.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import PostController from './post.controller';
 
+// TODO use imported PostController directlty as postCOntroller
 const postController = PostController;
 const postRouter = Router();
 

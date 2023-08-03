@@ -8,8 +8,8 @@ class PostService {
   /**
    * Create a new post
    */
-  public async create(title: string, body: string, creator: string): Promise<Post | Error> {
-    const post = await this.post.create({ title, body, creator });
+  public async create(title: string, body: string, creator: string, tags: string[]): Promise<Post | Error> {
+    const post = await this.post.create({ title, body, creator, tags });
     if(!post) {
       throw new BadRequest('Unable to create post');
     }
@@ -20,8 +20,9 @@ class PostService {
    * Find all posts
    */
   public async findAll() {
-    // mongoose.Schema middleware to populate 'creator' and exclude '-password' for find*() queries?
-    const posts = await this.post.find();
+    // TODO mongoose.Schema middleware to populate 'creator'?
+    // TODO sorting find by tags {'tags': ''} and creator, seperate functions?? or dynmic options object
+    const posts = await this.post.find({});
     if (!posts) {
       throw new NotFound('No post found')
     }
@@ -54,6 +55,7 @@ class PostService {
       throw new Forbidden();
     }
 
+    // TODO switch to findOneAndUpdate? for tag middleware populating
     const modifiedPost = await this.post.findByIdAndUpdate(postId, postData, { new: true });
 
     return modifiedPost;
