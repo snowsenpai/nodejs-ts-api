@@ -1,11 +1,12 @@
 import User from '@/resources/user/user.interface';
-// use a serialized user instead of the full user object
+import { TPaginationDetails } from '@/middleware/pagination.middleware';
 
 declare global {
   namespace Express {
     export interface Request {
       user: User;
       passwordResetSecret: string;
+      paginationDetails: TPaginationDetails;
     }
   }
 }

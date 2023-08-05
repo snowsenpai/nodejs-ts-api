@@ -23,8 +23,8 @@ class PostService {
     // TODO mongoose.Schema middleware to populate 'creator'?
     // TODO sorting find by tags {'tags': ''} and creator, seperate functions?? or dynmic options object
     const posts = await this.post.find({});
-    if (!posts) {
-      throw new NotFound('No post found')
+    if (posts.length === 0) {
+      throw new NotFound('No post found');
     }
 
     return posts;
