@@ -21,16 +21,21 @@ async function create (
   }
 };
 
+async function postPaginationOptions () {
+ const paginationOptions = await postService.getPagiationOptions();
+ return paginationOptions;
+}
+
 async function getAllPosts (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> {
   try {
-    // pagination logic
-    const posts = await postService.findAll();
+    const paginationDetails = req.paginationDetails;
+    const result = await postService.findAll(paginationDetails);
 
-    res.status(200).json({ posts: posts });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -100,4 +105,5 @@ export default {
   getAllPosts,
   getPostById,
   modifyPost,
+  postPaginationOptions,
 };

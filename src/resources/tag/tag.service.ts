@@ -19,10 +19,25 @@ class TagService {
   public async findAll() {
     const tags = await this.tag.find({});
     // TODO fix all empty array checks for find() queries
-    if (!tags) {
+    if (tags.length === 0) {
       throw new NotFound('No tags added yet');
     }
     return tags;
+  }
+
+  /**
+   * getPaginationOptions
+   */
+  public async getTagFilters() {
+    const tags = (await this.tag.find({})).map((doc) => doc._id as string);
+    const defaultFilter = 'tags';
+    const tagSort = 'asc'; //ascending
+    const tagPaginationOption = {
+      defaultFilter,
+      tags,
+      tagSort,
+    }
+    return tagPaginationOption;
   }
 }
 

@@ -2,16 +2,17 @@ import { Router } from 'express';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/post/post.validation';
 import authenticated from '@/middleware/authenticated.middleware';
-import PostController from './post.controller';
+import paginationMiddleware from '@/middleware/pagination.middleware';
+import postController from './post.controller';
 
-// TODO use imported PostController directlty as postCOntroller
-const postController = PostController;
+// TODO use imported PostController directlty as postController
 const postRouter = Router();
 
 const basePath = '/posts';
 
 postRouter.get(
   basePath,
+  paginationMiddleware(postController.postPaginationOptions()),
   postController.getAllPosts
 );
 

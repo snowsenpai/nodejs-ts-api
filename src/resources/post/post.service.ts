@@ -1,9 +1,12 @@
 import PostModel from "./post.model";
 import Post from "./post.interface";
+import TagService from "../tag/tag.service";
 import { NotFound, BadRequest, Forbidden } from "@/utils/exceptions/client-errors.utils";
+import { TPaginationDetails, TPaginationOptions } from "@/middleware/pagination.middleware";
 
 class PostService {
   private post = PostModel;
+  private tags = new TagService();
 
   /**
    * Create a new post
@@ -17,17 +20,65 @@ class PostService {
   }
 
   /**
+   * getPagiationOptions
+   */
+  public async getPagiationOptions() {
+    const tagFilters = await this.tags.getTagFilters();
+    const paginationOptions: TPaginationOptions = {
+      defaultFilter: tagFilters.defaultFilter,
+      filters: {
+        tags: tagFilters.tags,
+      },
+      defaultSort: tagFilters.tagSort
+    }
+    return paginationOptions;
+  }
+
+  /**
    * Find all posts
    */
-  public async findAll() {
+  public async findAll(paginationDetails: TPaginationDetails) {
     // TODO mongoose.Schema middleware to populate 'creator'?
-    // TODO sorting find by tags {'tags': ''} and creator, seperate functions?? or dynmic options object
-    const posts = await this.post.find({});
+    // TODO sorting find by tags {'tags': ''} and creator
+    const {
+      filterValue,
+      filterField,
+      limit,
+      page,
+      search,
+      sortBy
+    } = paginationDetails;
+
+    const posts = await this.post.find({name: {$regex: search, $options: 'i'}})
+    .where(filterField)
+    .in([...filterValue])
+    .sort(sortBy)
+    .skip((page - 1) * limit)
+    .limit(limit);
+
     if (posts.length === 0) {
       throw new NotFound('No post found');
     }
 
-    return posts;
+    const total = await this.post.countDocuments({
+      filterField: { $in: [...filterValue] },
+      name: {$regex: search, $options: 'i'},
+    });
+
+    const hasNextPage = limit * page < total;
+    const nextPage = hasNextPage ? page + 1 : null;
+    const hasPrevPage = page > 1;
+    const prevPage = hasPrevPage ? page - 1 : null;
+
+    return {
+      total,
+      currentPage: page,
+      nextPage,
+      prevPage,
+      limit,
+      filterOptions: filterValue,
+      posts
+    };
   }
 
   /**
