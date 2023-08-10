@@ -49,7 +49,11 @@ class PostService {
       sortBy
     } = paginationDetails;
 
-    const posts = await this.post.find({name: {$regex: search, $options: 'i'}})
+    // search field should be dev defined or retrieved from a dynamic queryOption(s)
+    // e.g can query based on title, location name, etc, validation should be in place for fields 
+    const searchQuery = { title: {$regex: search, $options: 'i'}};
+
+    const posts = await this.post.find({...searchQuery})
     .where(filterField)
     .in([...filterValue])
     .sort(sortBy)
@@ -60,21 +64,24 @@ class PostService {
       throw new NotFound('No post found');
     }
 
-    const total = await this.post.countDocuments({
-      filterField: { $in: [...filterValue] },
-      name: {$regex: search, $options: 'i'},
+    const totalPostsFound = await this.post.countDocuments({
+      ...searchQuery,
+      [filterField]: { $in: [...filterValue] },
     });
 
-    const hasNextPage = limit * page < total;
+    const hasNextPage = limit * page < totalPostsFound;
     const nextPage = hasNextPage ? page + 1 : null;
     const hasPrevPage = page > 1;
     const prevPage = hasPrevPage ? page - 1 : null;
+    const lastPage = Math.ceil(totalPostsFound/limit);
 
+    // imporvement: if sending filterOptions, should be the filter 'name' not 'id'
     return {
-      total,
+      totalPostsFound,
       currentPage: page,
       nextPage,
       prevPage,
+      lastPage,
       limit,
       filterOptions: filterValue,
       posts
