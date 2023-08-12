@@ -56,7 +56,7 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified === false) {
-      throw new Forbidden('Only verified users can enable OTP')
+      throw new Forbidden('Only verified users can enable OTP');
     }
 
     const base32Secret = cryptoHelper.generateRandomBase32(24);

@@ -10,6 +10,12 @@ const authRouter = Router();
 const basePath = '/auth';
 
 authRouter.get(
+  `${basePath}/otp/generate`,
+  authenticated,
+  authController.generateOTP
+);
+
+authRouter.get(
   `${basePath}/otp/auth-qrcode`,
   authenticated,
   authController.otpQRCode
@@ -56,12 +62,6 @@ authRouter.post(
   passwordReset,
   validationMiddleware(validate.resetPassword),
   authController.resetPassword
-);
-
-authRouter.post(
-  `${basePath}/otp/generate`,
-  authenticated,
-  authController.generateOTP
 );
 
 authRouter.post(
