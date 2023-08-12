@@ -1,6 +1,6 @@
 import TagModel from "./tag.model";
 import Tag from "./tag.interface";
-import { NotFound, Forbidden, BadRequest } from "@/utils/exceptions/client-errors.utils";
+import { NotFound } from "@/utils/exceptions/client-errors.utils";
 
 class TagService {
   private tag = TagModel;
@@ -18,8 +18,7 @@ class TagService {
    */
   public async findAll() {
     const tags = await this.tag.find({});
-    // TODO fix all empty array checks for find() queries or (!array.length)
-    if (tags.length === 0) {
+    if (!tags.length) {
       throw new NotFound('No tags added yet');
     }
     return tags;

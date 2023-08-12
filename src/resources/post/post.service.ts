@@ -38,8 +38,6 @@ class PostService {
    * Find all posts
    */
   public async findAll(paginationDetails: TPaginationDetails) {
-    // TODO mongoose.Schema middleware to populate 'creator'?
-    // TODO sorting find by tags {'tags': ''} and creator
     const {
       filterValue,
       filterField,
@@ -60,7 +58,7 @@ class PostService {
     .skip((page - 1) * limit)
     .limit(limit);
 
-    if (posts.length === 0) {
+    if (!posts.length) {
       throw new NotFound('No post found');
     }
 
@@ -113,7 +111,6 @@ class PostService {
       throw new Forbidden();
     }
 
-    // TODO switch to findOneAndUpdate? for tag middleware populating
     const modifiedPost = await this.post.findByIdAndUpdate(postId, postData, { new: true });
 
     return modifiedPost;

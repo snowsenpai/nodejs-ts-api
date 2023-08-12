@@ -2,10 +2,6 @@ import UserModel from "./user.model";
 import EmailService from "../email/email.service";
 import { BadRequest, NotFound } from "@/utils/exceptions/client-errors.utils";
 
-//*  UserModel should have required security(e.g pass word) and otp fields
-//*  UserService should have appropriate methods to mutate and validate a
-//*  retrived user object from the database using a unique identifier e.g
-//*  user.id; this available to other controllers via middleware req.user.id
 class UserService {
   private user = UserModel;
   private EmailService = new EmailService();
@@ -47,7 +43,7 @@ class UserService {
    */
   public async findAllUsers() {
     const users = await this.user.find({});
-    if(!users){
+    if(!users.length){
       throw new NotFound('Unable to find any user');
     }
     return users;

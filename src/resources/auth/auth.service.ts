@@ -225,6 +225,9 @@ class AuthService {
    */
   public async validateRecoveryCode(userId: string, recoverCode: string) {
     const user = await this.UserService.getFullUserById(userId);
+    if (!(user.recoveryCodes.length)) {
+      throw new Forbidden('User has no recover code');
+    }
     const recoveryCodes = user.recoveryCodes;
 
     for (const code of recoveryCodes) {

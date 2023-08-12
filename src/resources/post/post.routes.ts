@@ -5,7 +5,6 @@ import authenticated from '@/middleware/authenticated.middleware';
 import paginationMiddleware from '@/middleware/pagination.middleware';
 import postController from './post.controller';
 
-// TODO use imported PostController directlty as postController
 const postRouter = Router();
 
 const basePath = '/posts';

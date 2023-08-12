@@ -2,9 +2,8 @@ import { Router } from "express";
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/user/user.validation';
 import authenticated from '@/middleware/authenticated.middleware';
-import UserController from "./user.controller";
+import userController from "./user.controller";
 
-const userController = UserController;
 const userRouter = Router();
 
 const basePath = '/user';

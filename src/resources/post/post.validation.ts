@@ -1,6 +1,6 @@
 import Joi from 'joi';
+import { isValidObjectId } from 'mongoose';
 
-// TODO validate tags array using custom operator to check for ObjectId?
 const create = Joi.object({
   title: Joi.string().required(),
   body: Joi.string().required(),
@@ -9,7 +9,12 @@ const create = Joi.object({
 
 const modify = Joi.object({
   title: Joi.string(),
-  body: Joi.string()
+  body: Joi.string(),
+  tags: Joi.array().items(Joi.string().custom((value, helpers) => {
+      const filtered = isValidObjectId(value);
+      return !filtered ? helpers.error('any.invalid') : value;
+    }, 'invalid objectId')
+  )
 });
 
 export default { create, modify };

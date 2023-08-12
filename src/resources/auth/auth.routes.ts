@@ -3,9 +3,8 @@ import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import passwordReset from '@/middleware/password-reset.middleware';
-import AuthController from "./auth.controller";
+import authController from "./auth.controller";
 
-const authController = AuthController;
 const authRouter = Router();
 
 const basePath = '/auth';
