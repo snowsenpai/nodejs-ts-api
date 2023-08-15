@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { NotFound } from "@/utils/exceptions/client-errors.utils";
 
 function handelInvalidRoutes (
   req: Request,
