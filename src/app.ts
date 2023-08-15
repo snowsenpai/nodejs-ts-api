@@ -3,6 +3,7 @@ import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
 import ErrorMiddleware from '@/middleware/error.middleware';
+import handelInvalidRoutes from './middleware/invalid-routes.middleware';
 import helmet from 'helmet';
 import logger from '@/utils/logger.util';
 
@@ -15,7 +16,7 @@ class App {
     this.port = port;
 
     this.initializeMiddleware();
-    this.initializeControllers(apiRoutes);
+    this.initializeRoutes(apiRoutes);
     this.initializeErrorHandling();
   }
 
@@ -28,10 +29,11 @@ class App {
     this.express.use(compression());
   }
 
-  private initializeControllers(apiRoutes: Router[]): void {
+  private initializeRoutes(apiRoutes: Router[]): void {
     apiRoutes.forEach((apiRoute: Router) => {
       this.express.use('/api', apiRoute);
     });
+    this.express.use('*', handelInvalidRoutes);
   }
 
   private initializeErrorHandling(): void {

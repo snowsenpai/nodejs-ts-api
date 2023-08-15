@@ -15,7 +15,7 @@ async function create (
 
     const post = await postService.create(title, body, userId, tags);
 
-    res.status(201).json({ post });
+    res.status(201).json(post);
   } catch (error) {
     next(error);
   }
@@ -76,7 +76,7 @@ async function modifyPost (
 
     const modifiedPost = await postService.modifyPost(postId, postData, userId);
 
-    res.status(201).json({ modifiedPost });
+    res.status(201).json(modifiedPost);
   } catch (error) {
     next(error);
   }
@@ -93,7 +93,7 @@ async function deletePost (
 
     const message = await postService.deletePost(postId, userId);
     
-    res.status(200).json({ message: message });
+    res.status(200).json(message);
   } catch (error) {
     next(error);
   }

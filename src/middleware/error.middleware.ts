@@ -11,7 +11,7 @@ function errorMiddleware(
   const status = error.status || 500;
   let message = error.message;
   if (status === 500) {
-    message = 'Something went wrong';
+    message = 'Something went wrong, please reach out to an admin';
     logger.error(error);
   }
 

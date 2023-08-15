@@ -48,7 +48,7 @@ async function findUser(
 
     const user = await userService.findById(userId);
 
-    res.status(200).json({ data: user });
+    res.status(200).json(user);
   } catch (error) {
     next(error);
   }
@@ -66,7 +66,7 @@ async function updateUser(
 
     const updatedUser = await userService.updateUser(userId, userData);
 
-    res.status(201).json({ updatedUser });
+    res.status(201).json(updatedUser);
   } catch (error) {
     next(error);
   }
@@ -82,7 +82,7 @@ async function userPost(
 
     const posts = await userService.getAllPostsOfUser(userId);
 
-    res.status(200).json({ posts: posts });
+    res.status(200).json(posts);
   } catch (error) {
     next(error);
   }
@@ -95,9 +95,9 @@ async function deleteUser(
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;    
-    const response = await userService.deleteUser(userId);
+    const message = await userService.deleteUser(userId);
 
-    res.status(200).json(response);
+    res.status(200).json(message);
   } catch (error) {
     next(error);
   }

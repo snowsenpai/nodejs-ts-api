@@ -27,7 +27,6 @@ async function authenticatedMiddleware(
       return next(new Unauthorized());
     }
 
-    // no lean queries, posts virtual field
     const user = await UserModel.findById(payload.id).exec();
 
     if (!user) {

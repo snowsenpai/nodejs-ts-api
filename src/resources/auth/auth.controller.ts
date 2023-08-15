@@ -46,7 +46,7 @@ async function verifyOTP(
 
     const result = await authService.verifyOTP(userId, token);
 
-    res.status(201).json({ result });
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
@@ -63,7 +63,7 @@ async function validateOTP(
 
     const result = await authService.validateOTP(userId, token);
 
-    res.status(200).json({ result });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -128,7 +128,7 @@ async function verifyEmail(
     const userId = req.user._id;
     const message = await authService.verifyEmail(userId);
 
-    res.status(201).json({message});
+    res.status(201).json(message);
   } catch (error) {
     next(error)
   }

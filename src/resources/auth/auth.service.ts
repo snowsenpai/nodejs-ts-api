@@ -314,8 +314,7 @@ class AuthService {
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
-    const message = 'A verification link has been sent to your email';
-    return { message };
+    return { message: 'A verification link has been sent to your email' };
   }
 
   /**
@@ -390,8 +389,7 @@ class AuthService {
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 
-    const message = 'Password reset email has been sent';
-    return { message };
+    return { message: 'Password reset email has been sent' };
   }
 
   /**

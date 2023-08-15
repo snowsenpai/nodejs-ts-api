@@ -45,7 +45,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
 
       let filterValue: string | string[] = (req.query.filterValue as string) || 'All';
 
-      // based on filterName used, set a corresponding filterValue: string[] i.e T<paginationOptions.filters.filterName>
+      // based on filterName used, set a corresponding filterValue(string[]) i.e T<paginationOptions.filters.filterName>
       let matchedValue: string[];
 
       if (filter[0] in paginate.filters) {
