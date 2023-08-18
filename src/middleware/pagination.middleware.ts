@@ -82,5 +82,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
 }
 
 export default paginationMiddleware;
-// improvement:
-// handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
+//! improvements:
+//* handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
+//* search field ('title') should be dev defined or retrieved from a dynamic queryOption(s) e.g 'searchBy'
+// e.g can query based on title, location name, etc, validation should be in place for available fields

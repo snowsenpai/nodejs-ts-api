@@ -6,8 +6,8 @@ import tagContoller from "./tag.controller";
 const tagRouter = Router();
 const basePath = '/tags';
 
-// pre v2: role based authmw only ADMIN can access other endpoints
-// Get '/' '/:id' are PUBLIC
+//! role based authmiddleware
+// Get '/' & '/:id' are PUBLIC others require ADMIN role
 tagRouter.get(
   basePath,
   tagContoller.getAllTags

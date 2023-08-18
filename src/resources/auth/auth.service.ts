@@ -64,12 +64,10 @@ class AuthService {
 
     const base32Secret = cryptoHelper.generateRandomBase32(24);
 
-    // new time-based otp
     let totp = this.generateTOTP(base32Secret, user.email);
 
     let otpUrl = totp.toString();
 
-    // update user otpAuthUrl and otpBase32
     user.otpAuthUrl = otpUrl;
     user.otpBase32 = base32Secret;
     await user.save();
@@ -92,7 +90,6 @@ class AuthService {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'); 
     }
 
-    // update user data
     user.otpEnabled = true;
     user.otpVerified = true;
     
@@ -101,9 +98,9 @@ class AuthService {
     const recoveryCodesSize = 10;
 
     const recoveryCodes = cryptoHelper.randomStringArray(codeLength, recoveryCodesSize);
-    // hash recovery codes
+
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
-    // save hasded codes to user doc
+
     user.recoveryCodes = hashedRecoveryCodes;
 
     const updatedUser = await user.save();
@@ -177,11 +174,10 @@ class AuthService {
    */
   public async otpData(userId: string) {
     const user = await this.UserService.getFullUserById(userId);
-    // after generateOTP() authUrl will be defined
+
     const enabled = user.otpAuthUrl;
     if(!enabled) throw new HttpException(HttpStatus.UNAUTHORIZED, 'user otp not enabled');
 
-    // based on users otp status return otp data
     return {
       otpAuthUrl: user.otpAuthUrl,
       otpBase32: user.otpBase32
@@ -207,11 +203,8 @@ class AuthService {
    * hash an array of random strings as recovery codes of user
    */
   public async hashRecoveryCodes(recoveryCodes: string[]) {
-    // await the result of the iterable code
     const hashedCodes = await Promise.all(
-      // iterate over the array
       recoveryCodes.map( async (code) => {
-        // hash each code and return an object with a 'used' property for each hash
         const hasedCode = await hash(code, 7);
         return {
           hash: hasedCode,
@@ -236,8 +229,7 @@ class AuthService {
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoverCode, code.hash);
 
-      // using `if(!isMatch) or if-else` will exit the loop        
-      // fast if a match is not found after first iteration
+      // using `if(!isMatch) or if(!isMatch)-else` will exit the loop fast if a match is not found after first iteration
       if (isMatch) {
         if (code.used) {
           throw new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoverCode}`);
@@ -297,22 +289,21 @@ class AuthService {
     const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
     const secretToken = cryptoHelper.generateRandomString(lengthOfSecretToken);
 
-    // set generated secretToken to user.secretToken and save updated user
     user.secretToken = secretToken;
     const updatedUser = await user.save();
 
-    // when testing can use lower duration
-    const tokenExpiry = 60 * 60; // seconds in an hour
+    const tokenExpiry = 60 * 60; // an hour
     const emailJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
+    // when validating, encrypted data should be decrypted
     const emailToken = cryptoHelper.encryptData(emailJWT, 'utf-8', 'hex');
 
     const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
-    // when validating emailToken should be decryted to get the emailjwt
 
-    // in production could be full domain or api sub domain
+    //! use config file to access appDomain and other env vars
     const appDomain = process.env.APP_DOMAIN! || process.env.LOCAL_HOST!;
-    // https: //appName.com/api/auth/validate/email/:email/:token req.param => email, token
-    const verificationURL = `${appDomain}/api/auth/validate/email/${encryptedUserEmail}/${emailToken}`
+    //! dont hard code urls, dynamically access and modify resource routes 
+    // research: using node:url with express' req.url or req.originalUrl. appDomain wont be needed
+    const verificationURL = `${appDomain}/api/v1/auth/validate/email/${encryptedUserEmail}/${emailToken}`
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
@@ -330,27 +321,19 @@ class AuthService {
 
     const errorMesage = 'verification failed, possibly link is invalid or expired';
 
-    // if jsonwebtokenError, jwt is either expired, malformed or fake
     if (payload instanceof JsonWebTokenError) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMesage);
     }
 
     const unverifiedUserEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
 
-    // find a user with the decrypted email
     const existingUser = await this.UserService.getFullUserByEmail(unverifiedUserEmail);
 
-    const validUserSecert = existingUser.secretToken;
-    const recievedSecret = payload.secret;
-
-    // recived secret must equal to original secret generated and stored
-    // if not equal then recived secret might be malformed or fake
-    if (recievedSecret !== validUserSecert) {
+    if (payload.secret !== existingUser.secretToken) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMesage)
     }
 
     existingUser.verified = true;
-    // 'delete' generated secret from user documnet
     existingUser.secretToken = '';
 
     const verifiedUser = await existingUser.save();
@@ -384,9 +367,8 @@ class AuthService {
     const passwordJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
     const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
 
-    // frontend integration, frontend get endpoint, frontend will parse req params and send backend via api request
     const appDomain = process.env.APP_DOMAIN! || process.env.LOCAL_HOST!;
-    const passwordResetURL = `${appDomain}/api/auth/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
+    const passwordResetURL = `${appDomain}/api/auth/v1/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 
@@ -449,12 +431,11 @@ class AuthService {
     }
 
     const existingPassword = await user.isValidPassword(newPassword);
-    // new password should not be old password
     if (existingPassword) {
       throw new HttpException(HttpStatus.BAD_REQUEST, 'unacceptable password');
     }
+    //! imporvement: avoid permitting default & weak passwords (ref: OWASP AO7)
 
-    // update user password and reset verification fields
     user.password = newPassword;
     user.passwordResetRequest = false;
     user.grantPasswordReset = false;

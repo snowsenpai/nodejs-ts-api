@@ -43,9 +43,7 @@ class PostService {
       search,
       sortBy
     } = paginationDetails;
-
-    // search field should be dev defined or retrieved from a dynamic queryOption(s)
-    // e.g can query based on title, location name, etc, validation should be in place for fields 
+ 
     const searchQuery = { title: {$regex: search, $options: 'i'}};
 
     const posts = await this.post.find({...searchQuery})
@@ -70,7 +68,7 @@ class PostService {
     const prevPage = hasPrevPage ? page - 1 : null;
     const lastPage = Math.ceil(totalPostsFound/limit);
 
-    // imporvement: if sending filterOptions, should be the filter 'name' not 'id'
+    // imporvement: if sending filterOptions, should be the filter 'name' not 'id' refernce
     return {
       totalPostsFound,
       currentPage: page,

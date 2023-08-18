@@ -6,6 +6,7 @@ import {
 } from 'crypto';
 import { encode } from 'hi-base32';
 import { BinaryToTextEncoding, Encoding } from './types/crypto-helpers.types';
+import { HttpException, HttpStatus } from './exceptions';
 import logger from './logger.util';
 
 /**
@@ -15,7 +16,6 @@ import logger from './logger.util';
  */
 function generateRandomString(length: number) {
   const characters = process.env.SECRET_CHARACTERS!;
-  // number of characters available for selection
   const characterCount = characters.length;
 
   const buf = randomBytes(length);
@@ -58,7 +58,7 @@ function randomStringArray(length: number, count: number) {
     const randomString = generateRandomString(length);
     randomStrings.push(randomString);
   }
-  // random string uniqueness, cache db?, do-while(generatedStrings.has(generatedString) && generatedSize < count)...
+  // ? handle random string uniqueness, cache?...
 
   return randomStrings;
 }
@@ -110,23 +110,22 @@ function randomEndcoding(size: number, outputEncoding: BinaryToTextEncoding) {
   return randomEncodedString;
 }
 
-// encryption and decryption
 // normalize strings before passing to crypto apis
-const plain_key = (process.env.SECRET_KEY!).normalize(); //if no arg is passed default 'NFC'
+const plain_key = (process.env.SECRET_KEY!).normalize(); //if no arg is passed default 'NFC' (ref: MDN)
 const plain_iv = (process.env.SECRET_IV!).normalize();
+// use node:crypto getCiphers() for array of supported algorithms
 const algorithm = 'aes-256-cbc';
 
-// 32 bytes secret_key
+// byte sizes of keys depends on the algorithm used, double check
 const secret_key = createHash('sha512')
   .update(plain_key)
   .digest('hex')
-  .substring(0, 32);
+  .substring(0, 32); // 32 bytes secret_key
 
-// 16 bytes secret_iv
 const secret_iv = createHash('sha512')
   .update(plain_iv)
   .digest('hex')
-  .substring(0, 16)
+  .substring(0, 16); // 16 bytes secret_iv
 
 /**
  * `data` argument is a string with a specified `inputEncoding`.
@@ -150,7 +149,7 @@ function encryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return encryptedData;
   } catch (error) {
     logger.error(error, 'Encryption error');
-    throw new Error('invalid data type or format');
+    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data type or format');
   }
 }
 
@@ -177,10 +176,11 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return decryptedData;
   } catch (error) {
     logger.error(error, 'Decryption error');
-    throw new Error('invalid data type or format');
+    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data type or format');
   }
 }
 
+//! imporve security e.g avoid reuse of secret_keys and ivs (ref: OWASP AO2)
 export default {
   encryptData, 
   decryptData,

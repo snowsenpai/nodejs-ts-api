@@ -20,7 +20,7 @@ async function passwordReset(
     const recivedToken = cryptoHelper.decryptData(base64PasswordToken, 'base64', 'utf-8');
 
     const user = await userModel.findOne({ secretToken: recivedToken });
-    // token is invalid, or deleted (v2: use a cache for secrets blacklist or refresh encryption key and iv?)
+    //! handle invalid or deleted token  (use a cache for secrets blacklist?)
     if (!user) {
       throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid token');
     }
