@@ -237,12 +237,12 @@ class AuthService {
       // fast if a match is not found after first iteration
       if (isMatch) {
         if (code.used) {
-          throw new Forbidden('Code already used');
+          throw new Forbidden(`code has been used: ${recoverCode}`);
         } else {
           code.used = true;
           await user.save();
 
-          return {validCode: recoverCode, message: 'code is valid and cannot be used again'};
+          return { validCode: recoverCode };
         }
       }
     }
@@ -255,7 +255,7 @@ class AuthService {
   public async validCode(userId: string, recoveryCode: string) {
     const result = await this.validateRecoveryCode(userId, recoveryCode);
     if (!result) {
-      throw new Forbidden('Code does not exist');
+      throw new Forbidden('invalid recovery code');
     }
     return result;
   }
@@ -265,12 +265,11 @@ class AuthService {
    */
   public async updateEmail(userId: string, oldEmail: string, newEmail: string) {
     if (newEmail === oldEmail) {
-      throw new BadRequest('New email should not be the same as old email');
+      throw new BadRequest('new email should not be the same as old email');
     }
 
     const updatedUser = await this.UserService.updateUser(userId, { email: newEmail });
 
-    // if user is verified, set verified to false and trigger email verification process
     if (updatedUser.verified === true) {
       updatedUser.verified = false;
       const oldVerifiedUser = await updatedUser.save();
@@ -314,7 +313,7 @@ class AuthService {
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
-    return { message: 'A verification link has been sent to your email' };
+    return 'A verification link has been sent to your email';
   }
 
   /**
@@ -354,7 +353,6 @@ class AuthService {
     const verifiedUser = await existingUser.save();
 
     return {
-      sucessMessage: 'Your email account has been verified',
       verifiedUser: verifiedUser.verified,
       email: verifiedUser.email
     }
@@ -389,7 +387,7 @@ class AuthService {
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 
-    return { message: 'Password reset email has been sent' };
+    return 'a password reset email has been sent';
   }
 
   /**
@@ -437,14 +435,14 @@ class AuthService {
   public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    const errorMessage = 'Password reset failed, user not verified, has no permission to reset password or invalid credentials';
+    const errorMessage = 'Password reset failed, user not verified or has no permission to reset password';
 
     if (user.verified === false || user.grantPasswordReset === false || user.passwordResetRequest === false) {
       throw new BadRequest(errorMessage);
     }
 
     if (passwordToken !== user.secretToken) {
-      throw new BadRequest(errorMessage);
+      throw new BadRequest('invalid credentials');
     }
 
     const existingPassword = await user.isValidPassword(newPassword);
@@ -472,11 +470,11 @@ class AuthService {
   public async cancelPasswordReset(userId: string, passwordToken: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    if (user.passwordResetRequest === false) {
-      throw new Forbidden('Password reset request not recived');
-    }
-    if (user.grantPasswordReset === false) {
-      throw new Forbidden('Password reset permission not granted');
+    if (
+      user.passwordResetRequest === false ||
+      user.grantPasswordReset === false
+      ) {
+      throw new Forbidden('Password reset request not recived or permission not granted');
     }
     if (passwordToken !== user.secretToken) {
       throw new Forbidden('Invalid credentials');

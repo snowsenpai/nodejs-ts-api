@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import TagService from './tag.service';
+import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 import Tag from './tag.interface';
 
 const tagService = new TagService();
@@ -12,9 +13,13 @@ async function create (
   try {
     const { name, description } = req.body;
 
-    const tag = await tagService.create(name, description);
+    const data = await tagService.create(name, description);
 
-    res.status(201).json(tag);
+    res.status(HttpStatus.CREATED)
+    .json({
+      message: 'tag created successfully',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -26,8 +31,13 @@ async function getAllTags (
   next: NextFunction
 ): Promise<Response | void> {
   try {
-    const tags = await tagService.findAll();
-    res.status(200).json(tags);
+    const data = await tagService.findAll();
+
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'available tags retrieved',
+      data
+    });
   } catch (error) {
     next(error);
   }

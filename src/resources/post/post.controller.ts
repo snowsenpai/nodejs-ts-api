@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import PostService from '@/resources/post/post.service';
 import Post from './post.interface';
+import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const postService = new PostService();
 
@@ -13,9 +14,13 @@ async function create (
     const userId = req.user._id;
     const { title, body, tags } = req.body;
 
-    const post = await postService.create(title, body, userId, tags);
+    const data = await postService.create(title, body, userId, tags);
 
-    res.status(201).json(post);
+    res.status(HttpStatus.CREATED)
+    .json({
+      message: 'post created successfully',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -33,9 +38,13 @@ async function getAllPosts (
 ): Promise<Response | void> {
   try {
     const paginationDetails = req.paginationDetails;
-    const result = await postService.findAll(paginationDetails);
+    const data = await postService.findAll(paginationDetails);
 
-    res.status(200).json(result);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'all available posts retrieved',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -50,14 +59,18 @@ async function getPostById (
     const postId = req.params.id;
     const creator = req.query.creator;
 
-    let post;
+    let data;
     if (creator && creator === 'true') {
-      post = await postService.findOne(postId, creator);
+      data = await postService.findOne(postId, creator);
     } else {
-      post = await postService.findOne(postId);
+      data = await postService.findOne(postId);
     }
 
-    res.status(200).json(post);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'post retrived',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -74,9 +87,13 @@ async function modifyPost (
 
     const postData: Partial<Post> = req.body;
 
-    const modifiedPost = await postService.modifyPost(postId, postData, userId);
+    const data = await postService.modifyPost(postId, postData, userId);
 
-    res.status(201).json(modifiedPost);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'post updated successfully',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -93,7 +110,10 @@ async function deletePost (
 
     const message = await postService.deletePost(postId, userId);
     
-    res.status(200).json(message);
+    res.status(HttpStatus.OK)
+    .json({
+      message
+    });
   } catch (error) {
     next(error);
   }

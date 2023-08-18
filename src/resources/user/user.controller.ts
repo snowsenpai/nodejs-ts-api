@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 import UserService from './user.service';
 import User from './user.interface';
-import { NotFound } from '@/utils/exceptions/client-errors.utils';
+import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const userService = new UserService();
 
@@ -19,7 +19,10 @@ async function register (
       password,
     );
 
-    res.status(201).json(message);
+    res.status(HttpStatus.CREATED)
+    .json({
+      message
+    });
     
   } catch (error) {
     next(error);
@@ -31,11 +34,11 @@ function getUser (
   res: Response,
   next: NextFunction
 ): Response | void {
-  if(!req.user) {
-    return next(new NotFound('No logged in user'));
-  }
-  const user = req.user;
-  res.status(200).json(user);
+  res.status(HttpStatus.OK)
+  .json({
+    message: 'user data retrieved',
+    data: req.user
+  });
 };
 
 async function findUser(
@@ -46,9 +49,13 @@ async function findUser(
   try {
     const userId = req.params.id;
 
-    const user = await userService.findById(userId);
+    const data = await userService.findById(userId);
 
-    res.status(200).json(user);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'user data retrieved',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -64,9 +71,13 @@ async function updateUser(
     // Only fields specified in joi schema will be in the request body,i.e {stripUnknown: true}
     const userData: Partial<User> = req.body;
 
-    const updatedUser = await userService.updateUser(userId, userData);
+    const data = await userService.updateUser(userId, userData);
 
-    res.status(201).json(updatedUser);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'user updated succcessfully',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -80,9 +91,13 @@ async function userPost(
   try {
     const userId = req.params.id;
 
-    const posts = await userService.getAllPostsOfUser(userId);
+    const data = await userService.getAllPostsOfUser(userId);
 
-    res.status(200).json(posts);
+    res.status(HttpStatus.OK)
+    .json({
+      message: 'user post field populated',
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -97,7 +112,10 @@ async function deleteUser(
     const userId = req.user._id;    
     const message = await userService.deleteUser(userId);
 
-    res.status(200).json(message);
+    res.status(HttpStatus.OK)
+    .json({
+      message
+    });
   } catch (error) {
     next(error);
   }

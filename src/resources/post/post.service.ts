@@ -11,7 +11,7 @@ class PostService {
   /**
    * Create a new post
    */
-  public async create(title: string, body: string, creator: string, tags: string[]): Promise<Post | Error> {
+  public async create(title: string, body: string, creator: string, tags: string[]) {
     const post = await this.post.create({ title, body, creator, tags });
     if(!post) {
       throw new BadRequest('Unable to create post');
@@ -112,6 +112,9 @@ class PostService {
     }
 
     const modifiedPost = await this.post.findByIdAndUpdate(postId, postData, { new: true });
+    if (!modifiedPost) {
+      throw new NotFound('unable to modify post');
+    }
 
     return modifiedPost;
   }
@@ -127,7 +130,7 @@ class PostService {
     }
     await post.deleteOne();
 
-    return { message:'Post deleted' };
+    return 'post deleted succcessfully';
   }
 }
 

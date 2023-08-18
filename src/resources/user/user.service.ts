@@ -35,7 +35,7 @@ class UserService {
     }
     this.EmailService.sendWelcomeEmail(email, firstName);
 
-    return { message: 'User created' };
+    return 'user account created succcessfully';
  }
 
   /**
@@ -120,7 +120,7 @@ class UserService {
     if (!user) {
       throw new NotFound('User not found');
     }
-    return { message:'User deleted' };
+    return 'user account deleted succcessfully';
   }
 
   /**
