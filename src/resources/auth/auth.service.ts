@@ -7,7 +7,7 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import UserService from "../user/user.service";
 import EmailService from '../email/email.service';
 import token from '@/utils/token.util';
-import { Token, TokenData } from '@/utils/interfaces/token.interface';
+import { Token } from '@/utils/interfaces/token.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import cryptoHelper from '@/utils/crypto-helpers.util';
 
@@ -21,7 +21,7 @@ class AuthService {
   public async login(
     email: string,
     password: string
-  ): Promise<TokenData | Error> {
+  ) {
     const user = await this.UserService.getFullUserByEmail(email);
 
     const validPassword = await user.isValidPassword(password);
@@ -31,7 +31,10 @@ class AuthService {
     }
     const accessToken = token.createToken({id: user._id});
 
-    return accessToken;
+    return {
+      accessToken,
+      userOtpEnabled: user.otpEnabled,
+    };
   }
 
   /**

@@ -10,7 +10,7 @@ type TFilters = {
   [filterName: string]: string[]
 }
 
-// TsortBy is tightly coupled to Mongoose T<SortOrder>
+//! TsortBy is tightly coupled to Mongoose T<SortOrder>
 type TSortBy = { [key: string]: SortOrder}
 type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
@@ -31,12 +31,12 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
   ): Promise<void> => {
     try {
       const paginate = await paginationOptions;
-      // can extend TPaginationOptions so services can define default page, limit
+      //? can extend TPaginationOptions so services can define default page, limit
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 5;
       const search = (req.query.search as string) || '';
 
-      // uri?filter=filterName,sortOrder || filter=filterName
+      // url?filter=filterName,sortOrder || filter=filterName
       let filter: string | string[] = (req.query.filter as string) || paginate.defaultFilter;
 
       req.query.filter ? (filter = (req.query.filter as string).split(',')) : (filter = [filter]);
@@ -55,7 +55,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         throw new HttpException(HttpStatus.BAD_REQUEST, `filter option '${filter[0]}' is invalid`);
       }
 
-      // cast to string to handle type error from req.query types
+      // cast to string to specify type and prevent type errors from req.query types
       filterValue === 'All' ? (filterValue = [...matchedValue]) : (filterValue = (req.query.filterValue as string).split(','));
 
       let sortBy: TSortBy = {};
@@ -83,5 +83,4 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
 
 export default paginationMiddleware;
 // improvement:
-// handling filter for other fields e.g dateField (createdAt for mongodb) or year
-// and their filterValues
+// handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
