@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { BadRequest } from '@/utils/exceptions/client-errors.utils';
+import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 export type TPaginationOptions = {
   defaultFilter: string,
@@ -52,7 +52,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         const matchedKey = filter[0];
         matchedValue = paginate.filters[matchedKey];
       } else {
-        throw new BadRequest(`filter option '${filter[0]}' is invalid`);
+        throw new HttpException(HttpStatus.BAD_REQUEST, `filter option '${filter[0]}' is invalid`);
       }
 
       // cast to string to handle type error from req.query types

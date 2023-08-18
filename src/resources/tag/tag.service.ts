@@ -1,6 +1,5 @@
 import TagModel from "./tag.model";
-import Tag from "./tag.interface";
-import { NotFound } from "@/utils/exceptions/client-errors.utils";
+import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 class TagService {
   private tag = TagModel;
@@ -19,7 +18,7 @@ class TagService {
   public async findAll() {
     const tags = await this.tag.find({});
     if (!tags.length) {
-      throw new NotFound('no tags added yet');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'no tags added yet');
     }
     return tags;
   }

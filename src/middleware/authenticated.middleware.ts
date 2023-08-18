@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import token from '@/utils/token.util';
 import UserModel from '@/resources/user/user.model';
 import { Token } from '@/utils/interfaces/token.interface';
-import { Unauthorized, NotFound } from '@/utils/exceptions/client-errors.utils';
+import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import jwt  from 'jsonwebtoken';
 
 async function authenticatedMiddleware(
@@ -10,11 +10,12 @@ async function authenticatedMiddleware(
   res: Response,
   next: NextFunction
   ): Promise<Response | void>  {
-  try {
+    const errorMessage = 'You are not authorized';
+    try {
     const bearer = req.headers.authorization;
 
     if (!bearer || !bearer.startsWith('Bearer ') ) {
-      return next(new Unauthorized());
+      return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
     }
 
     const accessToken = bearer.split('Bearer ')[1].trim();
@@ -24,19 +25,19 @@ async function authenticatedMiddleware(
     );
 
     if (payload instanceof jwt.JsonWebTokenError) {
-      return next(new Unauthorized());
+      return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
     }
 
     const user = await UserModel.findById(payload.id).exec();
 
     if (!user) {
-      return next(new NotFound('User not found'));
+      return next(new HttpException(HttpStatus.NOT_FOUND,'User not found'));
     }
 
     req.user = user;
     return next();
   } catch (error) {
-    return next(new Unauthorized());
+    return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
   }
 }
 

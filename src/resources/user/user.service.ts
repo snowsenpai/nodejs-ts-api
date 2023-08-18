@@ -1,6 +1,6 @@
 import UserModel from "./user.model";
 import EmailService from "../email/email.service";
-import { BadRequest, NotFound } from "@/utils/exceptions/client-errors.utils";
+import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 class UserService {
   private user = UserModel;
@@ -19,7 +19,7 @@ class UserService {
     const existingUser = await this.user.findOne({ email: email });
 
     if (existingUser) {
-      throw new BadRequest('user already exists');
+      throw new HttpException(HttpStatus.BAD_REQUEST, 'user already exists');
     }
     const role = 'user';
 
@@ -42,7 +42,7 @@ class UserService {
   public async findAllUsers() {
     const users = await this.user.find({});
     if(!users.length){
-      throw new NotFound('unable to find any user');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'unable to find any user');
     }
     return users;
   }
@@ -54,7 +54,7 @@ class UserService {
     const user = await this.user.findOne({email: userEmail}).exec();
 
     if (!user) {
-      throw new NotFound('user does not exist');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user does not exist');
     }
 
     return user;
@@ -66,7 +66,7 @@ class UserService {
   public async findById(userId: string) {
     const user = await this.user.findById(userId);
     if(!user){
-      throw new NotFound('unable to find user');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'unable to find user');
     }
     return user;
   }
@@ -80,7 +80,7 @@ class UserService {
     const user = await this.user.findById(userId).select(this.sensitiveUserFields);
 
     if (!user) {
-      throw new NotFound('user not found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
     return user;
   }
@@ -94,7 +94,7 @@ class UserService {
     const user = await this.user.findOne({ email: userEmail }).select(this.sensitiveUserFields);
 
     if (!user) {
-      throw new NotFound('user not found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
     return user;    
   }
@@ -105,7 +105,7 @@ class UserService {
   public async updateUser(userId: string, userData: object) {
     const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
     if (!user) {
-      throw new NotFound('user not found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
     return user;
   }
@@ -116,7 +116,7 @@ class UserService {
   public async deleteUser(userId: string) {
     const user = await this.user.findByIdAndDelete(userId);
     if (!user) {
-      throw new NotFound('user not found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
     return 'user account deleted succcessfully';
   }
@@ -127,7 +127,7 @@ class UserService {
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
     if (!user) {
-      throw new NotFound('user does not exist');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'user does not exist');
     }
     const posts = await user.populate('posts');
 

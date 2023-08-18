@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import TagService from './tag.service';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
-import Tag from './tag.interface';
 
 const tagService = new TagService();
 

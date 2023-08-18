@@ -1,7 +1,6 @@
 import PostModel from "./post.model";
-import Post from "./post.interface";
 import TagService from "../tag/tag.service";
-import { NotFound, BadRequest, Forbidden } from "@/utils/exceptions/client-errors.utils";
+import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import { TPaginationDetails, TPaginationOptions } from "@/middleware/pagination.middleware";
 
 class PostService {
@@ -57,7 +56,7 @@ class PostService {
     .limit(limit);
 
     if (!posts.length) {
-      throw new NotFound('no post found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'no post found');
     }
 
     const totalPostsFound = await this.post.countDocuments({
@@ -91,7 +90,7 @@ class PostService {
   public async findOne(id: string, creator?: string) {
     const post = await this.post.findById(id);
     if (!post) {
-      throw new NotFound('post not found');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'post not found');
     }
     if (creator === 'true') {
       return await post.populate('creator');
@@ -106,12 +105,12 @@ class PostService {
     const post = await this.findOne(postId);
 
     if (post.creator.toString() !== userId.toString()) {
-      throw new Forbidden();
+      throw new HttpException(HttpStatus.FORBIDDEN, 'You are not permitted');
     }
 
     const modifiedPost = await this.post.findByIdAndUpdate(postId, postData, { new: true });
     if (!modifiedPost) {
-      throw new NotFound('unable to modify post');
+      throw new HttpException(HttpStatus.NOT_FOUND, 'unable to modify post');
     }
 
     return modifiedPost;
@@ -124,7 +123,7 @@ class PostService {
     const post = await this.findOne(postId);
 
     if (post.creator.toString() !== userId.toString()) {
-      throw new Forbidden();
+      throw new HttpException(HttpStatus.FORBIDDEN, 'You are not permitted');
     }
     await post.deleteOne();
 
