@@ -19,7 +19,7 @@ class UserService {
     const existingUser = await this.user.findOne({ email: email });
 
     if (existingUser) {
-      throw new BadRequest('User already exists');
+      throw new BadRequest('user already exists');
     }
     const role = 'user';
 
@@ -31,7 +31,7 @@ class UserService {
       role,
     });
     if(!newUser) {
-      throw new BadRequest('Could not create user');
+      throw new BadRequest('could not create user');
     }
     this.EmailService.sendWelcomeEmail(email, firstName);
 
@@ -44,7 +44,7 @@ class UserService {
   public async findAllUsers() {
     const users = await this.user.find({});
     if(!users.length){
-      throw new NotFound('Unable to find any user');
+      throw new NotFound('unable to find any user');
     }
     return users;
   }
@@ -56,7 +56,7 @@ class UserService {
     const user = await this.user.findOne({email: userEmail}).exec();
 
     if (!user) {
-      throw new NotFound('User does not exist');
+      throw new NotFound('user does not exist');
     }
 
     return user;
@@ -68,7 +68,7 @@ class UserService {
   public async findById(userId: string) {
     const user = await this.user.findById(userId);
     if(!user){
-      throw new NotFound('Unable to find user');
+      throw new NotFound('unable to find user');
     }
     return user;
   }
@@ -82,7 +82,7 @@ class UserService {
     const user = await this.user.findById(userId).select(this.sensitiveUserFields);
 
     if (!user) {
-      throw new NotFound('User not found');
+      throw new NotFound('user not found');
     }
     return user;
   }
@@ -96,7 +96,7 @@ class UserService {
     const user = await this.user.findOne({ email: userEmail }).select(this.sensitiveUserFields);
 
     if (!user) {
-      throw new NotFound('User not found');
+      throw new NotFound('user not found');
     }
     return user;    
   }
@@ -107,7 +107,7 @@ class UserService {
   public async updateUser(userId: string, userData: object) {
     const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
     if (!user) {
-      throw new NotFound('User not found');
+      throw new NotFound('user not found');
     }
     return user;
   }
@@ -118,7 +118,7 @@ class UserService {
   public async deleteUser(userId: string) {
     const user = await this.user.findByIdAndDelete(userId);
     if (!user) {
-      throw new NotFound('User not found');
+      throw new NotFound('user not found');
     }
     return 'user account deleted succcessfully';
   }
@@ -129,7 +129,7 @@ class UserService {
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
     if (!user) {
-      throw new NotFound('User does not exist');
+      throw new NotFound('user does not exist');
     }
     const posts = await user.populate('posts');
 

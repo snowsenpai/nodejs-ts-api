@@ -14,7 +14,7 @@ class PostService {
   public async create(title: string, body: string, creator: string, tags: string[]) {
     const post = await this.post.create({ title, body, creator, tags });
     if(!post) {
-      throw new BadRequest('Unable to create post');
+      throw new BadRequest('unable to create post');
     }
     return post;
   }
@@ -59,7 +59,7 @@ class PostService {
     .limit(limit);
 
     if (!posts.length) {
-      throw new NotFound('No post found');
+      throw new NotFound('no post found');
     }
 
     const totalPostsFound = await this.post.countDocuments({

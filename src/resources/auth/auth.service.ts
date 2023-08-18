@@ -27,7 +27,7 @@ class AuthService {
     const validPassword = await user.isValidPassword(password);
 
     if (validPassword === false) {
-      throw new Unauthorized('Wrong credentials');
+      throw new Unauthorized('wrong credentials');
     }
     const accessToken = token.createToken({id: user._id});
 
@@ -56,7 +56,7 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified === false) {
-      throw new Forbidden('Only verified users can enable OTP');
+      throw new Forbidden('only verified users can enable OTP');
     }
 
     const base32Secret = cryptoHelper.generateRandomBase32(24);
@@ -86,7 +86,7 @@ class AuthService {
     let delta = totp.validate({ token });
 
     if(delta === null) {
-      throw new Unauthorized('Token is invalid or user does not exist'); 
+      throw new Unauthorized('token is invalid or user does not exist'); 
     }
 
     // update user data
@@ -129,7 +129,7 @@ class AuthService {
     let delta = totp.validate({ token, window: 1 });
 
     if(delta === null) {
-      throw new Unauthorized('Token is invalid or user does not exist');
+      throw new Unauthorized('token is invalid or user does not exist');
     }
 
     return { otpValid: true };
@@ -147,7 +147,7 @@ class AuthService {
     let delta = totp.validate({ token, window: 1 });
 
     if(delta === null) {
-      throw new Unauthorized('Token is invalid or user does not exist');
+      throw new Unauthorized('token is invalid or user does not exist');
     }
 
     user.otpEnabled = false;
@@ -176,7 +176,7 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
     // after generateOTP() authUrl will be defined
     const enabled = user.otpAuthUrl;
-    if(!enabled) throw new Unauthorized('User otp not enabled');
+    if(!enabled) throw new Unauthorized('user otp not enabled');
 
     // based on users otp status return otp data
     return {
@@ -226,7 +226,7 @@ class AuthService {
   public async validateRecoveryCode(userId: string, recoverCode: string) {
     const user = await this.UserService.getFullUserById(userId);
     if (!(user.recoveryCodes.length)) {
-      throw new Forbidden('User has no recover code');
+      throw new Forbidden('user has no recover code');
     }
     const recoveryCodes = user.recoveryCodes;
 
@@ -288,7 +288,7 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified) {
-      throw new BadRequest('User is already verified');
+      throw new BadRequest('user is already verified');
     }
 
     const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
@@ -325,7 +325,7 @@ class AuthService {
     const emailJWT = cryptoHelper.decryptData(emailToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(emailJWT);
 
-    const errorMesage = 'Verification failed, possibly link is invalid or expired';
+    const errorMesage = 'verification failed, possibly link is invalid or expired';
 
     // if jsonwebtokenError, jwt is either expired, malformed or fake
     if (payload instanceof JsonWebTokenError) {
@@ -365,7 +365,7 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified === false) {
-      throw new Forbidden('Only verified users can reset their password');
+      throw new Forbidden('only verified users can reset their password');
     }
 
     const secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH);
@@ -397,7 +397,7 @@ class AuthService {
     const passwordJWT = cryptoHelper.decryptData(passwordToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(passwordJWT);
 
-    const errorMessage = 'Failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
+    const errorMessage = 'failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
 
     if (payload instanceof JsonWebTokenError) {
       throw new BadRequest(errorMessage);
@@ -408,7 +408,7 @@ class AuthService {
     const user = await this.UserService.getFullUserByEmail(usersEmail);
 
     if (user.passwordResetRequest === false) {
-      throw new BadRequest('User made no request to reset password');
+      throw new BadRequest('user made no request to reset password');
     }
 
     const recievedSecret = payload.secret;
@@ -435,7 +435,7 @@ class AuthService {
   public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    const errorMessage = 'Password reset failed, user not verified or has no permission to reset password';
+    const errorMessage = 'password reset failed, user not verified or has no permission to reset password';
 
     if (user.verified === false || user.grantPasswordReset === false || user.passwordResetRequest === false) {
       throw new BadRequest(errorMessage);
@@ -448,7 +448,7 @@ class AuthService {
     const existingPassword = await user.isValidPassword(newPassword);
     // new password should not be old password
     if (existingPassword) {
-      throw new BadRequest('Unacceptable password');
+      throw new BadRequest('unacceptable password');
     }
 
     // update user password and reset verification fields
@@ -474,10 +474,10 @@ class AuthService {
       user.passwordResetRequest === false ||
       user.grantPasswordReset === false
       ) {
-      throw new Forbidden('Password reset request not recived or permission not granted');
+      throw new Forbidden('password reset request not recived or permission not granted');
     }
     if (passwordToken !== user.secretToken) {
-      throw new Forbidden('Invalid credentials');
+      throw new Forbidden('invalid credentials');
     }
 
     user.passwordResetRequest = false;

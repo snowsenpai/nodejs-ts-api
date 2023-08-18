@@ -52,7 +52,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         const matchedKey = filter[0];
         matchedValue = paginate.filters[matchedKey];
       } else {
-        throw new BadRequest(`Filter option '${filter[0]}' is invalid`);
+        throw new BadRequest(`filter option '${filter[0]}' is invalid`);
       }
 
       // cast to string to handle type error from req.query types

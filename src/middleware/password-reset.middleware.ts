@@ -22,7 +22,7 @@ async function passwordReset(
     const user = await userModel.findOne({ secretToken: recivedToken });
     // token is invalid, or deleted (v2: use a cache for secrets blacklist or refresh encryption key and iv?)
     if (!user) {
-      throw new BadRequest('Invalid token');
+      throw new BadRequest('invalid token');
     }
 
     req.passwordResetSecret = recivedToken;

@@ -150,7 +150,7 @@ function encryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return encryptedData;
   } catch (error) {
     logger.error(error, 'Encryption error');
-    throw new Error('Invalid data type or format');
+    throw new Error('invalid data type or format');
   }
 }
 
@@ -177,7 +177,7 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return decryptedData;
   } catch (error) {
     logger.error(error, 'Decryption error');
-    throw new Error('Invalid data type or format');
+    throw new Error('invalid data type or format');
   }
 }
 

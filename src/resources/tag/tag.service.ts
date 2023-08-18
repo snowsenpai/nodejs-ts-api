@@ -19,7 +19,7 @@ class TagService {
   public async findAll() {
     const tags = await this.tag.find({});
     if (!tags.length) {
-      throw new NotFound('No tags added yet');
+      throw new NotFound('no tags added yet');
     }
     return tags;
   }
