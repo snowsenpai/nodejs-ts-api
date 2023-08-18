@@ -269,11 +269,17 @@ class AuthService {
       updatedUser.verified = false;
       const oldVerifiedUser = await updatedUser.save();
 
-      const message = await this.verifyEmail(oldVerifiedUser._id);
-      return message;
+      return await this.verifyEmail(oldVerifiedUser._id);;
     }
 
-    return updatedUser;
+    return {
+      message: 'your email has been updated',
+      data: {
+        emailUpdated: true,
+        newEmail: updatedUser.email,
+        verifiedEmail: updatedUser.verified
+      }
+    };
   }
 
   /**
@@ -307,7 +313,12 @@ class AuthService {
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
-    return 'A verification link has been sent to your email';
+    return {
+      message: `a verification link has been sent to ${updatedUser.email}`,
+      data: {
+        sendVerifyEmail: true
+      }
+    };
   }
 
   /**
@@ -339,8 +350,8 @@ class AuthService {
     const verifiedUser = await existingUser.save();
 
     return {
-      verifiedUser: verifiedUser.verified,
-      email: verifiedUser.email
+      email: verifiedUser.email,
+      emailVerified: verifiedUser.verified
     }
   }
 
@@ -372,7 +383,9 @@ class AuthService {
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 
-    return 'a password reset email has been sent';
+    return {
+      sendPasswordResetEmail: true
+    };
   }
 
   /**

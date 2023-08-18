@@ -125,7 +125,9 @@ class PostService {
     }
     await post.deleteOne();
 
-    return 'post deleted succcessfully';
+    return {
+      postDeleted: true
+    };
   }
 }
 

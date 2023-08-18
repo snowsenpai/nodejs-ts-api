@@ -68,7 +68,7 @@ async function getPostById (
 
     res.status(HttpStatus.OK)
     .json({
-      message: 'post retrived',
+      message: 'post retrieved',
       data
     });
   } catch (error) {
@@ -108,11 +108,12 @@ async function deletePost (
     const postId = req.params.id;
     const userId = req.user._id;
 
-    const message = await postService.deletePost(postId, userId);
+    const data = await postService.deletePost(postId, userId);
     
     res.status(HttpStatus.OK)
     .json({
-      message
+      message: 'post deleted succcessfully',
+      data
     });
   } catch (error) {
     next(error);

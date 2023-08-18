@@ -33,7 +33,9 @@ class UserService {
 
     this.EmailService.sendWelcomeEmail(email, firstName);
 
-    return 'user account created succcessfully';
+    return {
+      createdNewUserAccount: true
+    };
  }
 
   /**
@@ -118,7 +120,9 @@ class UserService {
     if (!user) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
-    return 'user account deleted succcessfully';
+    return {
+      deletedUserData: true
+    };
   }
 
   /**

@@ -12,7 +12,7 @@ async function register (
 ): Promise<Response | void> {
   try {
     const { firstName, lastName, email, password } = req.body;
-    const message = await userService.register(
+    const data = await userService.register(
       firstName,
       lastName,
       email,
@@ -21,7 +21,8 @@ async function register (
 
     res.status(HttpStatus.CREATED)
     .json({
-      message
+      message: 'user account created succcessfully',
+      data
     });
     
   } catch (error) {
@@ -110,11 +111,12 @@ async function deleteUser(
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;    
-    const message = await userService.deleteUser(userId);
+    const data = await userService.deleteUser(userId);
 
     res.status(HttpStatus.OK)
     .json({
-      message
+      message: 'user account deleted succcessfully',
+      data
     });
   } catch (error) {
     next(error);

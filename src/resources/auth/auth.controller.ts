@@ -151,12 +151,9 @@ async function verifyEmail(
 ): Promise<Response | void>{
   try {
     const userId = req.user._id;
-    const message = await authService.verifyEmail(userId);
+    const data = await authService.verifyEmail(userId);
 
-    res.status(HttpStatus.OK)
-    .json({
-      message
-    });
+    res.status(HttpStatus.OK).json(data);
   } catch (error) {
     next(error)
   }
@@ -190,11 +187,12 @@ async function passwordResetRequest(
   try {
     const userId = req.user._id;
 
-    const message = await authService.passwordResetRequest(userId);
+    const data = await authService.passwordResetRequest(userId);
 
     res.status(HttpStatus.OK)
     .json({
-      message
+      message: 'a password reset email has been sent',
+      data
     });
   } catch (error) {
     next(error);
@@ -276,10 +274,7 @@ async function updateEmail(
 
     const data = await authService.updateEmail(userId, oldEmail, newEmail);
 
-    res.status(HttpStatus.OK)
-    .json({
-      data
-    });
+    res.status(HttpStatus.OK).json(data);
   } catch (error) {
     next(error);
   }
