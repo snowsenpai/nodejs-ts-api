@@ -23,16 +23,14 @@ class UserService {
     }
     const role = 'user';
 
-    const newUser = await this.user.create({
+    await this.user.create({
       firstName,
       lastName,
       email,
       password,
       role,
     });
-    if(!newUser) {
-      throw new BadRequest('could not create user');
-    }
+
     this.EmailService.sendWelcomeEmail(email, firstName);
 
     return 'user account created succcessfully';

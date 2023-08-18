@@ -13,9 +13,7 @@ class PostService {
    */
   public async create(title: string, body: string, creator: string, tags: string[]) {
     const post = await this.post.create({ title, body, creator, tags });
-    if(!post) {
-      throw new BadRequest('unable to create post');
-    }
+
     return post;
   }
 
