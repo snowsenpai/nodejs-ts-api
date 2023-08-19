@@ -31,12 +31,13 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
   ): Promise<void> => {
     try {
       const paginate = await paginationOptions;
-      //? can extend TPaginationOptions so services can define default page, limit
+
+      // URL?page=1&limit=3&filter=filterName,sortOrder&search=value&filterValue=a,b,c
+      // cast query index to 'string' to prevent type errors from req.query types
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 5;
       const search = (req.query.search as string) || '';
 
-      // url?filter=filterName,sortOrder || filter=filterName
       let filter: string | string[] = (req.query.filter as string) || paginate.defaultFilter;
 
       req.query.filter ? (filter = (req.query.filter as string).split(',')) : (filter = [filter]);
@@ -45,7 +46,7 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
 
       let filterValue: string | string[] = (req.query.filterValue as string) || 'All';
 
-      // based on filterName used, set a corresponding filterValue(string[]) i.e T<paginationOptions.filters.filterName>
+      // based on 'filterName', set a corresponding filterValue(string[]) i.e T<paginationOptions.filters.filterName>
       let matchedValue: string[];
 
       if (filter[0] in paginate.filters) {
@@ -55,7 +56,6 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         throw new HttpException(HttpStatus.BAD_REQUEST, `filter option '${filter[0]}' is invalid`);
       }
 
-      // cast to string to specify type and prevent type errors from req.query types
       filterValue === 'All' ? (filterValue = [...matchedValue]) : (filterValue = (req.query.filterValue as string).split(','));
 
       let sortBy: TSortBy = {};
@@ -86,3 +86,5 @@ export default paginationMiddleware;
 //* handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
 //* search field ('title') should be dev defined or retrieved from a dynamic queryOption(s) e.g 'searchBy'
 // e.g can query based on title, location name, etc, validation should be in place for available fields
+//* can extend TPaginationOptions so services can define default page, limit, filterValue (and search?)
+//* query parameter validation for 'filterName' and 'filterValue' against defined values

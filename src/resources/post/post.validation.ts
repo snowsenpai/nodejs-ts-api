@@ -17,4 +17,26 @@ const modify = Joi.object({
   )
 });
 
-export default { create, modify };
+const findOnePost = Joi.object({
+  id: Joi.string().hex().length(24)
+});
+
+const postCreator = Joi.object({
+  creator: Joi.string().pattern(/^true$/)
+});
+
+const postPagination = Joi.object({
+  page: Joi.string(),
+  limit: Joi.string(),
+  search: Joi.string(),
+  filter: Joi.string(),
+  filterValue: Joi.string(),
+});
+
+export default {
+  create,
+  findOnePost,
+  modify,
+  postCreator,
+  postPagination,
+};

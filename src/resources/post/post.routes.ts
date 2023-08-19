@@ -11,31 +11,36 @@ const basePath = '/posts';
 
 postRouter.get(
   basePath,
+  validationMiddleware(validate.postPagination, 'query'),
   paginationMiddleware(postController.postPaginationOptions()),
   postController.getAllPosts
 );
 
 postRouter.get(
   `${basePath}/:id`,
+  validationMiddleware(validate.findOnePost, 'params'),
+  validationMiddleware(validate.postCreator, 'query'),
   postController.getPostById
 );
 
 postRouter.post(
   basePath,
+  validationMiddleware(validate.create, 'body'),
   authenticated,
-  validationMiddleware(validate.create),
   postController.create
 );
 
 postRouter.patch(
   `${basePath}/:id`,
+  validationMiddleware(validate.findOnePost, 'params'),
+  validationMiddleware(validate.modify, 'body'),
   authenticated,
-  validationMiddleware(validate.modify),
   postController.modifyPost
 );
 
 postRouter.delete(
   `${basePath}/:id`,
+  validationMiddleware(validate.findOnePost, 'params'),
   authenticated,
   postController.deletePost
 );

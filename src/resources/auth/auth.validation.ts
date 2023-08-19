@@ -22,4 +22,22 @@ const updateEmail = Joi.object({
   newEmail: Joi.string().email().required()
 });
 
-export default { login, otpToken, recoveryCode, resetPassword, updateEmail };
+const emailValidation = Joi.object({
+  encryptedEmail: Joi.string().hex().required(),
+  emailToken: Joi.string().hex().required()
+});
+
+const passwordReset = Joi.object({
+  encryptedEmail: Joi.string().hex().required(),
+  passwordToken: Joi.string().hex().required()
+});
+
+export default {
+  login,
+  otpToken,
+  recoveryCode,
+  resetPassword,
+  updateEmail,
+  emailValidation,
+  passwordReset
+};

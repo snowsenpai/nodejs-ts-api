@@ -15,7 +15,7 @@ tagRouter.get(
 
 tagRouter.post(
   basePath,
-  validationMiddleware(validate.create),
+  validationMiddleware(validate.create, 'body'),
   tagContoller.create
 )
 

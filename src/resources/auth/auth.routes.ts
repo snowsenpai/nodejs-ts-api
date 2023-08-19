@@ -29,6 +29,7 @@ authRouter.get(
 
 authRouter.get(
   `${basePath}/validate/email/:encryptedEmail/:emailToken`,
+  validationMiddleware(validate.emailValidation, 'params'),
   authController.validateEmail
 );
 
@@ -40,6 +41,7 @@ authRouter.get(
 
 authRouter.get(
   `${basePath}/validate/password-reset-request/:encryptedEmail/:passwordToken`,
+  validationMiddleware(validate.passwordReset, 'params'),
   authController.validatePasswordReset
 );
 
@@ -52,50 +54,50 @@ authRouter.get(
 
 authRouter.post(
   `${basePath}/login`,
-  validationMiddleware(validate.login),
+  validationMiddleware(validate.login, 'body'),
   authController.login
 );
 
 authRouter.post(
   `${basePath}/reset-password`,
+  validationMiddleware(validate.resetPassword, 'body'),
   authenticated,
   passwordReset,
-  validationMiddleware(validate.resetPassword),
   authController.resetPassword
 );
 
 authRouter.post(
   `${basePath}/otp/verify`,
+  validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  validationMiddleware(validate.otpToken),
   authController.verifyOTP
 );
 
 authRouter.post(
   `${basePath}/otp/validate`,
+  validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  validationMiddleware(validate.otpToken),
   authController.validateOTP
 );
 
 authRouter.post(
   `${basePath}/otp/disable`,
+  validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  validationMiddleware(validate.otpToken),
   authController.disableOTP
 );
 
 authRouter.post(
   `${basePath}/verify/recovery-code`,
+  validationMiddleware(validate.recoveryCode, 'body'),
   authenticated,
-  validationMiddleware(validate.recoveryCode),
   authController.validateRecoveryCode
 );
 
 authRouter.patch(
   `${basePath}/update-email`,
+  validationMiddleware(validate.updateEmail, 'body'),
   authenticated,
-  validationMiddleware(validate.updateEmail),
   authController.updateEmail
 );
 

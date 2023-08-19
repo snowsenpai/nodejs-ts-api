@@ -16,24 +16,26 @@ userRouter.get(
 
 userRouter.get(
   `${basePath}/:id`,
+  validationMiddleware(validate.findOneUser, 'params'),
   userController.findUser
 );
 
 userRouter.get(
   `${basePath}/:id/posts`,
+  validationMiddleware(validate.findOneUser, 'params'),
   userController.userPost
 );
 
 userRouter.post(
   `${basePath}/register`,
-  validationMiddleware(validate.register),
+  validationMiddleware(validate.register, 'body'),
   userController.register
 );
 
 userRouter.patch(
   `${basePath}`,
+  validationMiddleware(validate.updateUser, 'body'),
   authenticated,
-  validationMiddleware(validate.updateUser),
   userController.updateUser
 );
 
