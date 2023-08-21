@@ -258,7 +258,7 @@ class AuthService {
   /**
    * updateEmail
    */
-  public async updateEmail(userId: string, oldEmail: string, newEmail: string) {
+  public async updateEmail(userId: string, oldEmail: string, newEmail: string, fullUrl: string) {
     if (newEmail === oldEmail) {
       throw new HttpException(HttpStatus.BAD_REQUEST, 'new email should not be the same as old email');
     }
@@ -269,7 +269,7 @@ class AuthService {
       updatedUser.verified = false;
       const oldVerifiedUser = await updatedUser.save();
 
-      return await this.verifyEmail(oldVerifiedUser._id);;
+      return await this.verifyEmail(oldVerifiedUser._id, fullUrl);
     }
 
     return {
@@ -285,7 +285,7 @@ class AuthService {
   /**
    * verifyEmail
    */
-  public async verifyEmail(userId: string) {
+  public async verifyEmail(userId: string, fullURL: string) {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified) {
@@ -305,11 +305,7 @@ class AuthService {
 
     const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
-    //! use config file to access appDomain and other env vars
-    const appDomain = process.env.APP_DOMAIN! || process.env.LOCAL_HOST!;
-    //! dont hard code urls, dynamically access and modify resource routes 
-    // research: using node:url with express' req.url or req.originalUrl. appDomain wont be needed
-    const verificationURL = `${appDomain}/api/v1/auth/validate/email/${encryptedUserEmail}/${emailToken}`
+    const verificationURL = `${fullURL}/${encryptedUserEmail}/${emailToken}`
 
     await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
 
@@ -358,7 +354,7 @@ class AuthService {
   /**
    * passwordResetRequest
    */
-  public async passwordResetRequest(userId: string) {
+  public async passwordResetRequest(userId: string, fullURL: string) {
     const user = await this.UserService.getFullUserById(userId);
 
     if (user.verified === false) {
@@ -378,8 +374,7 @@ class AuthService {
     const passwordJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
     const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
 
-    const appDomain = process.env.APP_DOMAIN! || process.env.LOCAL_HOST!;
-    const passwordResetURL = `${appDomain}/api/auth/v1/validate/password-reset-request/${encryptedEmail}/${passwordToken}`;
+    const passwordResetURL = `${fullURL}/${encryptedEmail}/${passwordToken}`;
 
     await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
 

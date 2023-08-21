@@ -3,6 +3,7 @@ import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import passwordReset from '@/middleware/password-reset.middleware';
+import getFullUrl from '@/middleware/full-url.middleware';
 import authController from "./auth.controller";
 
 const authRouter = Router();
@@ -23,24 +24,26 @@ authRouter.get(
 
 authRouter.get(
   `${basePath}/verify/email`,
+  getFullUrl(false),
   authenticated,
   authController.verifyEmail
 );
 
 authRouter.get(
-  `${basePath}/validate/email/:encryptedEmail/:emailToken`,
+  `${basePath}/verify/email/:encryptedEmail/:emailToken`,
   validationMiddleware(validate.emailValidation, 'params'),
   authController.validateEmail
 );
 
 authRouter.get(
   `${basePath}/password-reset-request`,
+  getFullUrl(false),
   authenticated,
   authController.passwordResetRequest
 );
 
 authRouter.get(
-  `${basePath}/validate/password-reset-request/:encryptedEmail/:passwordToken`,
+  `${basePath}/password-reset-request/:encryptedEmail/:passwordToken`,
   validationMiddleware(validate.passwordReset, 'params'),
   authController.validatePasswordReset
 );
@@ -95,8 +98,9 @@ authRouter.post(
 );
 
 authRouter.patch(
-  `${basePath}/update-email`,
+  `${basePath}/verify/email`,
   validationMiddleware(validate.updateEmail, 'body'),
+  getFullUrl(false),
   authenticated,
   authController.updateEmail
 );

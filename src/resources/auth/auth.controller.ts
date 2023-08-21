@@ -151,7 +151,8 @@ async function verifyEmail(
 ): Promise<Response | void>{
   try {
     const userId = req.user._id;
-    const data = await authService.verifyEmail(userId);
+    const fullUrl = req.completeUrl;
+    const data = await authService.verifyEmail(userId, fullUrl);
 
     res.status(HttpStatus.OK).json(data);
   } catch (error) {
@@ -186,8 +187,9 @@ async function passwordResetRequest(
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
+    const fullUrl = req.completeUrl;
 
-    const data = await authService.passwordResetRequest(userId);
+    const data = await authService.passwordResetRequest(userId, fullUrl);
 
     res.status(HttpStatus.OK)
     .json({
@@ -271,8 +273,9 @@ async function updateEmail(
     const userId = req.user._id;
     const oldEmail = req.user.email;
     const { newEmail } = req.body;
+    const fullUrl = req.completeUrl;
 
-    const data = await authService.updateEmail(userId, oldEmail, newEmail);
+    const data = await authService.updateEmail(userId, oldEmail, newEmail, fullUrl);
 
     res.status(HttpStatus.OK).json(data);
   } catch (error) {
