@@ -6,9 +6,15 @@ module.exports = {
     'plugin:prettier/recommended',
   ],
   parserOptions: {
+    project: './tsconfig.json',
+    tsconsifRootDir: __dirname,
     ecmaVersion: 2018,
     sourceType: 'module',
   },
+  plugins: [
+    '@typescript-eslint/eslint-plugin',
+    'eslint-plugin-tsdoc'
+  ],
   rules: {
     'object-curly-spacing': ['error', 'always'],
     'prettier/prettier': [
@@ -17,5 +23,6 @@ module.exports = {
         endOfLine: 'auto',
       },
     ],
+    'tsdoc/syntax': 'warn'
   },
 };

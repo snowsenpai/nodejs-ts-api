@@ -5,9 +5,14 @@ import {
   createHash,
 } from 'crypto';
 import { encode } from 'hi-base32';
-import { BinaryToTextEncoding, Encoding } from './types/crypto-helpers.types';
 import { HttpException, HttpStatus } from './exceptions';
 import logger from './logger.util';
+
+// ref @types/node: cypto.d.ts
+export type BinaryToTextEncoding = 'base64' | 'base64url' | 'hex';
+export type CharacterEncoding = 'utf-8';
+export type LegacyCharacterEncoding = 'ascii';
+export type Encoding = BinaryToTextEncoding | CharacterEncoding | LegacyCharacterEncoding;
 
 /**
  * 

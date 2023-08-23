@@ -1,0 +1,17 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["src/"],
+  "entryPointStrategy": "expand",
+  "tsconfig": "./tsconfig.json",
+  "out": "./docs/code",
+  "plugin": ["typedoc-theme-hierarchy"],
+  "theme": "hierarchy",
+  "name": "Node TypeScript API",
+  "includeVersion": true,
+  "readme": "none",
+  "exclude": [
+    "./src/tests/*",
+    "./src/middleware/*.*.spec.ts",
+    "./src/resources/**/*.*.spec.ts"
+  ]
+}

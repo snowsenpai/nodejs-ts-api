@@ -6,13 +6,13 @@ export type TPaginationOptions = {
   filters: TFilters,
   defaultSort: string,
 };
-type TFilters = {
+export type TFilters = {
   [filterName: string]: string[]
 }
 
 //! TsortBy is tightly coupled to Mongoose T<SortOrder>
-type TSortBy = { [key: string]: SortOrder}
-type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
+export type TSortBy = { [key: string]: SortOrder}
+export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
 export type TPaginationDetails = {
   page: number,
