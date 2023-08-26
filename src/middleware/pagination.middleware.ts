@@ -2,33 +2,29 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 export type TPaginationOptions = {
-  defaultFilter: string,
-  filters: TFilters,
-  defaultSort: string,
+  defaultFilter: string;
+  filters: TFilters;
+  defaultSort: string;
 };
 export type TFilters = {
-  [filterName: string]: string[]
-}
+  [filterName: string]: string[];
+};
 
 //! TsortBy is tightly coupled to Mongoose T<SortOrder>
-export type TSortBy = { [key: string]: SortOrder}
+export type TSortBy = { [key: string]: SortOrder };
 export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
 export type TPaginationDetails = {
-  page: number,
-  limit: number,
-  search: string,
-  filterValue: string[],
-  filterField: string,
-  sortBy: TSortBy,
-}
+  page: number;
+  limit: number;
+  search: string;
+  filterValue: string[];
+  filterField: string;
+  sortBy: TSortBy;
+};
 
 function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): RequestHandler {
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const paginate = await paginationOptions;
 
@@ -56,13 +52,15 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         throw new HttpException(HttpStatus.BAD_REQUEST, `filter option '${filter[0]}' is invalid`);
       }
 
-      filterValue === 'All' ? (filterValue = [...matchedValue]) : (filterValue = (req.query.filterValue as string).split(','));
+      filterValue === 'All'
+        ? (filterValue = [...matchedValue])
+        : (filterValue = (req.query.filterValue as string).split(','));
 
-      let sortBy: TSortBy = {};
+      const sortBy: TSortBy = {};
       if (filter[1]) {
-        sortBy[filter[0]] = (filter[1] as SortOrder);
+        sortBy[filter[0]] = filter[1] as SortOrder;
       } else {
-        sortBy[filter[0]] = (paginate.defaultSort as SortOrder);
+        sortBy[filter[0]] = paginate.defaultSort as SortOrder;
       }
 
       req.paginationDetails = {
@@ -72,13 +70,13 @@ function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): R
         filterValue,
         filterField,
         sortBy,
-      }
+      };
 
       next();
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
 
 export default paginationMiddleware;

@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
-function getFullUrl (queryParams= true): RequestHandler {
-  return (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): void => {
+function getFullUrl(queryParams = true): RequestHandler {
+  return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const { protocol, originalUrl } = req;
       const headersHost = req.headers.host;
@@ -17,7 +13,7 @@ function getFullUrl (queryParams= true): RequestHandler {
     } catch (error) {
       next(error);
     }
-  }
+  };
 }
 
 export default getFullUrl;

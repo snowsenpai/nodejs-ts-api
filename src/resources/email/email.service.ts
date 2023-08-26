@@ -1,4 +1,4 @@
-import sendGrid from "./providers/sendGrid";
+import sendGrid from './providers/sendGrid';
 
 class EmailService {
   /**
@@ -14,7 +14,7 @@ class EmailService {
       html: `
         <h2>Hi ${firstName},</h2> 
         <p>Your account has been sucessfully created, to access other services ensure you verify your email.</p>
-      `
+      `,
     });
   }
 
@@ -36,7 +36,7 @@ class EmailService {
       <p>Button not working? Paste the following link into ypur browser:</p>
       <p>${url}</p>
       <p>For your security, the reset password link will expire after 1 hour</p>
-      `
+      `,
     });
   }
 
@@ -54,7 +54,7 @@ class EmailService {
       <p>${url}</p>
       <p>For your security, the reset password link will expire after 1 hour.</p>
       <p>If you belive that this request is suspicious, please contatct our <a href="#">support team</a>.</p>
-      `
+      `,
     });
   }
 }

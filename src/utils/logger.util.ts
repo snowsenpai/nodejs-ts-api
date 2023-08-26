@@ -1,5 +1,5 @@
-import pino from "pino";
-import path from "path";
+import pino from 'pino';
+import path from 'path';
 
 //to create log dir on app start? - fs.mkdir(path, {recursive:true}, cb), for production
 // fn should be called in entry point before other fns that utilize logger
@@ -14,26 +14,26 @@ const transport = pino.transport({
         compress: true,
         size: '300K',
       },
-      level: 'info'
+      level: 'info',
     },
     {
       target: 'pino-pretty',
       options: {
         colorize: true,
         translateTime: 'SYS:dd-mm-yyyy HH:MM:ss',
-        ignore: 'pid,hostname'
+        ignore: 'pid,hostname',
       },
-      level: 'info'
-    }
-  ]
+      level: 'info',
+    },
+  ],
 });
 
 const logger = pino(
   {
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    timestamp: pino.stdTimeFunctions.isoTime
+    timestamp: pino.stdTimeFunctions.isoTime,
   },
-  transport
+  transport,
 );
 
 export default logger;

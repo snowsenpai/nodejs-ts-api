@@ -1,4 +1,4 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 const register = Joi.object({
   firstName: Joi.string().max(20).required(),
@@ -17,7 +17,7 @@ const updateUser = Joi.object({
 });
 
 const findOneUser = Joi.object({
-  id: Joi.string().hex().length(24)
+  id: Joi.string().hex().length(24),
 });
 
 export default {

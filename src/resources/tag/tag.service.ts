@@ -1,4 +1,4 @@
-import TagModel from "./tag.model";
+import TagModel from './tag.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 class TagService {
@@ -34,7 +34,7 @@ class TagService {
       defaultFilter,
       tags,
       tagSort,
-    }
+    };
     return tagPaginationOption;
   }
 }

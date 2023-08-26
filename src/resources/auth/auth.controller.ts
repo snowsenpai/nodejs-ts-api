@@ -4,20 +4,15 @@ import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const authService = new AuthService();
 
-async function login (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function login(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     const { email, password } = req.body;
 
     const data = await authService.login(email, password);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'login successful',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -27,17 +22,16 @@ async function login (
 async function generateOTP(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
 
     const data = await authService.generateOTP(userId);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'generated otp credentials sucessfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -47,18 +41,17 @@ async function generateOTP(
 async function verifyOTP(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id
+    const userId = req.user._id;
     const { token } = req.body;
 
     const data = await authService.verifyOTP(userId, token);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'otp verified, two factor authentication is enabled',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -68,7 +61,7 @@ async function verifyOTP(
 async function validateOTP(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -76,10 +69,9 @@ async function validateOTP(
 
     const data = await authService.validateOTP(userId, token);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'otp is valid',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -89,7 +81,7 @@ async function validateOTP(
 async function disableOTP(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -97,10 +89,9 @@ async function disableOTP(
 
     const data = await authService.disabelOTP(userId, token);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'otp and two factor authentication disabled successfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -110,7 +101,7 @@ async function disableOTP(
 async function otpQRCode(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -126,7 +117,7 @@ async function otpQRCode(
 async function validateRecoveryCode(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -134,10 +125,9 @@ async function validateRecoveryCode(
 
     const data = await authService.validCode(userId, code);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'recovery code is valid and cannot be used again',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -147,8 +137,8 @@ async function validateRecoveryCode(
 async function verifyEmail(
   req: Request,
   res: Response,
-  next: NextFunction
-): Promise<Response | void>{
+  next: NextFunction,
+): Promise<Response | void> {
   try {
     const userId = req.user._id;
     const fullUrl = req.completeUrl;
@@ -156,34 +146,33 @@ async function verifyEmail(
 
     res.status(HttpStatus.OK).json(data);
   } catch (error) {
-    next(error)
+    next(error);
   }
 }
 
 async function validateEmail(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const { encryptedEmail, emailToken } = req.params;
 
     const data = await authService.validateEmail(encryptedEmail, emailToken);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'email account verified successfully',
-      data
+      data,
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
 }
 
 async function passwordResetRequest(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -191,10 +180,9 @@ async function passwordResetRequest(
 
     const data = await authService.passwordResetRequest(userId, fullUrl);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'a password reset email has been sent',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -204,17 +192,16 @@ async function passwordResetRequest(
 async function validatePasswordReset(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const { encryptedEmail, passwordToken } = req.params;
 
     const data = await authService.validatePasswordReset(encryptedEmail, passwordToken);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'password reset permission granted',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -224,7 +211,7 @@ async function validatePasswordReset(
 async function resetPassword(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const { newPassword } = req.body;
@@ -233,10 +220,9 @@ async function resetPassword(
 
     const data = await authService.resetPassword(userId, passwordToken, newPassword);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'password reset successful, please login with your new credentials',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -246,7 +232,7 @@ async function resetPassword(
 async function cancelPasswordReset(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -254,10 +240,9 @@ async function cancelPasswordReset(
 
     const data = await authService.cancelPasswordReset(userId, passwordToken);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'password reset has been canceled',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -267,7 +252,7 @@ async function cancelPasswordReset(
 async function updateEmail(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;

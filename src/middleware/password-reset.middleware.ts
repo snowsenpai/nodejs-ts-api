@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express';
 import cryptoHelper from '@/utils/crypto-helpers.util';
 import userModel from '@/resources/user/user.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
@@ -6,12 +6,12 @@ import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 async function passwordReset(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const basic = (req.headers.passwordToken as string);
+    const basic = req.headers.passwordToken as string;
 
-    if (!basic || !basic.startsWith('Basic ') ) {
+    if (!basic || !basic.startsWith('Basic ')) {
       return next(new HttpException(HttpStatus.UNAUTHORIZED, 'You are not authorized'));
     }
 

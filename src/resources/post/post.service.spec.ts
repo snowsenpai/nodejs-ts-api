@@ -1,5 +1,5 @@
-import PostService from "./post.service";
-import PostModel from "./post.model";
+import PostService from './post.service';
+import PostModel from './post.model';
 
 jest.mock('./post.model', () => {
   return {
@@ -7,18 +7,17 @@ jest.mock('./post.model', () => {
   };
 });
 
-
 describe('PostService', () => {
   let postService: PostService;
   let mockPostModel: jest.Mocked<typeof PostModel>;
 
-  const userId = 'userid';  
+  const userId = 'userid';
   const title = 'new post';
   const body = 'new test post body';
 
   const post = {
     title: 'title',
-    body: 'body'
+    body: 'body',
   };
 
   beforeEach(() => {

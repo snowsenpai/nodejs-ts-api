@@ -13,21 +13,21 @@ postRouter.get(
   basePath,
   validationMiddleware(validate.postPagination, 'query'),
   paginationMiddleware(postController.postPaginationOptions()),
-  postController.getAllPosts
+  postController.getAllPosts,
 );
 
 postRouter.get(
   `${basePath}/:id`,
   validationMiddleware(validate.findOnePost, 'params'),
   validationMiddleware(validate.postCreator, 'query'),
-  postController.getPostById
+  postController.getPostById,
 );
 
 postRouter.post(
   basePath,
   validationMiddleware(validate.create, 'body'),
   authenticated,
-  postController.create
+  postController.create,
 );
 
 postRouter.patch(
@@ -35,14 +35,14 @@ postRouter.patch(
   validationMiddleware(validate.findOnePost, 'params'),
   validationMiddleware(validate.modify, 'body'),
   authenticated,
-  postController.modifyPost
+  postController.modifyPost,
 );
 
 postRouter.delete(
   `${basePath}/:id`,
   validationMiddleware(validate.findOnePost, 'params'),
   authenticated,
-  postController.deletePost
+  postController.deletePost,
 );
 
 export default postRouter;

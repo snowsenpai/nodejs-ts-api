@@ -12,11 +12,11 @@ describe('User controller .api/user', () => {
   // bracket notation to access private methods and properties
   beforeEach(() => {
     userController = UserController;
-    req = {}
-    res = { 
+    req = {};
+    res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
-      send: jest.fn()
+      send: jest.fn(),
     };
     next = jest.fn();
   });
@@ -30,23 +30,18 @@ describe('User controller .api/user', () => {
     //   const name = 'John';
     //   const email = 'test@test.com';
     //   const password = 'password';
-
     //   req.body = { name, email, password };
-
     //   await userController['register'](req as Request, res as Response, next);
-
     //   expect(registerSpy).toHaveBeenCalledWith(name, email, password, 'user');
     //   expect(res.status).toHaveBeenCalledWith(201);
     //   expect(res.json).toHaveBeenCalledWith({ message: 'User created' });
     //   expect(next).not.toHaveBeenCalled();
     // });
-
     // FIX: Controller is no longer a class
     // it('should call next with HttpException if an error occurs', async () => {
     //   const errorMessage = 'Things exploded';
     //   jest.spyOn(userController['UserService'], 'register')
     //   .mockRejectedValueOnce( new HttpException(400, errorMessage) );
-
     //   const req = {
     //     body: {
     //       name: '',
@@ -56,13 +51,10 @@ describe('User controller .api/user', () => {
     //   }
     //   const next = jest.fn();
     //   await userController['register'](req as Request, res as Response, next);
-      
     //   const [arg] = next.mock.calls[0];
-
     //   expect(res.status).not.toHaveBeenCalled();
     //   expect(res.json).not.toHaveBeenCalled();
     //   expect(next).toHaveBeenCalledWith(expect.any(HttpException));
-      
     //   expect(arg).toBeInstanceOf(HttpException);
     //   expect(arg.status).toBe(400);
     //   expect(arg.message).toBe(errorMessage);
@@ -127,18 +119,15 @@ describe('User controller .api/user', () => {
     //     // @ts-ignore
     //     user
     //   }
-
     //   userController['getUser'](req as Request, res as Response, next)
     //   expect(res.status).toHaveBeenCalledWith(200);
     //   expect(res.send).toHaveBeenCalledWith({ data: user });
     //   expect(next).not.toHaveBeenCalled();
     // });
-
     // FIX: Controller is no longer a class
     // it('should call next with HttpException is user does not exist in req', () => {
     //   const next = jest.fn();
     //   userController['getUser'](req as Request, res as Response, next);
-
     //   const [arg] = next.mock.calls[0];
     //   expect(res.status).not.toHaveBeenCalled();
     //   expect(res.send).not.toHaveBeenCalled();

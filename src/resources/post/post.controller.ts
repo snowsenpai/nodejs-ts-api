@@ -5,55 +5,49 @@ import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const postService = new PostService();
 
-async function create (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function create(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     const userId = req.user._id;
     const { title, body, tags } = req.body;
 
     const data = await postService.create(title, body, userId, tags);
 
-    res.status(HttpStatus.CREATED)
-    .json({
+    res.status(HttpStatus.CREATED).json({
       message: 'post created successfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);
   }
-};
-
-async function postPaginationOptions () {
- const paginationOptions = await postService.getPagiationOptions();
- return paginationOptions;
 }
 
-async function getAllPosts (
+async function postPaginationOptions() {
+  const paginationOptions = await postService.getPagiationOptions();
+  return paginationOptions;
+}
+
+async function getAllPosts(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const paginationDetails = req.paginationDetails;
     const data = await postService.findAll(paginationDetails);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'all available posts retrieved',
-      data
+      data,
     });
   } catch (error) {
     next(error);
   }
 }
 
-async function getPostById (
+async function getPostById(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const postId = req.params.id;
@@ -66,20 +60,19 @@ async function getPostById (
       data = await postService.findOne(postId);
     }
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'post retrieved',
-      data
+      data,
     });
   } catch (error) {
     next(error);
   }
 }
 
-async function modifyPost (
+async function modifyPost(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const postId = req.params.id;
@@ -89,31 +82,29 @@ async function modifyPost (
 
     const data = await postService.modifyPost(postId, postData, userId);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'post updated successfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);
   }
 }
 
-async function deletePost (
+async function deletePost(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const postId = req.params.id;
     const userId = req.user._id;
 
     const data = await postService.deletePost(postId, userId);
-    
-    res.status(HttpStatus.OK)
-    .json({
+
+    res.status(HttpStatus.OK).json({
       message: 'post deleted succcessfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);

@@ -1,7 +1,7 @@
-import PostModel from "./post.model";
-import TagService from "../tag/tag.service";
+import PostModel from './post.model';
+import TagService from '../tag/tag.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
-import { TPaginationDetails, TPaginationOptions } from "@/middleware/pagination.middleware";
+import { TPaginationDetails, TPaginationOptions } from '@/middleware/pagination.middleware';
 
 class PostService {
   private post = PostModel;
@@ -26,8 +26,8 @@ class PostService {
       filters: {
         tags: tagFilters.tags,
       },
-      defaultSort: tagFilters.tagSort
-    }
+      defaultSort: tagFilters.tagSort,
+    };
     return paginationOptions;
   }
 
@@ -35,23 +35,17 @@ class PostService {
    * Find all posts
    */
   public async findAll(paginationDetails: TPaginationDetails) {
-    const {
-      filterValue,
-      filterField,
-      limit,
-      page,
-      search,
-      sortBy
-    } = paginationDetails;
- 
-    const searchQuery = { title: {$regex: search, $options: 'i'}};
+    const { filterValue, filterField, limit, page, search, sortBy } = paginationDetails;
 
-    const posts = await this.post.find({...searchQuery})
-    .where(filterField)
-    .in([...filterValue])
-    .sort(sortBy)
-    .skip((page - 1) * limit)
-    .limit(limit);
+    const searchQuery = { title: { $regex: search, $options: 'i' } };
+
+    const posts = await this.post
+      .find({ ...searchQuery })
+      .where(filterField)
+      .in([...filterValue])
+      .sort(sortBy)
+      .skip((page - 1) * limit)
+      .limit(limit);
 
     if (!posts.length) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'no post found');
@@ -66,7 +60,7 @@ class PostService {
     const nextPage = hasNextPage ? page + 1 : null;
     const hasPrevPage = page > 1;
     const prevPage = hasPrevPage ? page - 1 : null;
-    const lastPage = Math.ceil(totalPostsFound/limit);
+    const lastPage = Math.ceil(totalPostsFound / limit);
 
     // imporvement: if sending filterOptions, should be the filter 'name' not 'id' refernce
     return {
@@ -77,7 +71,7 @@ class PostService {
       lastPage,
       limit,
       filterOptions: filterValue,
-      posts
+      posts,
     };
   }
 
@@ -126,7 +120,7 @@ class PostService {
     await post.deleteOne();
 
     return {
-      postDeleted: true
+      postDeleted: true,
     };
   }
 }

@@ -8,7 +8,7 @@ const sendGrid = async (options: TMailOptions) => {
   try {
     const mailOptions = {
       from: options.from ?? `SnowSenpai <${process.env.APP_EMAIL}>`,
-      ...options
+      ...options,
     };
 
     await sgMail.send(mailOptions);

@@ -1,7 +1,8 @@
 import { Schema, model } from 'mongoose';
 import Post from './post.interface';
 
-const PostSchema = new Schema({
+const PostSchema = new Schema(
+  {
     title: {
       type: String,
       required: true,
@@ -13,16 +14,19 @@ const PostSchema = new Schema({
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true
+      required: true,
     },
-    tags: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Tag',
-      required: true
-    }],
-  }, {
-    timestamps: true
-  }
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Tag',
+        required: true,
+      },
+    ],
+  },
+  {
+    timestamps: true,
+  },
 );
 
 PostSchema.post('save', async function (doc, next) {

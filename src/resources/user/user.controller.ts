@@ -5,57 +5,36 @@ import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const userService = new UserService();
 
-async function register (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function register(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     const { firstName, lastName, email, password } = req.body;
-    const data = await userService.register(
-      firstName,
-      lastName,
-      email,
-      password,
-    );
+    const data = await userService.register(firstName, lastName, email, password);
 
-    res.status(HttpStatus.CREATED)
-    .json({
+    res.status(HttpStatus.CREATED).json({
       message: 'user account created succcessfully',
-      data
+      data,
     });
-    
   } catch (error) {
     next(error);
   }
 }
 
-function getUser (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Response | void {
-  res.status(HttpStatus.OK)
-  .json({
+function getUser(req: Request, res: Response, next: NextFunction): Response | void {
+  res.status(HttpStatus.OK).json({
     message: 'user data retrieved',
-    data: req.user
+    data: req.user,
   });
-};
+}
 
-async function findUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function findUser(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     const userId = req.params.id;
 
     const data = await userService.findById(userId);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'user data retrieved',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -65,7 +44,7 @@ async function findUser(
 async function updateUser(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
     const userId = req.user._id;
@@ -74,30 +53,24 @@ async function updateUser(
 
     const data = await userService.updateUser(userId, userData);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'user updated succcessfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);
   }
 }
 
-async function userPost(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> {
+async function userPost(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
     const userId = req.params.id;
 
     const data = await userService.getAllPostsOfUser(userId);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'user post field populated',
-      data
+      data,
     });
   } catch (error) {
     next(error);
@@ -107,16 +80,15 @@ async function userPost(
 async function deleteUser(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;    
+    const userId = req.user._id;
     const data = await userService.deleteUser(userId);
 
-    res.status(HttpStatus.OK)
-    .json({
+    res.status(HttpStatus.OK).json({
       message: 'user account deleted succcessfully',
-      data
+      data,
     });
   } catch (error) {
     next(error);

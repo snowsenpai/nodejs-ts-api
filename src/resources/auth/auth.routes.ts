@@ -1,64 +1,56 @@
-import { Router } from "express";
+import { Router } from 'express';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from '@/resources/auth/auth.validation';
 import authenticated from '@/middleware/authenticated.middleware';
 import passwordReset from '@/middleware/password-reset.middleware';
 import getFullUrl from '@/middleware/full-url.middleware';
-import authController from "./auth.controller";
+import authController from './auth.controller';
 
 const authRouter = Router();
 
 const basePath = '/auth';
 
-authRouter.get(
-  `${basePath}/otp/generate`,
-  authenticated,
-  authController.generateOTP
-);
+authRouter.get(`${basePath}/otp/generate`, authenticated, authController.generateOTP);
 
-authRouter.get(
-  `${basePath}/otp/auth-qrcode`,
-  authenticated,
-  authController.otpQRCode
-);
+authRouter.get(`${basePath}/otp/auth-qrcode`, authenticated, authController.otpQRCode);
 
 authRouter.get(
   `${basePath}/verify/email`,
   getFullUrl(false),
   authenticated,
-  authController.verifyEmail
+  authController.verifyEmail,
 );
 
 authRouter.get(
   `${basePath}/verify/email/:encryptedEmail/:emailToken`,
   validationMiddleware(validate.emailValidation, 'params'),
-  authController.validateEmail
+  authController.validateEmail,
 );
 
 authRouter.get(
   `${basePath}/password-reset-request`,
   getFullUrl(false),
   authenticated,
-  authController.passwordResetRequest
+  authController.passwordResetRequest,
 );
 
 authRouter.get(
   `${basePath}/password-reset-request/:encryptedEmail/:passwordToken`,
   validationMiddleware(validate.passwordReset, 'params'),
-  authController.validatePasswordReset
+  authController.validatePasswordReset,
 );
 
 authRouter.get(
   `${basePath}/cancel-password-reset`,
   authenticated,
   passwordReset,
-  authController.cancelPasswordReset
+  authController.cancelPasswordReset,
 );
 
 authRouter.post(
   `${basePath}/login`,
   validationMiddleware(validate.login, 'body'),
-  authController.login
+  authController.login,
 );
 
 authRouter.post(
@@ -66,35 +58,35 @@ authRouter.post(
   validationMiddleware(validate.resetPassword, 'body'),
   authenticated,
   passwordReset,
-  authController.resetPassword
+  authController.resetPassword,
 );
 
 authRouter.post(
   `${basePath}/otp/verify`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  authController.verifyOTP
+  authController.verifyOTP,
 );
 
 authRouter.post(
   `${basePath}/otp/validate`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  authController.validateOTP
+  authController.validateOTP,
 );
 
 authRouter.post(
   `${basePath}/otp/disable`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
-  authController.disableOTP
+  authController.disableOTP,
 );
 
 authRouter.post(
   `${basePath}/verify/recovery-code`,
   validationMiddleware(validate.recoveryCode, 'body'),
   authenticated,
-  authController.validateRecoveryCode
+  authController.validateRecoveryCode,
 );
 
 authRouter.patch(
@@ -102,7 +94,7 @@ authRouter.patch(
   validationMiddleware(validate.updateEmail, 'body'),
   getFullUrl(false),
   authenticated,
-  authController.updateEmail
+  authController.updateEmail,
 );
 
 export default authRouter;

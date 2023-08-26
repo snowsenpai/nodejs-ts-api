@@ -5,7 +5,7 @@ const { compilerOptions } = require('./tsconfig.json');
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  testMatch: ['**/**/*.test.ts','**/**/*.spec.ts'],
+  testMatch: ['**/**/*.test.ts', '**/**/*.spec.ts'],
   verbose: true,
   testTimeout: 30000,
   forceExit: true,
@@ -14,5 +14,5 @@ module.exports = {
   restoreMocks: true,
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {prefix: '<rootDir>/src'})
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/src' }),
 };

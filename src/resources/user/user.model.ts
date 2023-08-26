@@ -2,7 +2,8 @@ import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
 import User from './user.interface';
 
-const UserSchema = new Schema({
+const UserSchema = new Schema(
+  {
     firstName: {
       type: String,
       required: true,
@@ -36,11 +37,11 @@ const UserSchema = new Schema({
     },
     passwordResetRequest: {
       type: Boolean,
-      default: false
+      default: false,
     },
     grantPasswordReset: {
       type: Boolean,
-      default: false
+      default: false,
     },
     otpEnabled: {
       type: Boolean,
@@ -61,23 +62,24 @@ const UserSchema = new Schema({
     recoveryCodes: {
       type: [{ hash: String, used: Boolean }],
       select: false,
-    }
-  }, {
+    },
+  },
+  {
     timestamps: true,
     toJSON: {
-      virtuals: true
-    }
-  }
+      virtuals: true,
+    },
+  },
 );
 
-UserSchema.virtual('fullName').get(function() {
+UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
 UserSchema.virtual('posts', {
   ref: 'Post',
   localField: '_id',
-  foreignField: 'creator'
+  foreignField: 'creator',
 });
 
 UserSchema.pre<User>('save', async function (next) {
@@ -90,9 +92,7 @@ UserSchema.pre<User>('save', async function (next) {
   next();
 });
 
-UserSchema.methods.isValidPassword = async function (
-  password: string
-): Promise<Error | boolean> {
+UserSchema.methods.isValidPassword = async function (password: string): Promise<Error | boolean> {
   return await bcrypt.compare(password, this.password);
 };
 

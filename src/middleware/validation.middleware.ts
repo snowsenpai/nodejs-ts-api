@@ -12,15 +12,11 @@ function validationMiddleware(schema: Joi.Schema, requestField: TRequestField): 
     body: 'body',
     params: 'params',
     query: 'query',
-    headers: 'headers'
-  }
+    headers: 'headers',
+  };
 
   const validateField = fieldMapping[requestField];
-  return async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const validationOptions = {
       abortEarly: false,
       allowUnknown: true,
@@ -29,10 +25,7 @@ function validationMiddleware(schema: Joi.Schema, requestField: TRequestField): 
 
     const dataToValidate = req[validateField];
     try {
-      const value = await schema.validateAsync(
-        dataToValidate,
-        validationOptions
-      );
+      const value = await schema.validateAsync(dataToValidate, validationOptions);
       req[validateField] = value;
       next();
     } catch (e: any) {
@@ -59,4 +52,4 @@ export default validationMiddleware;
  * @api
  * validate req.headers from an extended Joi.schema
  */
-export const improvements = {}
+export const improvements = {};

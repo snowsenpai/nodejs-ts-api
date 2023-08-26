@@ -4,7 +4,7 @@ import * as QRCOde from 'qrcode';
 import { PassThrough } from 'stream';
 import { hash, compare } from 'bcrypt';
 import { JsonWebTokenError } from 'jsonwebtoken';
-import UserService from "../user/user.service";
+import UserService from '../user/user.service';
 import EmailService from '../email/email.service';
 import token from '@/utils/token.util';
 import { Token } from '@/utils/interfaces/token.interface';
@@ -18,10 +18,7 @@ class AuthService {
   /**
    * Attempt to login a user
    */
-  public async login(
-    email: string,
-    password: string
-  ) {
+  public async login(email: string, password: string) {
     const user = await this.UserService.getFullUserByEmail(email);
 
     const validPassword = await user.isValidPassword(password);
@@ -29,7 +26,7 @@ class AuthService {
     if (validPassword === false) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'wrong credentials');
     }
-    const accessToken = token.createToken({id: user._id});
+    const accessToken = token.createToken({ id: user._id });
 
     return {
       accessToken,
@@ -41,20 +38,20 @@ class AuthService {
    * generateTOTP
    */
   public generateTOTP(secret: string, label?: string) {
-    let newTOTP = new OTPAuth.TOTP({
+    const newTOTP = new OTPAuth.TOTP({
       issuer: process.env.APP_NAME,
       label: label || process.env.APP_LABEL,
       algorithm: 'SHA1',
       digits: 6,
       period: 30,
-      secret: secret
+      secret: secret,
     });
     return newTOTP;
   }
 
   /**
    * generateOTP
-  */
+   */
   public async generateOTP(userId: string) {
     const user = await this.UserService.getFullUserById(userId);
 
@@ -64,9 +61,9 @@ class AuthService {
 
     const base32Secret = cryptoHelper.generateRandomBase32(24);
 
-    let totp = this.generateTOTP(base32Secret, user.email);
+    const totp = this.generateTOTP(base32Secret, user.email);
 
-    let otpUrl = totp.toString();
+    const otpUrl = totp.toString();
 
     user.otpAuthUrl = otpUrl;
     user.otpBase32 = base32Secret;
@@ -82,17 +79,17 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
     const secret = user.otpBase32;
 
-    let totp = this.generateTOTP(secret, user.email);
+    const totp = this.generateTOTP(secret, user.email);
 
-    let delta = totp.validate({ token });
+    const delta = totp.validate({ token });
 
-    if(delta === null) {
-      throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'); 
+    if (delta === null) {
+      throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist');
     }
 
     user.otpEnabled = true;
     user.otpVerified = true;
-    
+
     // generate recovery codes
     const codeLength = 8;
     const recoveryCodesSize = 10;
@@ -111,10 +108,10 @@ class AuthService {
         id: updatedUser._id,
         firstName: updatedUser.firstName,
         email: updatedUser.email,
-        otpEnabled: updatedUser.otpEnabled
+        otpEnabled: updatedUser.otpEnabled,
       },
-      recoveryCodes
-    }
+      recoveryCodes,
+    };
   }
 
   /**
@@ -124,11 +121,11 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
     const secret = user.otpBase32;
 
-    let totp = this.generateTOTP(secret, user.email);
+    const totp = this.generateTOTP(secret, user.email);
 
-    let delta = totp.validate({ token, window: 1 });
+    const delta = totp.validate({ token, window: 1 });
 
-    if(delta === null) {
+    if (delta === null) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist');
     }
 
@@ -142,11 +139,11 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
     const secret = user.otpBase32;
 
-    let totp = this.generateTOTP(secret, user.email);
+    const totp = this.generateTOTP(secret, user.email);
 
-    let delta = totp.validate({ token, window: 1 });
+    const delta = totp.validate({ token, window: 1 });
 
-    if(delta === null) {
+    if (delta === null) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist');
     }
 
@@ -163,9 +160,9 @@ class AuthService {
         id: updatedUser._id,
         firstName: updatedUser.firstName,
         email: updatedUser.email,
-        otpEnabled: updatedUser.otpEnabled
-      }
-    }
+        otpEnabled: updatedUser.otpEnabled,
+      },
+    };
   }
 
   /**
@@ -176,12 +173,12 @@ class AuthService {
     const user = await this.UserService.getFullUserById(userId);
 
     const enabled = user.otpAuthUrl;
-    if(!enabled) throw new HttpException(HttpStatus.UNAUTHORIZED, 'user otp not enabled');
+    if (!enabled) throw new HttpException(HttpStatus.UNAUTHORIZED, 'user otp not enabled');
 
     return {
       otpAuthUrl: user.otpAuthUrl,
-      otpBase32: user.otpBase32
-    }
+      otpBase32: user.otpBase32,
+    };
   }
 
   /**
@@ -192,7 +189,7 @@ class AuthService {
   public async responseWithQRCode(data: string, res: Response) {
     const qrStream = new PassThrough();
     await QRCOde.toFileStream(qrStream, data, {
-      width: 200
+      width: 200,
     });
 
     qrStream.pipe(res);
@@ -204,13 +201,13 @@ class AuthService {
    */
   public async hashRecoveryCodes(recoveryCodes: string[]) {
     const hashedCodes = await Promise.all(
-      recoveryCodes.map( async (code) => {
+      recoveryCodes.map(async (code) => {
         const hasedCode = await hash(code, 7);
         return {
           hash: hasedCode,
-          used: false
-        }
-      })
+          used: false,
+        };
+      }),
     );
     return hashedCodes;
   }
@@ -221,7 +218,7 @@ class AuthService {
    */
   public async validateRecoveryCode(userId: string, recoverCode: string) {
     const user = await this.UserService.getFullUserById(userId);
-    if (!(user.recoveryCodes.length)) {
+    if (!user.recoveryCodes.length) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user has no recover code');
     }
     const recoveryCodes = user.recoveryCodes;
@@ -260,7 +257,10 @@ class AuthService {
    */
   public async updateEmail(userId: string, oldEmail: string, newEmail: string, fullUrl: string) {
     if (newEmail === oldEmail) {
-      throw new HttpException(HttpStatus.BAD_REQUEST, 'new email should not be the same as old email');
+      throw new HttpException(
+        HttpStatus.BAD_REQUEST,
+        'new email should not be the same as old email',
+      );
     }
 
     const updatedUser = await this.UserService.updateUser(userId, { email: newEmail });
@@ -277,8 +277,8 @@ class AuthService {
       data: {
         emailUpdated: true,
         newEmail: updatedUser.email,
-        verifiedEmail: updatedUser.verified
-      }
+        verifiedEmail: updatedUser.verified,
+      },
     };
   }
 
@@ -299,21 +299,25 @@ class AuthService {
     const updatedUser = await user.save();
 
     const tokenExpiry = 60 * 60; // an hour
-    const emailJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
+    const emailJWT = token.createToken({ secret: secretToken }, tokenExpiry).token;
     // when validating, encrypted data should be decrypted
     const emailToken = cryptoHelper.encryptData(emailJWT, 'utf-8', 'hex');
 
     const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
-    const verificationURL = `${fullURL}/${encryptedUserEmail}/${emailToken}`
+    const verificationURL = `${fullURL}/${encryptedUserEmail}/${emailToken}`;
 
-    await this.EmailService.sendVerifyMail(updatedUser.email, updatedUser.firstName, verificationURL)
+    await this.EmailService.sendVerifyMail(
+      updatedUser.email,
+      updatedUser.firstName,
+      verificationURL,
+    );
 
     return {
       message: `a verification link has been sent to ${updatedUser.email}`,
       data: {
-        sendVerifyEmail: true
-      }
+        sendVerifyEmail: true,
+      },
     };
   }
 
@@ -337,7 +341,7 @@ class AuthService {
     const existingUser = await this.UserService.getFullUserByEmail(unverifiedUserEmail);
 
     if (payload.secret !== existingUser.secretToken) {
-      throw new HttpException(HttpStatus.BAD_REQUEST, errorMesage)
+      throw new HttpException(HttpStatus.BAD_REQUEST, errorMesage);
     }
 
     existingUser.verified = true;
@@ -347,8 +351,8 @@ class AuthService {
 
     return {
       email: verifiedUser.email,
-      emailVerified: verifiedUser.verified
-    }
+      emailVerified: verifiedUser.verified,
+    };
   }
 
   /**
@@ -371,15 +375,19 @@ class AuthService {
     const encryptedEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
-    const passwordJWT = (token.createToken({ secret: secretToken }, tokenExpiry)).token;
+    const passwordJWT = token.createToken({ secret: secretToken }, tokenExpiry).token;
     const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
 
     const passwordResetURL = `${fullURL}/${encryptedEmail}/${passwordToken}`;
 
-    await this.EmailService.sendPasswordResetMail(updatedUser.email, updatedUser.firstName, passwordResetURL);
+    await this.EmailService.sendPasswordResetMail(
+      updatedUser.email,
+      updatedUser.firstName,
+      passwordResetURL,
+    );
 
     return {
-      sendPasswordResetEmail: true
+      sendPasswordResetEmail: true,
     };
   }
 
@@ -390,7 +398,8 @@ class AuthService {
     const passwordJWT = cryptoHelper.decryptData(passwordToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(passwordJWT);
 
-    const errorMessage = 'failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials'
+    const errorMessage =
+      'failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials';
 
     if (payload instanceof JsonWebTokenError) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
@@ -418,8 +427,8 @@ class AuthService {
 
     return {
       grantPasswordReset: updatedUser.grantPasswordReset,
-      base64SecretToken
-    }
+      base64SecretToken,
+    };
   }
 
   /**
@@ -428,9 +437,14 @@ class AuthService {
   public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    const errorMessage = 'password reset failed, user not verified or has no permission to reset password';
+    const errorMessage =
+      'password reset failed, user not verified or has no permission to reset password';
 
-    if (user.verified === false || user.grantPasswordReset === false || user.passwordResetRequest === false) {
+    if (
+      user.verified === false ||
+      user.grantPasswordReset === false ||
+      user.passwordResetRequest === false
+    ) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
@@ -452,8 +466,8 @@ class AuthService {
     await user.save();
 
     return {
-      successfulPasswordReset: true
-    }
+      successfulPasswordReset: true,
+    };
   }
 
   /**
@@ -462,11 +476,11 @@ class AuthService {
   public async cancelPasswordReset(userId: string, passwordToken: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    if (
-      user.passwordResetRequest === false ||
-      user.grantPasswordReset === false
-      ) {
-      throw new HttpException(HttpStatus.NOT_FOUND, 'password reset request not recived or permission not granted');
+    if (user.passwordResetRequest === false || user.grantPasswordReset === false) {
+      throw new HttpException(
+        HttpStatus.NOT_FOUND,
+        'password reset request not recived or permission not granted',
+      );
     }
     if (passwordToken !== user.secretToken) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'invalid credentials');
@@ -477,7 +491,7 @@ class AuthService {
     user.secretToken = '';
     await user.save();
 
-    return { passwordResetCanceled: true }
+    return { passwordResetCanceled: true };
   }
 }
 

@@ -1,21 +1,22 @@
-import UserModel from "./user.model";
-import EmailService from "../email/email.service";
+import UserModel from './user.model';
+import EmailService from '../email/email.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 class UserService {
   private user = UserModel;
   private EmailService = new EmailService();
-  private sensitiveUserFields = ['+password', '+secretToken', '+otpBase32', '+otpAuthUrl', '+recoveryCodes'];
+  private sensitiveUserFields = [
+    '+password',
+    '+secretToken',
+    '+otpBase32',
+    '+otpAuthUrl',
+    '+recoveryCodes',
+  ];
 
   /**
    * Register a new user
-  */
- public async register(
-  firstName: string,
-  lastName: string,
-  email: string,
-  password: string
- ) {
+   */
+  public async register(firstName: string, lastName: string, email: string, password: string) {
     const existingUser = await this.user.findOne({ email: email });
 
     if (existingUser) {
@@ -34,16 +35,16 @@ class UserService {
     this.EmailService.sendWelcomeEmail(email, firstName);
 
     return {
-      createdNewUserAccount: true
+      createdNewUserAccount: true,
     };
- }
+  }
 
   /**
    * Find all users
    */
   public async findAllUsers() {
     const users = await this.user.find({});
-    if(!users.length){
+    if (!users.length) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'unable to find any user');
     }
     return users;
@@ -53,7 +54,7 @@ class UserService {
    * Find a user by email
    */
   public async findByEmail(userEmail: string) {
-    const user = await this.user.findOne({email: userEmail}).exec();
+    const user = await this.user.findOne({ email: userEmail }).exec();
 
     if (!user) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user does not exist');
@@ -67,7 +68,7 @@ class UserService {
    */
   public async findById(userId: string) {
     const user = await this.user.findById(userId);
-    if(!user){
+    if (!user) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'unable to find user');
     }
     return user;
@@ -75,7 +76,7 @@ class UserService {
 
   /**
    * getFullUSerById
-   * 
+   *
    * for authentication process
    */
   public async getFullUserById(userId: string) {
@@ -89,7 +90,7 @@ class UserService {
 
   /**
    * getFullUserByEmail
-   * 
+   *
    * for authentication process
    */
   public async getFullUserByEmail(userEmail: string) {
@@ -98,7 +99,7 @@ class UserService {
     if (!user) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
-    return user;    
+    return user;
   }
 
   /**
@@ -121,7 +122,7 @@ class UserService {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user not found');
     }
     return {
-      deletedUserData: true
+      deletedUserData: true,
     };
   }
 

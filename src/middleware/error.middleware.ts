@@ -7,7 +7,7 @@ function errorMiddleware(
   error: HttpException,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void {
   const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
   let message = error.message;

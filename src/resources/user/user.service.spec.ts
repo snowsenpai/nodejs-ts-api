@@ -1,10 +1,10 @@
-import token from "@/utils/token.util";
+import token from '@/utils/token.util';
 
 // Mock token.createToken
 jest.mock('../../utils/token');
 
-import UserService from "./user.service";
-import UserModel from "./user.model";
+import UserService from './user.service';
+import UserModel from './user.model';
 // Mock User Model
 jest.mock('./user.model', () => {
   return {
@@ -16,7 +16,7 @@ jest.mock('./user.model', () => {
 describe('UserService', () => {
   let userService: UserService;
   let mockUserModel: jest.Mocked<typeof UserModel>;
-  
+
   const name = 'bob';
   const email = 'test@test.com';
   const password = 'testing';
@@ -37,14 +37,14 @@ describe('UserService', () => {
       await userService.register(name, email, password, role);
 
       expect(mockUserModel.create).toHaveBeenCalledWith({
-        name, 
-        email, 
+        name,
+        email,
         password,
-         role,
+        role,
       });
     });
-    
-    it('should throw an error if register fails', async () => { 
+
+    it('should throw an error if register fails', async () => {
       const errorMessage = 'Failed to register user';
       mockUserModel.create.mockRejectedValueOnce(new Error(errorMessage));
 
@@ -61,7 +61,6 @@ describe('UserService', () => {
   //       isValidPassword: jest.fn().mockResolvedValue(true),
   //     }
   //     mockUserModel.findOne.mockResolvedValue(mockUser);
-      
 
   //     const result = await userService.login(email, password);
 
