@@ -305,6 +305,7 @@ class AuthService {
 
     const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
 
+    //! dynamically send frontend url with concatenated data rather than backend url
     const verificationURL = `${fullURL}/${encryptedUserEmail}/${emailToken}`;
 
     await this.EmailService.sendVerifyMail(

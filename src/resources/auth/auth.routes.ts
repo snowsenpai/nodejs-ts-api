@@ -28,14 +28,14 @@ authRouter.get(
 );
 
 authRouter.get(
-  `${basePath}/password-reset-request`,
+  `${basePath}/password-reset`,
   getFullUrl(false),
   authenticated,
   authController.passwordResetRequest,
 );
 
 authRouter.get(
-  `${basePath}/password-reset-request/:encryptedEmail/:passwordToken`,
+  `${basePath}/password-reset/:encryptedEmail/:passwordToken`,
   validationMiddleware(validate.passwordReset, 'params'),
   authController.validatePasswordReset,
 );
@@ -62,21 +62,21 @@ authRouter.post(
 );
 
 authRouter.post(
-  `${basePath}/otp/verify`,
+  `${basePath}/verify/otp`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
   authController.verifyOTP,
 );
 
 authRouter.post(
-  `${basePath}/otp/validate`,
+  `${basePath}/validate/otp`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
   authController.validateOTP,
 );
 
 authRouter.post(
-  `${basePath}/otp/disable`,
+  `${basePath}/disable/otp`,
   validationMiddleware(validate.otpToken, 'body'),
   authenticated,
   authController.disableOTP,
