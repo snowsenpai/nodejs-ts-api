@@ -11,7 +11,7 @@ async function login(req: Request, res: Response, next: NextFunction): Promise<R
     const data = await authService.login(email, password);
 
     res.status(HttpStatus.OK).json({
-      message: 'login successful',
+      message: 'login successful, use your access token to send request to protected resources',
       data,
     });
   } catch (error) {

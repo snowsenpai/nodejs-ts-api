@@ -1,4 +1,5 @@
 import sendGrid from './providers/sendGrid';
+import templates from './templates';
 
 class EmailService {
   /**
@@ -11,10 +12,7 @@ class EmailService {
     await sendGrid({
       to: email,
       subject: 'Welcome!',
-      html: `
-        <h2>Hi ${firstName},</h2> 
-        <p>Your account has been sucessfully created, to access other services ensure you verify your email.</p>
-      `,
+      html: templates.generateWelcomeEmail(firstName),
     });
   }
 
@@ -29,14 +27,7 @@ class EmailService {
     await sendGrid({
       to: email,
       subject: 'Verify your email address',
-      text: 'to access all our services',
-      html: `
-      <h2>Hi ${firstName},</h2> 
-      <p>Use this <a href="${url}" target="_blank">link</a> to verify your email.</p>
-      <p>Button not working? Paste the following link into ypur browser:</p>
-      <p>${url}</p>
-      <p>For your security, the reset password link will expire after 1 hour</p>
-      `,
+      html: templates.generateVerifyEmail(firstName, url),
     });
   }
 
@@ -46,15 +37,8 @@ class EmailService {
   public async sendPasswordResetMail(email: string, firstName: string, url: string) {
     await sendGrid({
       to: email,
-      subject: 'Verify password reset request',
-      html: `
-      <h2>Hi ${firstName},</h2>
-      <p>We recived a request to reset your password, use this <a href="${url}" target="_blank">link</a> to approve the request.</p> 
-      <p>Button not working? Paste the following link into your browser:</p>
-      <p>${url}</p>
-      <p>For your security, the reset password link will expire after 1 hour.</p>
-      <p>If you belive that this request is suspicious, please contatct our <a href="#">support team</a>.</p>
-      `,
+      subject: 'Verify reset password request',
+      html: templates.generateResetPasswordEmail(firstName, url),
     });
   }
 }

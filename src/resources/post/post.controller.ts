@@ -22,7 +22,7 @@ async function create(req: Request, res: Response, next: NextFunction): Promise<
 }
 
 async function postPaginationOptions() {
-  const paginationOptions = await postService.getPagiationOptions();
+  const paginationOptions = await postService.paginationOptions();
   return paginationOptions;
 }
 

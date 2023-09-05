@@ -1,9 +1,10 @@
 import PostModel from './post.model';
 import TagService from '../tag/tag.service';
+import PublicResource from '@/utils/interfaces/public-resource.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import { TPaginationDetails, TPaginationOptions } from '@/middleware/pagination.middleware';
 
-class PostService {
+class PostService implements PublicResource {
   private post = PostModel;
   private tags = new TagService();
 
@@ -17,18 +18,18 @@ class PostService {
   }
 
   /**
-   * getPagiationOptions
+   * pagiationOptions
    */
-  public async getPagiationOptions() {
+  public async paginationOptions() {
     const tagFilters = await this.tags.getTagFilters();
-    const paginationOptions: TPaginationOptions = {
+    const options: TPaginationOptions = {
       defaultFilter: tagFilters.defaultFilter,
       filters: {
         tags: tagFilters.tags,
       },
       defaultSort: tagFilters.tagSort,
     };
-    return paginationOptions;
+    return options;
   }
 
   /**
