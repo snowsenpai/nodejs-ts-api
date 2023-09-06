@@ -40,7 +40,7 @@ class AuthService {
   public generateTOTP(secret: string, label?: string) {
     const newTOTP = new OTPAuth.TOTP({
       issuer: process.env.APP_NAME,
-      label: label || process.env.APP_LABEL,
+      label: label || process.env.APP_NAME,
       algorithm: 'SHA1',
       digits: 6,
       period: 30,
