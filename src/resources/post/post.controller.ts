@@ -7,7 +7,7 @@ const postService = new PostService();
 
 async function create(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { title, body, tags } = req.body;
 
     const data = await postService.create(title, body, userId, tags);
@@ -32,7 +32,7 @@ async function getAllPosts(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const paginationDetails = req.paginationDetails;
+    const paginationDetails = req.paginationDetails!;
     const data = await postService.findAll(paginationDetails);
 
     res.status(HttpStatus.OK).json({
@@ -76,7 +76,7 @@ async function modifyPost(
 ): Promise<Response | void> {
   try {
     const postId = req.params.id;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     const postData: Partial<Post> = req.body;
 
@@ -98,7 +98,7 @@ async function deletePost(
 ): Promise<Response | void> {
   try {
     const postId = req.params.id;
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     const data = await postService.deletePost(postId, userId);
 

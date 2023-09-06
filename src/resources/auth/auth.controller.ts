@@ -25,7 +25,7 @@ async function generateOTP(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     const data = await authService.generateOTP(userId);
 
@@ -44,7 +44,7 @@ async function verifyOTP(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { token } = req.body;
 
     const data = await authService.verifyOTP(userId, token);
@@ -64,7 +64,7 @@ async function validateOTP(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { token } = req.body;
 
     const data = await authService.validateOTP(userId, token);
@@ -84,7 +84,7 @@ async function disableOTP(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { token } = req.body;
 
     const data = await authService.disabelOTP(userId, token);
@@ -104,7 +104,7 @@ async function otpQRCode(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
 
     const { otpAuthUrl } = await authService.otpData(userId);
 
@@ -120,7 +120,7 @@ async function validateRecoveryCode(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const { code } = req.body;
 
     const data = await authService.validCode(userId, code);
@@ -140,8 +140,8 @@ async function verifyEmail(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
-    const fullUrl = req.completeUrl;
+    const userId = req.user?._id;
+    const fullUrl = req.completeUrl!;
     const data = await authService.verifyEmail(userId, fullUrl);
 
     res.status(HttpStatus.OK).json(data);
@@ -175,8 +175,8 @@ async function passwordResetRequest(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
-    const fullUrl = req.completeUrl;
+    const userId = req.user?._id;
+    const fullUrl = req.completeUrl!;
 
     const data = await authService.passwordResetRequest(userId, fullUrl);
 
@@ -215,8 +215,8 @@ async function resetPassword(
 ): Promise<Response | void> {
   try {
     const { newPassword } = req.body;
-    const userId = req.user._id;
-    const passwordToken = req.passwordResetSecret;
+    const userId = req.user?._id;
+    const passwordToken = req.passwordResetSecret!;
 
     const data = await authService.resetPassword(userId, passwordToken, newPassword);
 
@@ -235,8 +235,8 @@ async function cancelPasswordReset(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
-    const passwordToken = req.passwordResetSecret;
+    const userId = req.user?._id;
+    const passwordToken = req.passwordResetSecret!;
 
     const data = await authService.cancelPasswordReset(userId, passwordToken);
 
@@ -255,10 +255,9 @@ async function updateEmail(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
-    const oldEmail = req.user.email;
+    const { _id: userId, email: oldEmail } = req.user!;
     const { newEmail } = req.body;
-    const fullUrl = req.completeUrl;
+    const fullUrl = req.completeUrl!;
 
     const data = await authService.updateEmail(userId, oldEmail, newEmail, fullUrl);
 

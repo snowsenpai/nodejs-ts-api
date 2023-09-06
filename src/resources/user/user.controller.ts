@@ -47,7 +47,7 @@ async function updateUser(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     // Only fields specified in joi schema will be in the request body,i.e {stripUnknown: true}
     const userData: Partial<User> = req.body;
 
@@ -83,7 +83,7 @@ async function deleteUser(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const userId = req.user._id;
+    const userId = req.user?._id;
     const data = await userService.deleteUser(userId);
 
     res.status(HttpStatus.OK).json({
