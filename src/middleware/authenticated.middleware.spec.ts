@@ -2,9 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import authenticatedMiddleware from './authenticated.middleware';
 import UserModel from '@/resources/user/user.model';
 import HttpException from '@/utils/exceptions/http.exception';
+import { HttpStatus } from '@/utils/exceptions';
 import token from '@/utils/token.util';
 
-jest.mock('../utils/token.ts');
+//! refactor test
+// use '@jest-mock/express' module ro mock req, res & next
+// use jest.spyOn to mock and define implementation for imported modulues
+jest.mock('../utils/token.util.ts');
 
 jest.mock('../resources/user/user.model.ts', () => {
   return {
@@ -38,8 +42,8 @@ describe('Authentication middleware', () => {
 
     const error: Error = (next as jest.Mock).mock.calls[0][0] as Error;
 
-    expect(error.message).toBe('Unauthorized');
-    expect((error as HttpException).status).toBe(401);
+    expect(error.message).toBe('You are not authorized');
+    expect((error as HttpException).status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
   it('should call next with an HttpException if authorization header is invalid', async () => {
@@ -50,8 +54,8 @@ describe('Authentication middleware', () => {
     const error: Error = (next as jest.Mock).mock.calls[0][0] as Error;
 
     expect(next).toHaveBeenCalledWith(expect.any(HttpException));
-    expect(error.message).toBe('Unauthorized');
-    expect((error as HttpException).status).toBe(401);
+    expect(error.message).toBe('You are not authorized');
+    expect((error as HttpException).status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
   it('should call next with an HttpException if token verification fails', async () => {
@@ -64,8 +68,8 @@ describe('Authentication middleware', () => {
 
     const error: Error = (next as jest.Mock).mock.calls[0][0] as Error;
     expect(next).toHaveBeenCalledWith(expect.any(HttpException));
-    expect(error.message).toBe('Unauthorized');
-    expect((error as HttpException).status).toBe(401);
+    expect(error.message).toBe('You are not authorized');
+    expect((error as HttpException).status).toBe(HttpStatus.UNAUTHORIZED);
   });
 
   it('should set the user in the request object and call next if token is valid', async () => {

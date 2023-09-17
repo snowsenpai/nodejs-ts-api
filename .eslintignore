@@ -2,3 +2,4 @@ node_modules/
 /dist/
 /docs/
 .eslintrc.js
+jest.config.js
