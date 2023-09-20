@@ -48,7 +48,7 @@ describe('PostController', () => {
       );
     });
 
-    it('should call next with HttpException status code if an error occurs', async () => {
+    it('should call next with HttpException if an error occurs', async () => {
       const req = getMockReq();
       const { res, next } = getMockRes();
       const createSpy = jest.spyOn(postController, 'create');
@@ -113,7 +113,7 @@ describe('PostController', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next with HttpException status code if an error occurs', async () => {
+    it('should call next with HttpException if an error occurs', async () => {
       // eslint-disable-next-line prettier/prettier
       const paginationDetails = getPaginationDetails([objectId], 'tags', 1, 1, 'test', {
         asc: 'asc',

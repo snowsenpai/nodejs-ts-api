@@ -131,10 +131,9 @@ class UserService {
    */
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
-    if (!user) {
-      throw new HttpException(HttpStatus.NOT_FOUND, 'user does not exist');
-    }
+
     const posts = await user.populate('posts');
+    // fix: posts could be empty, create a flag using .populated() then throw
 
     return posts;
   }

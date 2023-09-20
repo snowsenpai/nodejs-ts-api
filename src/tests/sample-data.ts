@@ -9,12 +9,31 @@ const sampleTag = {
   description: 'just used for testing',
 };
 
+const password = 'newPassword';
+
 const sampleUser = {
   _id: new Types.ObjectId().toString(),
   firstName: 'Test',
   lastName: 'User',
   email: 'user@test.com',
   verified: false,
+  otpVerified: false,
+  otpEnabled: false,
+  role: 'user',
+  passwordResetRequest: false,
+  grantPasswordReset: false,
+  posts: [],
+  populate: jest.fn(),
+  save: jest.fn(),
+};
+
+const sampleFullUser = {
+  ...sampleUser,
+  password: 'hashedPassword',
+  secretToken: '',
+  otpAuthUrl: '',
+  otpBase32: '',
+  recoveryCodes: [{ hash: 'hash1', used: false }],
 };
 
 const samplePost = {
@@ -25,8 +44,6 @@ const samplePost = {
   tags: [sampleTag._id],
   deleteOne: jest.fn(),
 };
-
-// const fullUser = {};
 
 const samplePostPopulated = {
   ...samplePost,
@@ -67,7 +84,9 @@ export {
   objectId,
   samplePost,
   sampleTag,
+  password,
   sampleUser,
+  sampleFullUser,
   samplePostPopulated,
   tagsId,
   getPaginationDetails,
