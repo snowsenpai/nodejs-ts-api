@@ -90,11 +90,7 @@ class AuthService {
     user.otpEnabled = true;
     user.otpVerified = true;
 
-    // generate recovery codes
-    const codeLength = 8;
-    const recoveryCodesSize = 10;
-
-    const recoveryCodes = cryptoHelper.randomStringArray(codeLength, recoveryCodesSize);
+    const recoveryCodes = cryptoHelper.randomStringArray(8, 10);
 
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
 
@@ -103,7 +99,7 @@ class AuthService {
     const updatedUser = await user.save();
 
     return {
-      otpVerified: true,
+      otpVerified: updatedUser.otpVerified,
       user: {
         id: updatedUser._id,
         firstName: updatedUser.firstName,
@@ -223,6 +219,7 @@ class AuthService {
     }
     const recoveryCodes = user.recoveryCodes;
 
+    //! use array methods, no need for a for-loop
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoverCode, code.hash);
 

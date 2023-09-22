@@ -17,7 +17,7 @@
     "pretty": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "format": "run-s pretty lint",
     "prepare": "husky install",
-    "test": "cross-env NODE_ENV=test MONGO_DATABASE=test jest --runInBand --detectOpenHandles"
+    "test": "jest --runInBand --detectOpenHandles"
   },
   "lint-staged": {
     "*.ts": [
@@ -43,7 +43,6 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
-    "cross-env": "^7.0.3",
     "eslint": "^8.44.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^5.0.0",

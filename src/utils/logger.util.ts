@@ -1,8 +1,7 @@
 import pino from 'pino';
 import path from 'path';
 
-//to create log dir on app start? - fs.mkdir(path, {recursive:true}, cb), for production
-// fn should be called in entry point before other fns that utilize logger
+//issue: open handler detected by jest from pino.transport(
 const transport = pino.transport({
   targets: [
     {

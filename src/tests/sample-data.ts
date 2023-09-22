@@ -25,6 +25,7 @@ const sampleUser = {
   posts: [],
   populate: jest.fn(),
   save: jest.fn(),
+  isValidPassword: jest.fn(),
 };
 
 const sampleFullUser = {
@@ -33,7 +34,7 @@ const sampleFullUser = {
   secretToken: '',
   otpAuthUrl: '',
   otpBase32: '',
-  recoveryCodes: [{ hash: 'hash1', used: false }],
+  recoveryCodes: [],
 };
 
 const samplePost = {

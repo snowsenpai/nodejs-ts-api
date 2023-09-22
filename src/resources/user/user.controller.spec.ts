@@ -4,8 +4,6 @@ import { HttpStatus, HttpException } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { sampleUser, password, objectId, samplePost } from 'tests/sample-data';
 
-// prevent console.warn from sgMail.setApiKey
-jest.mock('@sendgrid/mail');
 // prevent an open handle from pino.transport
 jest.mock('pino');
 

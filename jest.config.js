@@ -15,4 +15,5 @@ module.exports = {
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootDir>/src' }),
+  setupFiles: ['<rootDir>/src/tests/env-setup.ts'],
 };
