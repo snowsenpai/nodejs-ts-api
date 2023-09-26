@@ -77,6 +77,7 @@ class AuthService {
    */
   public async verifyOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUserById(userId);
+    //TODO check user.otpBase32 if empty in a middleware fn, mount after authenticatedMW
     const secret = user.otpBase32;
 
     const totp = this.generateTOTP(secret, user.email);
@@ -115,6 +116,7 @@ class AuthService {
    */
   public async validateOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUserById(userId);
+    //TODO check user.otpVerified status in a middleware fn, mount after authenticatedMW
     const secret = user.otpBase32;
 
     const totp = this.generateTOTP(secret, user.email);
@@ -133,12 +135,14 @@ class AuthService {
    */
   public async disabelOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUserById(userId);
+    //TODO check user.otpVerified status in a middleware fn, mount after authenticatedMW
     const secret = user.otpBase32;
 
     const totp = this.generateTOTP(secret, user.email);
 
     const delta = totp.validate({ token, window: 1 });
 
+    // TODO review error messages
     if (delta === null) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist');
     }
@@ -212,26 +216,26 @@ class AuthService {
    * validateRecoveryCode
    * if no match is found will return `undefined`
    */
-  public async validateRecoveryCode(userId: string, recoverCode: string) {
+  public async validateRecoveryCode(userId: string, recoveryCode: string) {
     const user = await this.UserService.getFullUserById(userId);
     if (!user.recoveryCodes.length) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user has no recover code');
     }
     const recoveryCodes = user.recoveryCodes;
 
-    //! use array methods, no need for a for-loop
+    //! use array method on user.recoveryCodes, no need for a for-loop
     for (const code of recoveryCodes) {
-      const isMatch = await compare(recoverCode, code.hash);
+      const isMatch = await compare(recoveryCode, code.hash);
 
       // using `if(!isMatch) or if(!isMatch)-else` will exit the loop fast if a match is not found after first iteration
       if (isMatch) {
         if (code.used) {
-          throw new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoverCode}`);
+          throw new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoveryCode}`);
         } else {
           code.used = true;
           await user.save();
 
-          return { validCode: recoverCode };
+          return { validCode: true, recoveryCode };
         }
       }
     }
