@@ -18,6 +18,8 @@ jest.mock('bcrypt');
 
 const fullUrl = 'http:/fullUrl.test';
 
+// TODO dry,
+//todo code review, spies with reoccurring mockImplementation should have a single primary instance within the outer scope
 describe('AuthService', () => {
   let authService: AuthService;
 
@@ -560,7 +562,7 @@ describe('AuthService', () => {
       );
     });
 
-    it("should update an verified user's email", async () => {
+    it("should update an verified user's email and send verification email", async () => {
       const testUser = {
         ...sampleUser,
         verified: true,
@@ -619,6 +621,8 @@ describe('AuthService', () => {
     });
   });
 
+  // TODO review mock mEmailToken.expiresIn: 123, should equal 60*60 for correctness
+  // todo randStringSpy->newSecretToken should equal lengthOfSecret for correctness
   describe('verifyEmail', () => {
     it('should send a verification email to an unverified user', async () => {
       const lengthOfSecret = Number(process.env.USER_SECRET_TOKEN_LENGTH);
@@ -830,6 +834,455 @@ describe('AuthService', () => {
       );
       expect(getFullUserByEmailSpy).toHaveBeenCalledWith(decryptEmailResult);
       expect(testUser.save).not.toHaveBeenCalled();
+    });
+  });
+
+  // TODO review mock mEmailToken.expiresIn: 123, should equal 60*60 for correctness
+  // todo randStringSpy->newSecretToken should equal lengthOfSecret for correctness
+  describe('passwordResetRequest', () => {
+    it('should set secretToken and passwordResetRequest field of a user and send password reset email', async () => {
+      const lengthOfSecret = Number(process.env.USER_SECRET_TOKEN_LENGTH);
+      const newSecretToken = 'aicycgweiuvbsdivn';
+
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue({
+          ...testUser,
+          save: jest.fn().mockResolvedValue({
+            ...testUser,
+            secretToken: newSecretToken,
+            passwordResetRequest: true,
+          }),
+        });
+      const randStringSpy = jest
+        .spyOn(cryptoHelpers, 'generateRandomString')
+        .mockReturnValue(newSecretToken);
+
+      const mPasswordToken = { expiresIn: 123, token: 'newEmailToken' };
+      const createTokenSpy = jest.spyOn(token, 'createToken').mockReturnValue(mPasswordToken);
+
+      const encryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'encryptData')
+        .mockImplementation((data, inputType, outputType) => `${data}-${inputType}-${outputType}`);
+      const sendPasswordResetMailSpy = jest.spyOn(EmailService.prototype, 'sendPasswordResetMail');
+
+      const result = await authService.passwordResetRequest(testUser._id, fullUrl);
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+
+      const encryptEmailResult = encryptDataSpy.mock.results[0].value;
+      const encryptPasswordTokenResult = encryptDataSpy.mock.results[1].value;
+      const mockVerificationUrl = `${fullUrl}/${encryptEmailResult}/${encryptPasswordTokenResult}`;
+
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(randStringSpy).toHaveBeenCalledWith(lengthOfSecret);
+      expect(updatedUser.save).toHaveBeenCalled();
+      expect(updatedUser.secretToken).toBe(newSecretToken);
+      expect(updatedUser.passwordResetRequest).toBe(true);
+      expect(encryptDataSpy).toHaveBeenCalledTimes(2);
+      expect(encryptDataSpy.mock.calls[0]).toEqual(
+        expect.arrayContaining([updatedUser.email, 'utf-8', 'hex']),
+      );
+      expect(createTokenSpy).toHaveBeenCalledWith({ secret: newSecretToken }, 60 * 60);
+      expect(encryptDataSpy.mock.calls[1]).toEqual(
+        expect.arrayContaining([mPasswordToken.token, 'utf-8', 'hex']),
+      );
+      expect(sendPasswordResetMailSpy).toHaveBeenCalledWith(
+        updatedUser.email,
+        updatedUser.firstName,
+        mockVerificationUrl,
+      );
+      expect(result).toEqual({
+        sendPasswordResetEmail: updatedUser.passwordResetRequest,
+      });
+    });
+
+    it('should throw an error if a user is not verified', async () => {
+      const testUser = {
+        ...sampleFullUser,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+      const randStringSpy = jest.spyOn(cryptoHelpers, 'generateRandomString');
+      const createTokenSpy = jest.spyOn(token, 'createToken');
+      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const sendPasswordResetMailSpy = jest.spyOn(EmailService.prototype, 'sendPasswordResetMail');
+
+      await expect(authService.passwordResetRequest(testUser._id, fullUrl)).rejects.toThrow(
+        new HttpException(HttpStatus.NOT_FOUND, 'only verified users can reset their password'),
+      );
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(randStringSpy).not.toHaveBeenCalled();
+      expect(createTokenSpy).not.toHaveBeenCalled();
+      expect(encryptDataSpy).not.toHaveBeenCalled();
+      expect(sendPasswordResetMailSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('validatePasswordReset', () => {
+    const encryptedEmail = 'user@test.com-utf-8-hex';
+    const passwordToken = 'newPasswordToken-utf-8-hex';
+
+    it('should grant password reset permission to a user with passwordResetRequest', async () => {
+      const newSecretToken = 'pqewmrvdjtnlaioaedh';
+
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+      };
+      const getFullUserByEmailSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserByEmail')
+        // @ts-ignore
+        .mockResolvedValue({
+          ...testUser,
+          save: jest.fn().mockResolvedValue({
+            ...testUser,
+            secretToken: newSecretToken,
+            passwordResetRequest: true,
+            grantPasswordReset: true,
+          }),
+        });
+      const verifyTokenSpy = jest.spyOn(token, 'verifyToken').mockResolvedValue({
+        secret: newSecretToken,
+        expiresIn: 1200,
+      });
+
+      const decryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'decryptData')
+        .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
+      const encryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'encryptData')
+        .mockImplementation((data, inputType, outputType) => `${data}-${inputType}-${outputType}`);
+
+      const result = await authService.validatePasswordReset(encryptedEmail, passwordToken);
+      const updatedUser = await getFullUserByEmailSpy.mock.results[0].value;
+
+      const decryptTokenResult = decryptDataSpy.mock.results[0].value;
+      const decryptEmailResult = decryptDataSpy.mock.results[1].value;
+
+      const base64SecretToken = encryptDataSpy.mock.results[0].value;
+
+      expect(decryptDataSpy).toHaveBeenCalledTimes(2);
+      expect(decryptDataSpy.mock.calls[0]).toEqual(
+        expect.arrayContaining([passwordToken, 'hex', 'utf-8']),
+      );
+      expect(verifyTokenSpy).toHaveBeenCalledWith(decryptTokenResult);
+      expect(decryptDataSpy.mock.calls[1]).toEqual(
+        expect.arrayContaining([encryptedEmail, 'hex', 'utf-8']),
+      );
+      expect(getFullUserByEmailSpy).toHaveBeenCalledWith(decryptEmailResult);
+      expect(updatedUser.grantPasswordReset).toBe(true);
+      expect(updatedUser.save).toHaveBeenCalled();
+      expect(encryptDataSpy.mock.calls[0]).toEqual(
+        expect.arrayContaining([newSecretToken, 'utf-8', 'base64']),
+      );
+      expect(result).toEqual({
+        grantPasswordReset: updatedUser.grantPasswordReset,
+        passwordToken: base64SecretToken,
+      });
+    });
+
+    const errorMessage =
+      'failed to grant password reset permissions, possibly link is invalid, expired or wrong credentials';
+
+    it('should throw an error if payload is an instance of JsonWebTokenError', async () => {
+      const verifyTokenSpy = jest
+        .spyOn(token, 'verifyToken')
+        .mockResolvedValue(new JsonWebTokenError('Invalid Secret Token'));
+      const decryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'decryptData')
+        .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
+
+      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const getFullUserByEmailSpy = jest.spyOn(UserService.prototype, 'getFullUserByEmail');
+      await expect(
+        authService.validatePasswordReset(encryptedEmail, passwordToken),
+      ).rejects.toThrow(new HttpException(HttpStatus.BAD_REQUEST, errorMessage));
+
+      const decryptTokenResult = decryptDataSpy.mock.results[0].value;
+      expect(decryptDataSpy).toHaveBeenCalledTimes(1);
+      expect(verifyTokenSpy).toHaveBeenCalledWith(decryptTokenResult);
+      expect(getFullUserByEmailSpy).not.toHaveBeenCalled();
+      expect(encryptDataSpy).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if user.passwordResetRequest is false', async () => {
+      const newSecretToken = 'pqewmrvdjtnlaioaedh';
+
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+      };
+      const getFullUserByEmailSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserByEmail')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+      const verifyTokenSpy = jest.spyOn(token, 'verifyToken').mockResolvedValue({
+        secret: newSecretToken,
+        expiresIn: 1200,
+      });
+
+      const decryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'decryptData')
+        .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
+      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+
+      await expect(
+        authService.validatePasswordReset(encryptedEmail, passwordToken),
+      ).rejects.toThrow(
+        new HttpException(HttpStatus.BAD_REQUEST, 'user made no request to reset password'),
+      );
+
+      const decryptTokenResult = decryptDataSpy.mock.results[0].value;
+      const decryptEmailResult = decryptDataSpy.mock.results[1].value;
+      expect(decryptDataSpy).toHaveBeenCalledTimes(2);
+      expect(verifyTokenSpy).toHaveBeenCalledWith(decryptTokenResult);
+      expect(getFullUserByEmailSpy).toHaveBeenCalledWith(decryptEmailResult);
+      expect(encryptDataSpy).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if payload secert and user secretToken token does not match', async () => {
+      const newSecretToken = 'pqewmrvdjtnlaioaedh';
+
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+      };
+      const getFullUserByEmailSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserByEmail')
+        // @ts-ignore
+        .mockResolvedValue({
+          ...testUser,
+          save: jest.fn().mockResolvedValue({
+            ...testUser,
+            secretToken: newSecretToken,
+            passwordResetRequest: true,
+            grantPasswordReset: true,
+          }),
+        });
+      const verifyTokenSpy = jest.spyOn(token, 'verifyToken').mockResolvedValue({
+        secret: 'InvalidSecretToken',
+        expiresIn: 1200,
+      });
+
+      const decryptDataSpy = jest
+        .spyOn(cryptoHelpers, 'decryptData')
+        .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
+      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+
+      await expect(
+        authService.validatePasswordReset(encryptedEmail, passwordToken),
+      ).rejects.toThrow(new HttpException(HttpStatus.BAD_REQUEST, errorMessage));
+
+      const updatedUser = await getFullUserByEmailSpy.mock.results[0].value;
+      const decryptTokenResult = decryptDataSpy.mock.results[0].value;
+      const decryptEmailResult = decryptDataSpy.mock.results[1].value;
+
+      expect(decryptDataSpy).toHaveBeenCalledTimes(2);
+      expect(verifyTokenSpy).toHaveBeenCalledWith(decryptTokenResult);
+      expect(getFullUserByEmailSpy).toHaveBeenCalledWith(decryptEmailResult);
+      expect(encryptDataSpy).not.toHaveBeenCalled();
+      expect(updatedUser.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('resetPassword', () => {
+    const newPassword = 'freshAndStrong88£';
+    const newSecretToken = 'uqteygfuoihqcjadmp';
+
+    it('should update a user`s password and the save updated user record', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+        grantPasswordReset: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue({
+          ...testUser,
+          isValidPassword: jest.fn().mockResolvedValue(false),
+        });
+      const result = await authService.resetPassword(testUser._id, newSecretToken, newPassword);
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.isValidPassword).toHaveBeenCalledWith(newPassword);
+      expect(updatedUser.password).toBe(newPassword);
+      expect(updatedUser.passwordResetRequest).toBe(false);
+      expect(updatedUser.grantPasswordReset).toBe(false);
+      expect(updatedUser.secretToken).toBe('');
+      expect(updatedUser.save).toHaveBeenCalled();
+      expect(result).toEqual({
+        successfulPasswordReset: true,
+      });
+    });
+
+    it('should throw an error if a user`s verified, grantPasswordReset or passwordResetRequest field is false', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+        grantPasswordReset: false,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+
+      await expect(
+        authService.resetPassword(testUser._id, newSecretToken, newPassword),
+      ).rejects.toThrow(
+        new HttpException(
+          HttpStatus.BAD_REQUEST,
+          'password reset failed, user not verified or has no permission to reset password',
+        ),
+      );
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.isValidPassword).not.toHaveBeenCalled();
+      expect(updatedUser.save).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if passwordToken and user.secretToken does not match', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+        grantPasswordReset: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+      await expect(
+        authService.resetPassword(testUser._id, 'someInvalidToken', newPassword),
+      ).rejects.toThrow(new HttpException(HttpStatus.BAD_REQUEST, 'invalid credentials'));
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.isValidPassword).not.toHaveBeenCalled();
+      expect(updatedUser.save).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if the old password is provided as the new password', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newSecretToken,
+        passwordResetRequest: true,
+        grantPasswordReset: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue({
+          ...testUser,
+          isValidPassword: jest.fn().mockResolvedValue(true),
+        });
+
+      await expect(
+        authService.resetPassword(testUser._id, newSecretToken, testUser.password),
+      ).rejects.toThrow(new HttpException(HttpStatus.BAD_REQUEST, 'unacceptable credentials'));
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.isValidPassword).toHaveBeenCalledWith(testUser.password);
+      expect(updatedUser.save).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cancelPasswordReset', () => {
+    const newPasswordToken = 'uqteygfuoihqcjadmp';
+
+    it('should cancel a user`s password reset request', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newPasswordToken,
+        passwordResetRequest: true,
+        grantPasswordReset: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+      const result = await authService.cancelPasswordReset(testUser._id, newPasswordToken);
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.passwordResetRequest).toBe(false);
+      expect(updatedUser.grantPasswordReset).toBe(false);
+      expect(updatedUser.secretToken).toBe('');
+      expect(updatedUser.save).toHaveBeenCalled();
+      expect(result).toEqual({
+        passwordResetCanceled: true,
+      });
+    });
+
+    it('should throw an error if a user`s passwordResetRequest or grantPasswordReset field is false', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newPasswordToken,
+        passwordResetRequest: true,
+        grantPasswordReset: false,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+
+      await expect(authService.cancelPasswordReset(testUser._id, newPasswordToken)).rejects.toThrow(
+        new HttpException(
+          HttpStatus.BAD_REQUEST,
+          'password reset request not recived or permission not granted',
+        ),
+      );
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.save).not.toHaveBeenCalled();
+    });
+
+    it('should throw an error if passwordToken and user.secretToken does not match', async () => {
+      const testUser = {
+        ...sampleFullUser,
+        verified: true,
+        secretToken: newPasswordToken,
+        passwordResetRequest: true,
+        grantPasswordReset: true,
+      };
+      const getFullUserByIdSpy = jest
+        .spyOn(UserService.prototype, 'getFullUserById')
+        // @ts-ignore
+        .mockResolvedValue(testUser);
+
+      await expect(authService.cancelPasswordReset(testUser._id, 'invalidToken')).rejects.toThrow(
+        new HttpException(HttpStatus.BAD_REQUEST, 'invalid credentials'),
+      );
+
+      const updatedUser = await getFullUserByIdSpy.mock.results[0].value;
+      expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
+      expect(updatedUser.save).not.toHaveBeenCalled();
     });
   });
 });

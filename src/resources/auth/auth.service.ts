@@ -12,7 +12,7 @@ import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import cryptoHelper from '@/utils/crypto-helpers.util';
 
 class AuthService {
-  public UserService = new UserService();
+  private UserService = new UserService();
   private EmailService = new EmailService();
 
   /**
@@ -20,6 +20,7 @@ class AuthService {
    */
   public async login(email: string, password: string) {
     const user = await this.UserService.getFullUserByEmail(email);
+    // TODO check user.resetPasswordRequest, if true, throw 401, dont give access token
 
     const validPassword = await user.isValidPassword(password);
 
@@ -389,7 +390,7 @@ class AuthService {
     );
 
     return {
-      sendPasswordResetEmail: true,
+      sendPasswordResetEmail: updatedUser.passwordResetRequest,
     };
   }
 
@@ -416,9 +417,8 @@ class AuthService {
     }
 
     const recievedSecret = payload.secret;
-    const validUserSecert = user.secretToken;
 
-    if (recievedSecret !== validUserSecert) {
+    if (recievedSecret !== user.secretToken) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
     }
 
@@ -429,7 +429,7 @@ class AuthService {
 
     return {
       grantPasswordReset: updatedUser.grantPasswordReset,
-      base64SecretToken,
+      passwordToken: base64SecretToken,
     };
   }
 
@@ -438,16 +438,15 @@ class AuthService {
    */
   public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
     const user = await this.UserService.getFullUserById(userId);
-
-    const errorMessage =
-      'password reset failed, user not verified or has no permission to reset password';
-
     if (
       user.verified === false ||
       user.grantPasswordReset === false ||
       user.passwordResetRequest === false
     ) {
-      throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
+      throw new HttpException(
+        HttpStatus.BAD_REQUEST,
+        'password reset failed, user not verified or has no permission to reset password',
+      );
     }
 
     if (passwordToken !== user.secretToken) {
@@ -456,7 +455,7 @@ class AuthService {
 
     const existingPassword = await user.isValidPassword(newPassword);
     if (existingPassword) {
-      throw new HttpException(HttpStatus.BAD_REQUEST, 'unacceptable password');
+      throw new HttpException(HttpStatus.BAD_REQUEST, 'unacceptable credentials');
     }
     //! imporvement: avoid permitting default & weak passwords (ref: OWASP AO7)
 
@@ -480,12 +479,12 @@ class AuthService {
 
     if (user.passwordResetRequest === false || user.grantPasswordReset === false) {
       throw new HttpException(
-        HttpStatus.NOT_FOUND,
+        HttpStatus.BAD_REQUEST,
         'password reset request not recived or permission not granted',
       );
     }
     if (passwordToken !== user.secretToken) {
-      throw new HttpException(HttpStatus.NOT_FOUND, 'invalid credentials');
+      throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid credentials');
     }
 
     user.passwordResetRequest = false;
