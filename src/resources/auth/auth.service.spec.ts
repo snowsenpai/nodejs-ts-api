@@ -310,7 +310,7 @@ describe('AuthService', () => {
           });
         const token = '123456';
 
-        const result = await authService.disabelOTP(testUser._id, token);
+        const result = await authService.disableOTP(testUser._id, token);
         const modifiedUser = await getFullUserByIdSpy.mock.results[0].value;
 
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
@@ -349,7 +349,7 @@ describe('AuthService', () => {
           .mockResolvedValue(testUser);
         const token = '123456';
 
-        await expect(authService.disabelOTP(testUser._id, token)).rejects.toThrow(
+        await expect(authService.disableOTP(testUser._id, token)).rejects.toThrow(
           new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'),
         );
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);

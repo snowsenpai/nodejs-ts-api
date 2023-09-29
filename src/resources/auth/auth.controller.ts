@@ -87,7 +87,7 @@ async function disableOTP(
     const userId = req.user?._id;
     const { token } = req.body;
 
-    const data = await authService.disabelOTP(userId, token);
+    const data = await authService.disableOTP(userId, token);
 
     res.status(HttpStatus.OK).json({
       message: 'otp and two factor authentication disabled successfully',

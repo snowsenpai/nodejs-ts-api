@@ -132,9 +132,9 @@ class AuthService {
   }
 
   /**
-   * disabelOTP
+   * disableOTP
    */
-  public async disabelOTP(userId: string, token: string) {
+  public async disableOTP(userId: string, token: string) {
     const user = await this.UserService.getFullUserById(userId);
     //TODO check user.otpVerified status in a middleware fn, mount after authenticatedMW
     const secret = user.otpBase32;
@@ -240,6 +240,7 @@ class AuthService {
         }
       }
     }
+    //TODO throw error here, no need for validCode method
   }
 
   /**
