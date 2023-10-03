@@ -10,12 +10,12 @@ async function authenticatedMiddleware(
   res: Response,
   next: NextFunction,
 ): Promise<Response | void> {
-  const errorMessage = 'You are not authorized';
+  const authError = new HttpException(HttpStatus.UNAUTHORIZED, 'You are not authorized');
   try {
     const bearer = req.headers.authorization;
 
     if (!bearer || !bearer.startsWith('Bearer ')) {
-      return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
+      return next(authError);
     }
 
     const accessToken = bearer.split('Bearer ')[1].trim();
@@ -23,7 +23,7 @@ async function authenticatedMiddleware(
     const payload: Token | jwt.JsonWebTokenError = await token.verifyToken(accessToken);
 
     if (payload instanceof jwt.JsonWebTokenError) {
-      return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
+      return next(authError);
     }
 
     const user = await UserModel.findById(payload.id).exec();
@@ -35,7 +35,7 @@ async function authenticatedMiddleware(
     req.user = user;
     return next();
   } catch (error) {
-    return next(new HttpException(HttpStatus.UNAUTHORIZED, errorMessage));
+    return next(authError);
   }
 }
 
