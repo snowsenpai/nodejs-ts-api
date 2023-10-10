@@ -8,6 +8,7 @@ class TagService {
    * create
    */
   public async create(name: string, description: string) {
+    //! check for existing tag name
     const tag = await this.tag.create({ name, description });
     return tag;
   }

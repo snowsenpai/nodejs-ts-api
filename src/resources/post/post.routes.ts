@@ -12,7 +12,7 @@ const basePath = '/posts';
 postRouter.get(
   basePath,
   validationMiddleware(validate.postPagination, 'query'),
-  paginationMiddleware(postController.postPaginationOptions()),
+  paginationMiddleware(postController.postPaginationOptions),
   postController.getAllPosts,
 );
 

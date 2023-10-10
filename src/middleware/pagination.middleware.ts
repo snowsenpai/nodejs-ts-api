@@ -23,10 +23,12 @@ export type TPaginationDetails = {
   sortBy: TSortBy;
 };
 
-function paginationMiddleware(paginationOptions: Promise<TPaginationOptions>): RequestHandler {
+function paginationMiddleware(
+  paginationOptions: () => Promise<TPaginationOptions>,
+): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const paginate = await paginationOptions;
+      const paginate = await paginationOptions();
 
       // URL?page=1&limit=3&filter=filterName,sortOrder&search=value&filterValue=a,b,c
       // cast query index to 'string' to prevent type errors from req.query types

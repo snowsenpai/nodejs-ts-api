@@ -8,22 +8,12 @@ const connectDB = async () => {
 };
 
 // run afterAll
-const dropDB = async () => {
-  mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
+const dropCollection = async (collectionName: string) => {
+  await mongoose.connection.db.dropCollection(collectionName);
 };
 
-// run afterEach
-const dropCollections = async () => {
-  const collections = await mongoose.connection.db.collections();
-  for (const collection of collections) {
-    await collection.drop();
-  }
-};
-
-// afterAll
 const closeDB = async () => {
   await mongoose.connection.close();
 };
 
-export { connectDB, dropDB, dropCollections, closeDB };
+export { connectDB, dropCollection, closeDB };
