@@ -16,10 +16,7 @@ function errorMiddleware(
     logger.error(error);
   }
 
-  res.status(status).send({
-    status,
-    message,
-  });
+  res.status(status).send({ message });
 }
 
 export default errorMiddleware;
