@@ -1,12 +1,10 @@
-import { appPath, testApp } from 'tests/app-test';
+import { apiPaths, testApp } from 'tests/app-test';
 import request from 'supertest';
 import { connectDB, dropCollection, closeDB } from '@/utils/database/mongoose-test.util';
 import { HttpStatus } from '@/utils/exceptions';
 import { sampleTag } from 'tests/sample-data';
 
-const tagPath = `${appPath}/tags`;
-
-describe('/tag', () => {
+describe('/tags', () => {
   beforeAll(async () => {
     await connectDB();
   });
@@ -18,7 +16,7 @@ describe('/tag', () => {
 
   describe('POST /', () => {
     it('add a new tag to the db', async () => {
-      const res = await request(testApp).post(tagPath).send(sampleTag);
+      const res = await request(testApp).post(apiPaths.tagPath).send(sampleTag);
 
       expect(res.status).toBe(HttpStatus.CREATED);
       expect(res.body).toHaveProperty('message');
@@ -28,7 +26,7 @@ describe('/tag', () => {
     });
 
     it('should respond with a 400 if incoming data validation fails', async () => {
-      const res = await request(testApp).post(tagPath).send({
+      const res = await request(testApp).post(apiPaths.tagPath).send({
         name: '',
         description: '',
       });
@@ -40,7 +38,7 @@ describe('/tag', () => {
 
   describe('GET /', () => {
     it('should respond with an array of available tags', async () => {
-      const res = await request(testApp).get(tagPath);
+      const res = await request(testApp).get(apiPaths.tagPath);
 
       expect(res.status).toBe(HttpStatus.OK);
       expect(res.body).toHaveProperty('message');
