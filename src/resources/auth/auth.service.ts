@@ -340,6 +340,7 @@ class AuthService {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMesage);
     }
 
+    // TODO prevent access for verified users, find user first before verifing jwt
     const unverifiedUserEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
 
     const existingUser = await this.UserService.getFullUserByEmail(unverifiedUserEmail);
