@@ -90,7 +90,7 @@ authRouter.post(
 );
 
 authRouter.patch(
-  `${basePath}/verify/email`,
+  `${basePath}/email`,
   validationMiddleware(validate.updateEmail, 'body'),
   getFullUrl(false),
   authenticated,

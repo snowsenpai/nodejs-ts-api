@@ -9,7 +9,7 @@ async function passwordReset(
   next: NextFunction,
 ): Promise<Response | void> {
   try {
-    const basic = req.headers.passwordToken as string;
+    const basic = req.headers.passwordtoken as string;
 
     if (!basic || !basic.startsWith('Basic ')) {
       return next(new HttpException(HttpStatus.UNAUTHORIZED, 'You are not authorized'));

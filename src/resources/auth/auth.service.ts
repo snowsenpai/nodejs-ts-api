@@ -228,9 +228,9 @@ class AuthService {
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoveryCode, code.hash);
 
-      // using `if(!isMatch) or if(!isMatch)-else` will exit the loop fast if a match is not found after first iteration
       if (isMatch) {
         if (code.used) {
+          //! wrong status code
           throw new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoveryCode}`);
         } else {
           code.used = true;
@@ -268,6 +268,7 @@ class AuthService {
 
     const updatedUser = await this.UserService.updateUser(userId, { email: newEmail });
 
+    // TODO review conditionals, no need for deep equality checks for booleans, use the boolean value or NOT operator !
     if (updatedUser.verified === true) {
       updatedUser.verified = false;
       const oldVerifiedUser = await updatedUser.save();
