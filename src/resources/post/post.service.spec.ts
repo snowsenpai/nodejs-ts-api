@@ -62,7 +62,6 @@ describe('PostService', () => {
   describe('findAll', () => {
     it('should return all post found and pagination result', async () => {
       const paginationResult = getPaginationResult(1, null, null, 1);
-      // eslint-disable-next-line prettier/prettier
       const paginationDetails = getPaginationDetails([objectId], 'tags', 1, 1, 'test', {
         asc: 'asc',
       });
@@ -97,7 +96,6 @@ describe('PostService', () => {
     });
 
     it('should throw HttpException if no posts are found', async () => {
-      // eslint-disable-next-line prettier/prettier
       const paginationDetails = getPaginationDetails([objectId], 'tags', 1, 1, 'test', {
         asc: 'asc',
       });
@@ -141,7 +139,6 @@ describe('PostService', () => {
       expect(postModelSpy).toHaveBeenCalled();
       expect(findOneSpy).toHaveBeenCalledWith(samplePost._id, sampleUser._id);
       expect(result).toEqual(samplePostPopulated);
-      //? expect(result.creator).toEqual(sampleUser);
     });
 
     it('should throw HttpException is a post is not found', async () => {

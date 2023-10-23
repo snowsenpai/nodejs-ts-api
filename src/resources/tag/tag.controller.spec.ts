@@ -40,7 +40,7 @@ describe('TagController', () => {
       const createSpy = jest.spyOn(tagController, 'create');
 
       const error = new HttpException(HttpStatus.INTERNAL_SERVER_ERROR, 'things exploded!');
-      const serviceSpy = jest.spyOn(TagService.prototype, 'create').mockRejectedValue(error);
+      jest.spyOn(TagService.prototype, 'create').mockRejectedValue(error);
       await tagController.create(req, res, next);
 
       expect(req.body).toStrictEqual({});

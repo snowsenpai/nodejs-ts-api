@@ -30,7 +30,7 @@ async function generateOTP(
     const data = await authService.generateOTP(userId);
 
     res.status(HttpStatus.OK).json({
-      message: 'generated otp credentials sucessfully',
+      message: 'generated otp credentials successfully',
       data,
     });
   } catch (error) {

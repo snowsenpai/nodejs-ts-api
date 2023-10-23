@@ -4,12 +4,21 @@ import PublicResource from '@/utils/interfaces/public-resource.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import { TPaginationDetails, TPaginationOptions } from '@/middleware/pagination.middleware';
 
+/**
+ * Encapsulates methods for interacting with the database to facilitate read, write,
+ * create and destroy operations on `posts`.
+ */
 class PostService implements PublicResource {
+  /**
+   * Database intermediary for `posts`
+   */
   private post = PostModel;
   private tags = new TagService();
 
   /**
-   * Create a new post
+   * Creates a new post document.
+   *
+   * @returns created post document.
    */
   public async create(title: string, body: string, creator: string, tags: string[]) {
     const post = await this.post.create({ title, body, creator, tags });
@@ -18,7 +27,9 @@ class PostService implements PublicResource {
   }
 
   /**
-   * pagiationOptions
+   * Returns filters used for querying available `posts` resources.
+   *
+   * @returns filter values for posts fields (e.g post.tags), default filter field name (e.g tags) and sort order.
    */
   public async paginationOptions() {
     const tagFilters = await this.tags.getTagFilters();
@@ -33,7 +44,8 @@ class PostService implements PublicResource {
   }
 
   /**
-   * Find all posts
+   * Return a array of existing posts and pagination details
+   * @throws HttpException (404) if no post is found that match a specified query.
    */
   public async findAll(paginationDetails: TPaginationDetails) {
     const { filterValue, filterField, limit, page, search, sortBy } = paginationDetails;
@@ -63,7 +75,7 @@ class PostService implements PublicResource {
     const prevPage = hasPrevPage ? page - 1 : null;
     const lastPage = Math.ceil(totalPostsFound / limit);
 
-    // imporvement: if sending filterOptions, should be the filter 'name' not 'id' refernce
+    // if sending filterOptions, should be the filter 'name' not 'id'
     return {
       totalPostsFound,
       currentPage: page,
@@ -77,8 +89,11 @@ class PostService implements PublicResource {
   }
 
   /**
-   * Find a single post, `creator` option determines if the creator field in a post should be populated
-   * by the full creator document (excluding password)
+   * Returns a single post with an id field matching the given `id`.
+   *
+   * If `"true"` is received as a second argument the post's creator field will be replaced
+   * with it's creator details (by default only the creator's id is present).
+   * @throws HttpException (404) if no match is found.
    */
   public async findOne(id: string, creator?: string) {
     const post = await this.post.findById(id);
@@ -92,7 +107,12 @@ class PostService implements PublicResource {
   }
 
   /**
-   * Modify a single post
+   * Updates a single post document that match the given `postId`.
+   *
+   * `postData` should be the post field and it's new data,
+   * data type of the field must match the original data type.
+   * @throws HttpException (403) if `userId` does not match the post's creator `id`.
+   * @throws HttpException (404) if the post could not be modified.
    */
   public async modifyPost(postId: string, postData: object, userId: string) {
     const post = await this.findOne(postId);
@@ -110,7 +130,9 @@ class PostService implements PublicResource {
   }
 
   /**
-   * Delete a single post
+   * Deletes a single post document that match the given `postId`.
+   *
+   * @throws HttpException (403) if `userId` does not match the post's creator `id`.
    */
   public async deletePost(postId: string, userId: string) {
     const post = await this.findOne(postId);

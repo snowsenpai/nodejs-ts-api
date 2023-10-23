@@ -11,7 +11,7 @@ async function register(req: Request, res: Response, next: NextFunction): Promis
     const data = await userService.register(firstName, lastName, email, password);
 
     res.status(HttpStatus.CREATED).json({
-      message: 'user account created succcessfully',
+      message: 'user account created successfully',
       data,
     });
   } catch (error) {
@@ -54,7 +54,7 @@ async function updateUser(
     const data = await userService.updateUser(userId, userData);
 
     res.status(HttpStatus.OK).json({
-      message: 'user updated succcessfully',
+      message: 'user updated successfully',
       data,
     });
   } catch (error) {
@@ -87,7 +87,7 @@ async function deleteUser(
     const data = await userService.deleteUser(userId);
 
     res.status(HttpStatus.OK).json({
-      message: 'user account deleted succcessfully',
+      message: 'user account deleted successfully',
       data,
     });
   } catch (error) {

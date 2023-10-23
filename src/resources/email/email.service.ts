@@ -1,12 +1,14 @@
 import sendGrid from './providers/sendGrid';
 import templates from './templates';
 
+/**
+ * Methods to send emails from the server using API wrappers for email service providers.
+ */
 class EmailService {
   /**
-   * Send a welcome mail to new users
-   * @param email user's email
-   * @param firstName user's first name
-   * @returns boolean
+   * Send a welcome email to new users
+   * @param email - user's email
+   * @param firstName - user's first name
    */
   public async sendWelcomeEmail(email: string, firstName: string) {
     await sendGrid({
@@ -17,11 +19,10 @@ class EmailService {
   }
 
   /**
-   * Send verification email
-   * @param email user's email
-   * @param firstName user's first name
-   * @param url verification url
-   * @returns boolean
+   * Send a verification email.
+   * @param email - user's email.
+   * @param firstName - user's first name.
+   * @param url - verification url.
    */
   public async sendVerifyMail(email: string, firstName: string, url: string) {
     await sendGrid({
@@ -32,7 +33,10 @@ class EmailService {
   }
 
   /**
-   * sendPasswordResetMail
+   * Send a password reset email.
+   * @param email - user's email.
+   * @param firstName - user's first name.
+   * @param url - verification url.
    */
   public async sendPasswordResetMail(email: string, firstName: string, url: string) {
     await sendGrid({

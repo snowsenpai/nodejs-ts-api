@@ -18,8 +18,6 @@ jest.mock('bcrypt');
 
 const fullUrl = 'http:/fullUrl.test';
 
-// TODO dry,
-//todo code review, spies with reoccurring mockImplementation should have a single primary instance within the outer scope
 describe('AuthService', () => {
   let authService: AuthService;
 
@@ -28,7 +26,7 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('should retun an accessToken and the otpEnabled status of a valid user', async () => {
+    it('should return an accessToken and the otpEnabled status of a valid user', async () => {
       const userServiceSpy = jest
         .spyOn(UserService.prototype, 'getFullUserByEmail')
         // @ts-ignore
@@ -129,7 +127,7 @@ describe('AuthService', () => {
         const cryptoHelperSpy = jest.spyOn(cryptoHelpers, 'generateRandomBase32');
 
         await expect(authService.generateOTP(testUser._id)).rejects.toThrow(
-          new HttpException(HttpStatus.NOT_FOUND, 'only verified users can enable OTP'),
+          new HttpException(HttpStatus.UNAUTHORIZED, 'only verified users can enable OTP'),
         );
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(cryptoHelperSpy).not.toHaveBeenCalled();
@@ -152,14 +150,14 @@ describe('AuthService', () => {
         const cryptoHelperSpy = jest
           .spyOn(cryptoHelpers, 'randomStringArray')
           .mockReturnValue(mRandStrings);
-        const mHashedRandSrings = [
+        const mHashedRandStrings = [
           { hash: 'hashedFoo', used: false },
           { hash: 'hashedBar', used: false },
           { hash: 'hashedBaz', used: false },
         ];
         const hashRecoveryCodesSpy = jest
           .spyOn(AuthService.prototype, 'hashRecoveryCodes')
-          .mockResolvedValue(mHashedRandSrings);
+          .mockResolvedValue(mHashedRandStrings);
         const getFullUserByIdSpy = jest
           .spyOn(UserService.prototype, 'getFullUserById')
           // @ts-ignore
@@ -169,7 +167,7 @@ describe('AuthService', () => {
               ...testUser,
               otpEnabled: true,
               otpVerified: true,
-              recoveryCodes: mHashedRandSrings,
+              recoveryCodes: mHashedRandStrings,
             }),
           });
 
@@ -183,7 +181,7 @@ describe('AuthService', () => {
         expect(cryptoHelperSpy).toHaveBeenCalledWith(8, 10);
         expect(hashRecoveryCodesSpy).toHaveBeenCalledWith(mRandStrings);
         expect(modifiedUser.save).toHaveBeenCalled();
-        expect(modifiedUser.recoveryCodes).toEqual(mHashedRandSrings);
+        expect(modifiedUser.recoveryCodes).toEqual(mHashedRandStrings);
         expect(modifiedUser.otpEnabled).toBe(true);
         expect(modifiedUser.otpVerified).toBe(true);
         expect(result).toEqual({
@@ -216,7 +214,7 @@ describe('AuthService', () => {
 
         const token = '123456';
         await expect(authService.verifyOTP(testUser._id, token)).rejects.toThrow(
-          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'),
+          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid'),
         );
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(generateTOTPSpy).toHaveBeenCalledWith(testUser.otpBase32, testUser.email);
@@ -224,8 +222,6 @@ describe('AuthService', () => {
         expect(cryptoHelperSpy).not.toHaveBeenCalled();
         expect(hashRecoveryCodesSpy).not.toHaveBeenCalled();
       });
-
-      //TODO test case for user.otpBase32 if empty
     });
 
     describe('validateOTP', () => {
@@ -272,15 +268,13 @@ describe('AuthService', () => {
         const token = '123456';
 
         await expect(authService.validateOTP(testUser._id, token)).rejects.toThrow(
-          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'),
+          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid'),
         );
 
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(generateTOTPSpy).toHaveBeenCalledWith(testUser.otpBase32, testUser.email);
         expect(otpAuthTOTPSpy).toHaveBeenCalledWith({ token, window: 1 });
       });
-
-      //TODO test case for user.otpVerified === false
     });
 
     describe('disableOTP', () => {
@@ -350,14 +344,12 @@ describe('AuthService', () => {
         const token = '123456';
 
         await expect(authService.disableOTP(testUser._id, token)).rejects.toThrow(
-          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid or user does not exist'),
+          new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid'),
         );
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(generateTOTPSpy).toHaveBeenCalledWith(testUser.otpBase32, testUser.email);
         expect(otpAuthTOTPSpy).toHaveBeenCalledWith({ token, window: 1 });
       });
-
-      //TODO test case for user.otpVerified === false
     });
 
     describe('otpData', () => {
@@ -621,8 +613,6 @@ describe('AuthService', () => {
     });
   });
 
-  // TODO review mock mEmailToken.expiresIn: 123, should equal 60*60 for correctness
-  // todo randStringSpy->newSecretToken should equal lengthOfSecret for correctness
   describe('verifyEmail', () => {
     it('should send a verification email to an unverified user', async () => {
       const lengthOfSecret = Number(process.env.USER_SECRET_TOKEN_LENGTH);
@@ -765,7 +755,7 @@ describe('AuthService', () => {
       });
     });
 
-    const errorMesage = 'verification failed, possibly link is invalid or expired';
+    const errorMessage = 'verification failed, possibly link is invalid or expired';
 
     it('should throw an error if payload is an instance of JsonWebError', async () => {
       const verifyTokenSpy = jest
@@ -779,7 +769,7 @@ describe('AuthService', () => {
       const getFullUserByEmailSpy = jest.spyOn(UserService.prototype, 'getFullUserByEmail');
 
       await expect(authService.validateEmail(encryptedEmail, emailToken)).rejects.toThrow(
-        new HttpException(HttpStatus.BAD_REQUEST, errorMesage),
+        new HttpException(HttpStatus.BAD_REQUEST, errorMessage),
       );
 
       const decryptTokenResult = decryptDataSpy.mock.results[0].value;
@@ -819,7 +809,7 @@ describe('AuthService', () => {
           }),
         });
       await expect(authService.validateEmail(encryptedEmail, emailToken)).rejects.toThrow(
-        new HttpException(HttpStatus.BAD_REQUEST, errorMesage),
+        new HttpException(HttpStatus.BAD_REQUEST, errorMessage),
       );
       const decryptTokenResult = decryptDataSpy.mock.results[0].value;
       const decryptEmailResult = decryptDataSpy.mock.results[1].value;
@@ -837,8 +827,6 @@ describe('AuthService', () => {
     });
   });
 
-  // TODO review mock mEmailToken.expiresIn: 123, should equal 60*60 for correctness
-  // todo randStringSpy->newSecretToken should equal lengthOfSecret for correctness
   describe('passwordResetRequest', () => {
     it('should set secretToken and passwordResetRequest field of a user and send password reset email', async () => {
       const lengthOfSecret = Number(process.env.USER_SECRET_TOKEN_LENGTH);
@@ -916,7 +904,7 @@ describe('AuthService', () => {
       const sendPasswordResetMailSpy = jest.spyOn(EmailService.prototype, 'sendPasswordResetMail');
 
       await expect(authService.passwordResetRequest(testUser._id, fullUrl)).rejects.toThrow(
-        new HttpException(HttpStatus.NOT_FOUND, 'only verified users can reset their password'),
+        new HttpException(HttpStatus.UNAUTHORIZED, 'only verified users can reset their password'),
       );
       expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
       expect(randStringSpy).not.toHaveBeenCalled();
@@ -1050,7 +1038,7 @@ describe('AuthService', () => {
       expect(encryptDataSpy).not.toHaveBeenCalled();
     });
 
-    it('should throw an error if payload secert and user secretToken token does not match', async () => {
+    it('should throw an error if payload secret and user secretToken token does not match', async () => {
       const newSecretToken = 'pqewmrvdjtnlaioaedh';
 
       const testUser = {
@@ -1254,7 +1242,7 @@ describe('AuthService', () => {
       await expect(authService.cancelPasswordReset(testUser._id, newPasswordToken)).rejects.toThrow(
         new HttpException(
           HttpStatus.BAD_REQUEST,
-          'password reset request not recived or permission not granted',
+          'password reset request not received or permission not granted',
         ),
       );
 

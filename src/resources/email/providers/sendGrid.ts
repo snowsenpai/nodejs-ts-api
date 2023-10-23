@@ -4,6 +4,9 @@ import logger from '@/utils/logger.util';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
+/**
+ * A wrapper function for Twilio SendGrip API integration.
+ */
 const sendGrid = async (options: TMailOptions) => {
   try {
     const mailOptions = {
@@ -13,9 +16,9 @@ const sendGrid = async (options: TMailOptions) => {
 
     await sgMail.send(mailOptions);
   } catch (error) {
-    // ! handle scenarios that could result in a failed attempt, contact an admin(dev)
-    // * throwing the error terminates the node process
-    // * error: when server is offline
+    //! handle scenarios that could result in a failed attempt and contact an admin(dev)
+    // e.g error: when server is offline
+    // throwing the error terminates the node process
     logger.error(error, 'SendGrid error');
   }
 };

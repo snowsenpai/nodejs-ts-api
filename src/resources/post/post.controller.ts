@@ -103,7 +103,7 @@ async function deletePost(
     const data = await postService.deletePost(postId, userId);
 
     res.status(HttpStatus.OK).json({
-      message: 'post deleted succcessfully',
+      message: 'post deleted successfully',
       data,
     });
   } catch (error) {

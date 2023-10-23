@@ -1,15 +1,14 @@
 import { Router } from 'express';
 import validationMiddleware from '@/middleware/validation.middleware';
 import validate from './tag.validation';
-import tagContoller from './tag.controller';
+import tagController from './tag.controller';
 
 const tagRouter = Router();
 const basePath = '/tags';
 
-//! role based authmiddleware
-// Get '/' & '/:id' are PUBLIC others require ADMIN role
-tagRouter.get(basePath, tagContoller.getAllTags);
+tagRouter.get(basePath, tagController.getAllTags);
 
-tagRouter.post(basePath, validationMiddleware(validate.create, 'body'), tagContoller.create);
+// roleAuth: admins manage available tags, users can request for new tag(s)
+tagRouter.post(basePath, validationMiddleware(validate.create, 'body'), tagController.create);
 
 export default tagRouter;

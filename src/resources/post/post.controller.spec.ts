@@ -304,7 +304,7 @@ describe('PostController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'post deleted succcessfully',
+          message: 'post deleted successfully',
           data,
         }),
       );

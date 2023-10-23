@@ -248,7 +248,6 @@ describe('UserService', () => {
       const findByIdSpy = jest
         .spyOn(UserService.prototype, 'findById')
         // @ts-ignore
-        // not necessary, integration tests can verify that populate() works , a resolvedValue of sampleUser is okay
         .mockResolvedValue({
           ...sampleUser,
           populate: jest.fn().mockReturnValue({ ...sampleUser, posts: [samplePost] }),
@@ -259,7 +258,6 @@ describe('UserService', () => {
 
       expect(findByIdSpy).toHaveBeenCalledWith(sampleUser._id);
       expect(populateSpy).toHaveBeenCalledWith('posts');
-      // not needed if resolvedValue is just sampleUser
       // @ts-ignore
       expect(result.posts).toEqual([samplePost]);
     });

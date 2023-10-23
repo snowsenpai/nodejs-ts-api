@@ -2,7 +2,14 @@ import UserModel from './user.model';
 import EmailService from '../email/email.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
+/**
+ * Encapsulates methods for interacting with the database to facilitate read, write,
+ * create and destroy operations on `users`.
+ */
 class UserService {
+  /**
+   * Database intermediary for `users`
+   */
   private user = UserModel;
   private EmailService = new EmailService();
   private sensitiveUserFields = [
@@ -14,7 +21,11 @@ class UserService {
   ];
 
   /**
-   * Register a new user
+   * Creates a new user document.
+   *
+   * Users have a default role of `"user"`,
+   * a welcome email is sent to the created user's email.
+   * @throws HttpException (400) if an existing user with an identical email is found in the database.
    */
   public async register(firstName: string, lastName: string, email: string, password: string) {
     const existingUser = await this.user.findOne({ email: email });
@@ -40,7 +51,8 @@ class UserService {
   }
 
   /**
-   * Find all users
+   * Returns an array of all existing user documents in the database.
+   * @throws HttpException (404) if no user is found.
    */
   public async findAllUsers() {
     const users = await this.user.find({});
@@ -51,20 +63,22 @@ class UserService {
   }
 
   /**
-   * Find a user by email
+   * Returns a user document with an email field matching the given `userEmail`,
+   * by default sensitive user credentials are excluded.
+   * @throws HttpException (404) if no match is found.
    */
   public async findByEmail(userEmail: string) {
     const user = await this.user.findOne({ email: userEmail }).exec();
-
     if (!user) {
       throw new HttpException(HttpStatus.NOT_FOUND, 'user does not exist');
     }
-
     return user;
   }
 
   /**
-   * Find a user by id
+   * Returns a user document with an id field matching the given `userId`,
+   * by default sensitive user credentials are excluded.
+   * @throws HttpException (404) if no match is found.
    */
   public async findById(userId: string) {
     const user = await this.user.findById(userId);
@@ -75,9 +89,11 @@ class UserService {
   }
 
   /**
-   * getFullUSerById
+   * Returns a user document with an id field matching the given `userId`,
+   * including sensitive user credentials, intended for user authentication processes.
    *
-   * for authentication process
+   * `Ensure that the return value is never exposed to the client`.
+   * @throws HttpException (404) if no match is found.
    */
   public async getFullUserById(userId: string) {
     const user = await this.user.findById(userId).select(this.sensitiveUserFields);
@@ -89,9 +105,11 @@ class UserService {
   }
 
   /**
-   * getFullUserByEmail
+   * Returns a user document with an email field matching the given `userEmail`,
+   * including sensitive user credentials, intended for user authentication processes.
    *
-   * for authentication process
+   * `Ensure that the return value is never exposed to the client`.
+   * @throws HttpException (404) if no match is found.
    */
   public async getFullUserByEmail(userEmail: string) {
     const user = await this.user.findOne({ email: userEmail }).select(this.sensitiveUserFields);
@@ -103,7 +121,11 @@ class UserService {
   }
 
   /**
-   * Update a user
+   * Updates a single user document that match the given `userId`.
+   *
+   * `userData` should be the user field and it's new data,
+   * data type of the field must match the original data type.
+   * @throws HttpException (404) if no match is found.
    */
   public async updateUser(userId: string, userData: object) {
     const user = await this.user.findByIdAndUpdate(userId, userData, { new: true });
@@ -114,7 +136,8 @@ class UserService {
   }
 
   /**
-   * Delete a user
+   * Deletes a single user document that match the given `userId`.
+   * @throws HttpException (404) if no match is found.
    */
   public async deleteUser(userId: string) {
     const user = await this.user.findByIdAndDelete(userId);
@@ -127,14 +150,13 @@ class UserService {
   }
 
   /**
-   * Get all posts of a user
+   * Adds a posts field containing an array of the user's posts for a user document with an id field matching the given `userId`.
    */
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);
 
     const posts = await user.populate('posts');
     // fix: posts could be empty, create a flag using .populated() then throw
-
     return posts;
   }
 }

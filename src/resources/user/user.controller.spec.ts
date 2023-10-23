@@ -34,7 +34,7 @@ describe('UserController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.CREATED);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'user account created succcessfully',
+          message: 'user account created successfully',
           data: newUser,
         }),
       );
@@ -115,7 +115,7 @@ describe('UserController', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next with HttpExecption if an error occurs', async () => {
+    it('should call next with HttpException if an error occurs', async () => {
       const req = getMockReq({
         params: {
           id: objectId,
@@ -164,7 +164,7 @@ describe('UserController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'user updated succcessfully',
+          message: 'user updated successfully',
           data: updatedUser,
         }),
       );
@@ -227,7 +227,7 @@ describe('UserController', () => {
   });
 
   describe('deleteUser', () => {
-    it('should delete an existing user data and return a confimation message', async () => {
+    it('should delete an existing user data and return a confirmation message', async () => {
       const req = getMockReq({
         user: sampleUser,
       });
@@ -248,14 +248,14 @@ describe('UserController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'user account deleted succcessfully',
+          message: 'user account deleted successfully',
           data: serviceResult,
         }),
       );
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next with HttpExecption if an error occurs', async () => {
+    it('should call next with HttpException if an error occurs', async () => {
       const req = getMockReq();
       const { res, next } = getMockRes();
 

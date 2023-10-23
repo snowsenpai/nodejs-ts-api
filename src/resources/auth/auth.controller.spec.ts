@@ -89,7 +89,7 @@ describe('AuthController', () => {
       expect(res.status).toHaveBeenCalledWith(HttpStatus.OK);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'generated otp credentials sucessfully',
+          message: 'generated otp credentials successfully',
           data: mockData,
         }),
       );
@@ -165,10 +165,7 @@ describe('AuthController', () => {
       const { res, next } = getMockRes();
       const verifyOTPSpy = jest.spyOn(authController, 'verifyOTP');
 
-      const error = new HttpException(
-        HttpStatus.UNAUTHORIZED,
-        'token is invalid or user does not exist',
-      );
+      const error = new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid');
       const serviceSpy = jest.spyOn(AuthService.prototype, 'verifyOTP').mockRejectedValue(error);
 
       await authController.verifyOTP(req, res, next);
@@ -225,10 +222,7 @@ describe('AuthController', () => {
       const { res, next } = getMockRes();
       const validateOTPSpy = jest.spyOn(authController, 'validateOTP');
 
-      const error = new HttpException(
-        HttpStatus.UNAUTHORIZED,
-        'token is invalid or user does not exist',
-      );
+      const error = new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid');
       const serviceSpy = jest.spyOn(AuthService.prototype, 'validateOTP').mockRejectedValue(error);
 
       await authController.validateOTP(req, res, next);
@@ -293,10 +287,7 @@ describe('AuthController', () => {
       const { res, next } = getMockRes();
       const disableOTPSpy = jest.spyOn(authController, 'disableOTP');
 
-      const error = new HttpException(
-        HttpStatus.UNAUTHORIZED,
-        'token is invalid or user does not exist',
-      );
+      const error = new HttpException(HttpStatus.UNAUTHORIZED, 'token is invalid');
       const serviceSpy = jest.spyOn(AuthService.prototype, 'disableOTP').mockRejectedValue(error);
 
       await authController.disableOTP(req, res, next);
@@ -340,7 +331,7 @@ describe('AuthController', () => {
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should call next with HttpException if an error occors', async () => {
+    it('should call next with HttpException if an error occurs', async () => {
       const code = '';
       const req = getMockReq({
         user: sampleUser,
@@ -422,7 +413,7 @@ describe('AuthController', () => {
 
   describe('validateEmail', () => {
     it('should respond with 200 and email verification result of a user', async () => {
-      const encryptedEmail = 'definetlyEncrypted123456';
+      const encryptedEmail = 'definitelyEncrypted123456';
       const emailToken = '123456';
       const req = getMockReq({
         params: {
@@ -456,7 +447,7 @@ describe('AuthController', () => {
     });
 
     it('should call next with HttpException if an error occurs', async () => {
-      const encryptedEmail = 'definetlyEncrypted123456';
+      const encryptedEmail = 'definitelyEncrypted123456';
       const emailToken = '';
       const req = getMockReq({
         params: {
@@ -526,7 +517,7 @@ describe('AuthController', () => {
       const passwordResetSpy = jest.spyOn(authController, 'passwordResetRequest');
 
       const error = new HttpException(
-        HttpStatus.NOT_FOUND,
+        HttpStatus.UNAUTHORIZED,
         'only verified users can reset their password',
       );
       const serviceSpy = jest
@@ -546,7 +537,7 @@ describe('AuthController', () => {
 
   describe('validatePasswordReset', () => {
     it('should respond with 200 and validate a user`s password reset request', async () => {
-      const encryptedEmail = 'definetlyEncrypted123456';
+      const encryptedEmail = 'definitelyEncrypted123456';
       const passwordToken = '123456';
       const req = getMockReq({
         params: {
@@ -577,7 +568,7 @@ describe('AuthController', () => {
     });
 
     it('should call next with HttpException if an error occurs', async () => {
-      const encryptedEmail = 'definetlyEncrypted123456';
+      const encryptedEmail = 'definitelyEncrypted123456';
       const passwordToken = '';
       const req = getMockReq({
         params: {
@@ -716,7 +707,7 @@ describe('AuthController', () => {
 
       const error = new HttpException(
         HttpStatus.BAD_REQUEST,
-        'password reset request not recived or permission not granted',
+        'password reset request not received or permission not granted',
       );
       const serviceSpy = jest
         .spyOn(AuthService.prototype, 'cancelPasswordReset')
