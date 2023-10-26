@@ -32,7 +32,7 @@ class AuthService {
 
     const validPassword = await user.isValidPassword(password);
 
-    if (validPassword === false) {
+    if (!validPassword) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'wrong credentials');
     }
     const accessToken = token.createToken({ id: user._id });
@@ -71,7 +71,7 @@ class AuthService {
   public async generateOTP(userId: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    if (user.verified === false) {
+    if (!user.verified) {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'only verified users can enable OTP');
     }
 
@@ -258,14 +258,13 @@ class AuthService {
     }
     const recoveryCodes = user.recoveryCodes;
 
-    //! use array method on user.recoveryCodes, no need for a for-loop
     for (const code of recoveryCodes) {
       const isMatch = await compare(recoveryCode, code.hash);
 
       if (isMatch) {
         if (code.used) {
           //! wrong status code
-          throw new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoveryCode}`);
+          throw new HttpException(HttpStatus.FORBIDDEN, `code has been used: ${recoveryCode}`);
         } else {
           code.used = true;
           await user.save();
@@ -286,7 +285,7 @@ class AuthService {
   public async validCode(userId: string, recoveryCode: string) {
     const result = await this.validateRecoveryCode(userId, recoveryCode);
     if (!result) {
-      throw new HttpException(HttpStatus.NOT_FOUND, 'invalid recovery code');
+      throw new HttpException(HttpStatus.UNAUTHORIZED, 'invalid recovery code');
     }
     return result;
   }
@@ -312,8 +311,7 @@ class AuthService {
 
     const updatedUser = await this.UserService.updateUser(userId, { email: newEmail });
 
-    // TODO review conditionals, no need for deep equality checks for booleans, use the boolean value or NOT operator !
-    if (updatedUser.verified === true) {
+    if (updatedUser.verified) {
       updatedUser.verified = false;
       const oldVerifiedUser = await updatedUser.save();
 
@@ -418,7 +416,7 @@ class AuthService {
   public async passwordResetRequest(userId: string, fullURL: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    if (user.verified === false) {
+    if (!user.verified) {
       throw new HttpException(
         HttpStatus.UNAUTHORIZED,
         'only verified users can reset their password',
@@ -474,7 +472,7 @@ class AuthService {
 
     const user = await this.UserService.getFullUserByEmail(usersEmail);
 
-    if (user.passwordResetRequest === false) {
+    if (!user.passwordResetRequest) {
       throw new HttpException(HttpStatus.BAD_REQUEST, 'user made no request to reset password');
     }
 
@@ -506,11 +504,7 @@ class AuthService {
    */
   public async resetPassword(userId: string, passwordToken: string, newPassword: string) {
     const user = await this.UserService.getFullUserById(userId);
-    if (
-      user.verified === false ||
-      user.grantPasswordReset === false ||
-      user.passwordResetRequest === false
-    ) {
+    if (!user.verified || !user.grantPasswordReset || !user.passwordResetRequest) {
       throw new HttpException(
         HttpStatus.BAD_REQUEST,
         'password reset failed, user not verified or has no permission to reset password',
@@ -549,7 +543,7 @@ class AuthService {
   public async cancelPasswordReset(userId: string, passwordToken: string) {
     const user = await this.UserService.getFullUserById(userId);
 
-    if (user.passwordResetRequest === false || user.grantPasswordReset === false) {
+    if (!user.passwordResetRequest || !user.grantPasswordReset) {
       throw new HttpException(
         HttpStatus.BAD_REQUEST,
         'password reset request not received or permission not granted',

@@ -342,7 +342,7 @@ describe('AuthController', () => {
       const { res, next } = getMockRes();
       const validateSpy = jest.spyOn(authController, 'validateRecoveryCode');
 
-      const error = new HttpException(HttpStatus.NOT_FOUND, 'invalid recovery code');
+      const error = new HttpException(HttpStatus.UNAUTHORIZED, 'invalid recovery code');
       const serviceSpy = jest.spyOn(AuthService.prototype, 'validCode').mockRejectedValue(error);
 
       await authController.validateRecoveryCode(req, res, next);

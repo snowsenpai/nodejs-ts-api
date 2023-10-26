@@ -216,7 +216,7 @@ describe('/auth', () => {
       expect(res.body).toHaveProperty('data');
     });
 
-    it('should respond with 404 for a used recovery code', async () => {
+    it('should respond with 403 for a used recovery code', async () => {
       const res = await request(testApp)
         .post(`${apiPaths.authPath}/verify/recovery-code`)
         .set('Authorization', `Bearer ${accessToken}`)
@@ -224,11 +224,11 @@ describe('/auth', () => {
           code: recoveryCode,
         });
 
-      expect(res.status).toBe(HttpStatus.NOT_FOUND);
+      expect(res.status).toBe(HttpStatus.FORBIDDEN);
       expect(res.body).toHaveProperty('message', `code has been used: ${recoveryCode}`);
     });
 
-    it('should respond with 404 for an invalid recovery code', async () => {
+    it('should respond with 401 for an invalid recovery code', async () => {
       const res = await request(testApp)
         .post(`${apiPaths.authPath}/verify/recovery-code`)
         .set('Authorization', `Bearer ${accessToken}`)
@@ -236,7 +236,7 @@ describe('/auth', () => {
           code: '123456789',
         });
 
-      expect(res.status).toBe(HttpStatus.NOT_FOUND);
+      expect(res.status).toBe(HttpStatus.UNAUTHORIZED);
       expect(res.body).toHaveProperty('message', 'invalid recovery code');
     });
   });

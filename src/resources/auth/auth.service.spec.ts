@@ -462,7 +462,7 @@ describe('AuthService', () => {
       const recoveryCode = plainCodes[0];
 
       await expect(authService.validateRecoveryCode(testUser._id, recoveryCode)).rejects.toThrow(
-        new HttpException(HttpStatus.NOT_FOUND, `code has been used: ${recoveryCode}`),
+        new HttpException(HttpStatus.FORBIDDEN, `code has been used: ${recoveryCode}`),
       );
       expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
       expect(bcryptCompareSpy).toHaveBeenCalledTimes(1);
@@ -516,7 +516,7 @@ describe('AuthService', () => {
         .spyOn(AuthService.prototype, 'validateRecoveryCode')
         .mockResolvedValue(undefined);
       await expect(authService.validCode(sampleFullUser._id, 'code')).rejects.toThrow(
-        new HttpException(HttpStatus.NOT_FOUND, 'invalid recovery code'),
+        new HttpException(HttpStatus.UNAUTHORIZED, 'invalid recovery code'),
       );
       expect(validateCodeSpy).toHaveBeenCalledWith(sampleFullUser._id, 'code');
     });
