@@ -15,6 +15,8 @@ class TagService {
    * Creates a new tag document.
    *
    * `Unhandled error` - thrown if a tag with an identical name exists in the database.
+   * @param name - Tag name.
+   * @param description - Tag description.
    * @returns created tag document.
    */
   public async create(name: string, description: string) {

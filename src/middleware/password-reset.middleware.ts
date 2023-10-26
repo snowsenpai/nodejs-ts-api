@@ -3,6 +3,9 @@ import cryptoHelper from '@/utils/crypto-helpers.util';
 import userModel from '@/resources/user/user.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
+/**
+ * Checks if the incoming request has a `passwordtoken` basic header.
+ */
 async function passwordReset(
   req: Request,
   res: Response,

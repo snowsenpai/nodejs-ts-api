@@ -18,7 +18,11 @@ class PostService implements PublicResource {
   /**
    * Creates a new post document.
    *
-   * @returns created post document.
+   * @param title - Post's title.
+   * @param body - Post's body/content.
+   * @param creator - Post's author.
+   * @param tags - Post's tags.
+   * @returns the created post document.
    */
   public async create(title: string, body: string, creator: string, tags: string[]) {
     const post = await this.post.create({ title, body, creator, tags });
@@ -45,6 +49,8 @@ class PostService implements PublicResource {
 
   /**
    * Return a array of existing posts and pagination details
+   *
+   * @param paginationDetails - pagination details for post resource.
    * @throws HttpException (404) if no post is found that match a specified query.
    */
   public async findAll(paginationDetails: TPaginationDetails) {
@@ -93,6 +99,8 @@ class PostService implements PublicResource {
    *
    * If `"true"` is received as a second argument the post's creator field will be replaced
    * with it's creator details (by default only the creator's id is present).
+   * @param creator - Option to populate the post's creator field.
+   * @param id - Post id to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async findOne(id: string, creator?: string) {
@@ -111,6 +119,9 @@ class PostService implements PublicResource {
    *
    * `postData` should be the post field and it's new data,
    * data type of the field must match the original data type.
+   * @param postId - The post id to search for.
+   * @param postData - The field(s) to update.
+   * @param userId - Id of the user making the request.
    * @throws HttpException (403) if `userId` does not match the post's creator `id`.
    * @throws HttpException (404) if the post could not be modified.
    */
@@ -132,6 +143,8 @@ class PostService implements PublicResource {
   /**
    * Deletes a single post document that match the given `postId`.
    *
+   * @param postId - The post id to search for.
+   * @param userId - Id of the user making the request.
    * @throws HttpException (403) if `userId` does not match the post's creator `id`.
    */
   public async deletePost(postId: string, userId: string) {

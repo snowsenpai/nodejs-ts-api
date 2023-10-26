@@ -1,7 +1,6 @@
 import pino from 'pino';
 import path from 'path';
 
-//issue: open handler detected by jest from pino.transport(
 const transport = pino.transport({
   targets: [
     {

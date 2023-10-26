@@ -1,17 +1,18 @@
+import { Buffer } from 'node:buffer';
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto';
 import { encode } from 'hi-base32';
 import { HttpException, HttpStatus } from './exceptions';
 import logger from './logger.util';
 
-// ref @types/node: cypto.d.ts
+// ref @types/node: crypto.d.ts
 export type BinaryToTextEncoding = 'base64' | 'base64url' | 'hex';
 export type CharacterEncoding = 'utf-8';
 export type LegacyCharacterEncoding = 'ascii';
 export type Encoding = BinaryToTextEncoding | CharacterEncoding | LegacyCharacterEncoding;
 
 /**
- *
- * @param length - number of characters
+ * Generates and returns random alphanumeric characters.
+ * @param length - The number of characters to return.
  * @returns string of random alphanumeric characters
  */
 function generateRandomString(length: number) {
@@ -22,12 +23,11 @@ function generateRandomString(length: number) {
   let randomString = '';
 
   for (let i = 0; i < length; i++) {
-    // get the octect at position 'i' in the buffer using index operator buf[i]
-    // range is between 0 and 255
-    // randomIndex should be within the range of avalable characters
+    // get the octet at position 'i' in the buffer, octet is between 0 and 255
+    // `% characterCount` to set range within the length of available characters
     const randomIndex = buf[i] % characterCount;
 
-    // select corresponding character at randomindex and append to 'randomString'
+    // select corresponding character at randomIndex and append to `randomString`
     randomString += characters.charAt(randomIndex);
   }
 
@@ -35,9 +35,9 @@ function generateRandomString(length: number) {
 }
 
 /**
- *
- * @param size - number of characters to return
- * @returns
+ * Generates random base32 characters.
+ * @param size - The number of characters to return.
+ * @returns the generated base32 string.
  */
 function generateRandomBase32(size: number) {
   const buffer = randomBytes(size);
@@ -46,10 +46,10 @@ function generateRandomBase32(size: number) {
 }
 
 /**
- *
- * @param length the length of each string
- * @param count number of strings to return
- * @returns string[ ]
+ * Generates and returns an array random alphanumeric characters.
+ * @param length - The length of each string
+ * @param count - Number of strings to return
+ * @returns an array of random alphanumeric characters.
  */
 function randomStringArray(length: number, count: number) {
   const randomStrings = [];
@@ -58,39 +58,36 @@ function randomStringArray(length: number, count: number) {
     const randomString = generateRandomString(length);
     randomStrings.push(randomString);
   }
-  // ? handle random string uniqueness, cache?...
 
   return randomStrings;
 }
 
 /**
- * `data` argument is a string with a specified `inputEncoding`.
+ * Encodes a string to a given format `outputEncoding`.
  *
- * The `outputEncoding` specifies the output format of the encoded data,
- * a string using the specified encoding is returned
- * @param data
- * @param inputEncoding
- * @param outputEncoding
- * @returns
+ * Utilizes `'node:buffer'`.
+ * @param data - The string to encode.
+ * @param inputEncoding - The text format of `data` {@link Encoding}.
+ * @param outputEncoding - The encoded format to return {@link BinaryToTextEncoding}.
+ * @returns The encoded string.
  */
 function encodeData(data: string, inputEncoding: Encoding, outputEncoding: BinaryToTextEncoding) {
   const buffer = Buffer.from(data, inputEncoding);
-  const encodedeData = buffer.toString(outputEncoding);
-  return encodedeData;
+  const encodedData = buffer.toString(outputEncoding);
+  return encodedData;
 }
 
 /**
- * `data` argument is a string with a specified `inputEncoding`.
+ * Decodes a string to a given format `outputEncoding`
  *
- * The `outputEncoding` specifies the output format of the encoded data,
- * a string using the specified encoding is returned
+ * For correctness, `inputEncoding` must be the same as `outputEncoding`
+ * used when encoding.
  *
- * given certain scenarios, `inputEncoding` must be the same as `outputEncoding`
- * used when encoding data
- * @param data
- * @param inputEncoding
- * @param outputEncoding
- * @returns
+ * Utilizes `'node:buffer'`.
+ * @param data - The string to decode.
+ * @param inputEncoding - The text format of `data` {@link BinaryToTextEncoding}.
+ * @param outputEncoding - The decoded format to return {@link Encoding}.
+ * @returns The decoded string.
  */
 function decodeData(data: string, inputEncoding: BinaryToTextEncoding, outputEncoding: Encoding) {
   const buffer = Buffer.from(data, inputEncoding);
@@ -99,36 +96,41 @@ function decodeData(data: string, inputEncoding: BinaryToTextEncoding, outputEnc
 }
 
 /**
+ * Generates a random string with the specified `outputEncoding`.
  *
- * @param size number of characters to return
- * @param outputEncoding format of returned string
- * @returns
+ * Utilizes `'node:buffer'`.
+ * @param size - Number of characters to return.
+ * @param outputEncoding - The format to return {@link BinaryToTextEncoding}.
+ * @returns random encoded string.
  */
-function randomEndcoding(size: number, outputEncoding: BinaryToTextEncoding) {
+function randomEncoding(size: number, outputEncoding: BinaryToTextEncoding) {
   const buffer = randomBytes(size);
   const randomEncodedString = buffer.toString(outputEncoding).substring(0, size);
   return randomEncodedString;
 }
 
 // normalize strings before passing to crypto apis
-const plain_key = process.env.SECRET_KEY!.normalize(); //if no arg is passed default 'NFC' (ref: MDN)
+const plain_key = process.env.SECRET_KEY!.normalize(); //if no arg, default is 'NFC' (ref: MDN)
 const plain_iv = process.env.SECRET_IV!.normalize();
 // use node:crypto getCiphers() for array of supported algorithms
 const algorithm = 'aes-256-cbc';
 
-// byte sizes of keys depends on the algorithm used, double check
+// byte sizes of keys depends on the algorithm used, double check node:crypto 'createCipheriv'
 const secret_key = createHash('sha512').update(plain_key).digest('hex').substring(0, 32); // 32 bytes secret_key
 
 const secret_iv = createHash('sha512').update(plain_iv).digest('hex').substring(0, 16); // 16 bytes secret_iv
 
 /**
- * `data` argument is a string with a specified `inputEncoding`.
+ * Encrypts a string to a given format `outputEncoding`.
  *
- * The `outputEncoding` specifies the output format of the enciphered data,
- * a string using the specified encoding is returned
- * @param data
- * @param inputEncoding The `encoding` of the data
- * @param outputEncoding the `encoding` of the return value
+ * Utilizes node:crypto `createCipheriv`.
+ *
+ * @param data - String to encrypt.
+ * @param inputEncoding - The string format of data {@link Encoding}.
+ * @param outputEncoding - The encrypted format to return {@link Encoding}.
+ * @throws * {@link HttpException} if an error occurs.
+ *
+ * @returns the encrypted string.
  */
 function encryptData(data: string, inputEncoding: Encoding, outputEncoding: Encoding) {
   try {
@@ -143,21 +145,23 @@ function encryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return encryptedData;
   } catch (error) {
     logger.error(error, 'Encryption error');
-    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data type or format');
+    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data format');
   }
 }
 
 /**
- * `data` argument is a string with a specified `inputEncoding`.
+ * Decrypts a string to a given format `outputEncoding`.
  *
- * The `outputEncoding` specifies the output format of the enciphered data,
- * a string using the specified encoding is returned
+ * Utilizes node:crypto `createDecipheriv`.
  *
  * given certain scenarios, `inputEncoding` must be the same as `outputEncoding`
- * used when encrypting data
- * @param data
- * @param inputEncoding
- * @param outputEncoding
+ * used when encrypting data.
+ * @param data - The string to decrypt.
+ * @param inputEncoding - Format of string.
+ * @param outputEncoding - The decrypted format to return.
+ * @throws * {@link HttpException} if an error occurs.
+ *
+ * @returns the decrypted string.
  */
 function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Encoding) {
   try {
@@ -170,11 +174,11 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
     return decryptedData;
   } catch (error) {
     logger.error(error, 'Decryption error');
-    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data type or format');
+    throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid data format');
   }
 }
 
-//! imporve security e.g avoid reuse of secret_keys and ivs (ref: OWASP AO2)
+//! improve security e.g avoid reuse of secret_keys and ivs (ref: OWASP AO2)
 export default {
   encryptData,
   decryptData,
@@ -183,5 +187,5 @@ export default {
   generateRandomBase32,
   encodeData,
   decodeData,
-  randomEndcoding,
+  randomEncoding,
 };

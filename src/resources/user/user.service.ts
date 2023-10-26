@@ -25,6 +25,10 @@ class UserService {
    *
    * Users have a default role of `"user"`,
    * a welcome email is sent to the created user's email.
+   * @param firstName - User's first name.
+   * @param lastName - User's last name.
+   * @param email - User's email.
+   * @param password - User's password.
    * @throws HttpException (400) if an existing user with an identical email is found in the database.
    */
   public async register(firstName: string, lastName: string, email: string, password: string) {
@@ -65,6 +69,7 @@ class UserService {
   /**
    * Returns a user document with an email field matching the given `userEmail`,
    * by default sensitive user credentials are excluded.
+   * @param userEmail - User email to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async findByEmail(userEmail: string) {
@@ -78,6 +83,7 @@ class UserService {
   /**
    * Returns a user document with an id field matching the given `userId`,
    * by default sensitive user credentials are excluded.
+   * @param userId - User id to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async findById(userId: string) {
@@ -93,6 +99,7 @@ class UserService {
    * including sensitive user credentials, intended for user authentication processes.
    *
    * `Ensure that the return value is never exposed to the client`.
+   * @param userId - User id to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async getFullUserById(userId: string) {
@@ -109,6 +116,7 @@ class UserService {
    * including sensitive user credentials, intended for user authentication processes.
    *
    * `Ensure that the return value is never exposed to the client`.
+   * @param userEmail - The user email to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async getFullUserByEmail(userEmail: string) {
@@ -125,6 +133,8 @@ class UserService {
    *
    * `userData` should be the user field and it's new data,
    * data type of the field must match the original data type.
+   * @param userId - User id to search for.
+   * @param userData - The field(s) to update.
    * @throws HttpException (404) if no match is found.
    */
   public async updateUser(userId: string, userData: object) {
@@ -137,6 +147,7 @@ class UserService {
 
   /**
    * Deletes a single user document that match the given `userId`.
+   * @param userId - User id to search for.
    * @throws HttpException (404) if no match is found.
    */
   public async deleteUser(userId: string) {
@@ -151,6 +162,7 @@ class UserService {
 
   /**
    * Adds a posts field containing an array of the user's posts for a user document with an id field matching the given `userId`.
+   * @param userId - User id to search for.
    */
   public async getAllPostsOfUser(userId: string) {
     const user = await this.findById(userId);

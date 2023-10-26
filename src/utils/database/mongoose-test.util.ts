@@ -12,6 +12,7 @@ const dropCollection = async (collectionName: string) => {
   await mongoose.connection.db.dropCollection(collectionName);
 };
 
+// run afterAll
 const closeDB = async () => {
   await mongoose.connection.close();
 };

@@ -3,6 +3,9 @@ import HttpException from '@/utils/exceptions/http.exception';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 import logger from '@/utils/logger.util';
 
+/**
+ * Error handling middleware.
+ */
 function errorMiddleware(
   error: HttpException,
   req: Request,

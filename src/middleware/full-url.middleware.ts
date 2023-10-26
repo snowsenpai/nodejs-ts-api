@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 
+/**
+ * Generates a URL string by parsing information from the request object.
+ * @param queryParams - Includes request's query parameter in the parsed url.
+ */
 function getFullUrl(queryParams = true): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {

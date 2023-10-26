@@ -11,6 +11,10 @@ class App {
   public express: Application;
   public port: number;
 
+  /**
+   * @param apiRoutes - App Routes.
+   * @param port - Port number to listen for connections.
+   */
   constructor(apiRoutes: Router[], port: number) {
     this.express = express();
     this.port = port;

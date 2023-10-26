@@ -45,6 +45,8 @@ class EmailService {
       html: templates.generateResetPasswordEmail(firstName, url),
     });
   }
+
+  // static method to send emails to admin.
 }
 
 export default EmailService;

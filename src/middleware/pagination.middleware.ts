@@ -10,7 +10,7 @@ export type TFilters = {
   [filterName: string]: string[];
 };
 
-//! TsortBy is tightly coupled to Mongoose T<SortOrder>
+//! TSortBy is depends on Mongoose T<SortOrder>
 export type TSortBy = { [key: string]: SortOrder };
 export type SortOrder = -1 | 1 | 'asc' | 'ascending' | 'desc' | 'descending';
 
@@ -23,6 +23,11 @@ export type TPaginationDetails = {
   sortBy: TSortBy;
 };
 
+/**
+ * Helps handle pagination details form incoming requests.
+ * @param paginationOptions - Pagination option ({@link TPaginationOptions}) for a resource.
+ * @returns adds pagination details resolved from the incoming request and the pagination options to the request object.
+ */
 function paginationMiddleware(
   paginationOptions: () => Promise<TPaginationOptions>,
 ): RequestHandler {
@@ -84,7 +89,6 @@ function paginationMiddleware(
 export default paginationMiddleware;
 //! improvements:
 //* handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
-//* search field ('title') should be dev defined or retrieved from a dynamic queryOption(s) e.g 'searchBy'
-// e.g can query based on title, location name, etc, validation should be in place for available fields
-//* can extend TPaginationOptions so services can define default page, limit, filterValue (and search?)
-//* query parameter validation for 'filterName' and 'filterValue' against defined values
+//* filterValues should be passed by name not id reference.
+// e.g can query based on title, location name, etc
+//* query parameter validation for 'filterName' and 'filterValue'? against defined values.

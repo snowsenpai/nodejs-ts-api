@@ -5,6 +5,9 @@ import { Token } from '@/utils/interfaces/token.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import jwt from 'jsonwebtoken';
 
+/**
+ * Checks if the incoming request has authorization bearer header.
+ */
 async function authenticatedMiddleware(
   req: Request,
   res: Response,

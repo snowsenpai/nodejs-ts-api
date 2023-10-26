@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 import logger from '../logger.util';
 
+/**
+ * Connects to a mongodb database.
+ *
+ * Utilizes mongoose.
+ */
 const mongooseConnect = (): void => {
   const { MONGO_DATABASE, MONGO_PATH } = process.env;
 
@@ -17,12 +22,12 @@ const mongooseConnect = (): void => {
 };
 
 const handleReconnection = (): void => {
-  const reconectionInterval = 5000; //5 seconds
+  const reconnectionInterval = 10000; //10 seconds
 
   setTimeout(() => {
     logger.info('Attempting to reconnect to MongoDb...');
     mongooseConnect();
-  }, reconectionInterval);
+  }, reconnectionInterval);
 };
 
 export default mongooseConnect;
