@@ -1,4 +1,4 @@
-const generateResetPasswordEmail = (firstName: string, url: string) => `<!DOCTYPE html>
+export const generateResetPasswordEmail = (firstName: string, url: string) => `<!DOCTYPE html>
 
 <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 
@@ -252,4 +252,3 @@ const generateResetPasswordEmail = (firstName: string, url: string) => `<!DOCTYP
 </body>
 
 </html>`;
-export default generateResetPasswordEmail;

@@ -32,7 +32,7 @@ const passwordReset = Joi.object({
   passwordToken: Joi.string().hex().required(),
 });
 
-export default {
+export {
   login,
   otpToken,
   recoveryCode,

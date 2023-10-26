@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from 'express';
-import AuthService from './auth.service';
+import { AuthService } from './auth.service';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const authService = new AuthService();
@@ -267,7 +267,7 @@ async function updateEmail(
   }
 }
 
-export default {
+export {
   cancelPasswordReset,
   disableOTP,
   generateOTP,

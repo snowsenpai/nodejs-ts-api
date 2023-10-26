@@ -5,4 +5,4 @@ const create = Joi.object({
   description: Joi.string().required().max(120),
 });
 
-export default { create };
+export { create };

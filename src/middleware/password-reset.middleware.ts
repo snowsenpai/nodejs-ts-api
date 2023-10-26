@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import cryptoHelper from '@/utils/crypto-helpers.util';
-import userModel from '@/resources/user/user.model';
+import * as cryptoUtil from '@/utils/crypto.util';
+import { UserModel } from '@/resources/user/user.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 /**
  * Checks if the incoming request has a `passwordtoken` basic header.
  */
-async function passwordReset(
+export async function passwordReset(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -20,19 +20,17 @@ async function passwordReset(
 
     const base64PasswordToken = basic.split('Basic ')[1].trim();
 
-    const recivedToken = cryptoHelper.decryptData(base64PasswordToken, 'base64', 'utf-8');
+    const receivedToken = cryptoUtil.decryptData(base64PasswordToken, 'base64', 'utf-8');
 
-    const user = await userModel.findOne({ secretToken: recivedToken });
+    const user = await UserModel.findOne({ secretToken: receivedToken });
     //! handle invalid or deleted token  (use a cache for secrets blacklist?)
     if (!user) {
       throw new HttpException(HttpStatus.BAD_REQUEST, 'invalid token');
     }
 
-    req.passwordResetSecret = recivedToken;
+    req.passwordResetSecret = receivedToken;
     return next();
   } catch (error) {
     return next(error);
   }
 }
-
-export default passwordReset;

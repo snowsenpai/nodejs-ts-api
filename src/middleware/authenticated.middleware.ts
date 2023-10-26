@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import token from '@/utils/token.util';
-import UserModel from '@/resources/user/user.model';
+import * as token from '@/utils/token.util';
+import { UserModel } from '@/resources/user/user.model';
 import { Token } from '@/utils/interfaces/token.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import jwt from 'jsonwebtoken';
@@ -8,7 +8,7 @@ import jwt from 'jsonwebtoken';
 /**
  * Checks if the incoming request has authorization bearer header.
  */
-async function authenticatedMiddleware(
+export async function authenticated(
   req: Request,
   res: Response,
   next: NextFunction,
@@ -41,5 +41,3 @@ async function authenticatedMiddleware(
     return next(authError);
   }
 }
-
-export default authenticatedMiddleware;

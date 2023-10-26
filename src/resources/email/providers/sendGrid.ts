@@ -1,13 +1,13 @@
 import sgMail from '@sendgrid/mail';
 import { TMailOptions } from '../email.types';
-import logger from '@/utils/logger.util';
+import { logger } from '@/utils/logger.util';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 /**
  * A wrapper function for Twilio SendGrip API integration.
  */
-const sendGrid = async (options: TMailOptions) => {
+export const sendGrid = async (options: TMailOptions) => {
   try {
     const mailOptions = {
       from: options.from ?? `SnowSenpai <${process.env.APP_EMAIL}>`,
@@ -22,5 +22,3 @@ const sendGrid = async (options: TMailOptions) => {
     logger.error(error, 'SendGrid error');
   }
 };
-
-export default sendGrid;

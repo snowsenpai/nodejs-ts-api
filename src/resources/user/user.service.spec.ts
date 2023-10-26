@@ -1,6 +1,6 @@
-import UserService from './user.service';
-import UserModel from './user.model';
-import EmailService from '../email/email.service';
+import { UserService } from './user.service';
+import { UserModel } from './user.model';
+import { EmailService } from '../email/email.service';
 import { HttpStatus, HttpException } from '@/utils/exceptions';
 import { sampleUser, objectId, sampleFullUser, password, samplePost } from 'tests/sample-data';
 

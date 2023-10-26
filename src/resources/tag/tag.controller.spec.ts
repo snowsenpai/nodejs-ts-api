@@ -1,5 +1,5 @@
-import tagController from './tag.controller';
-import TagService from './tag.service';
+import * as tagController from './tag.controller';
+import { TagService } from './tag.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { sampleTag } from 'tests/sample-data';

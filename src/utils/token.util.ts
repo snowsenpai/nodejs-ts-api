@@ -10,7 +10,7 @@ import { Token, TokenData, EncodedData } from './interfaces/token.interface';
  * @param duration - signed token's duration in seconds, default duration one day.
  * @returns signed token and token's expiry in seconds.
  */
-export const createToken = (data: EncodedData, duration?: number): TokenData => {
+const createToken = (data: EncodedData, duration?: number): TokenData => {
   const defaultDuration = 60 * 60 * 24; // one day
   const expiresIn = duration || defaultDuration;
 
@@ -29,7 +29,7 @@ export const createToken = (data: EncodedData, duration?: number): TokenData => 
  * @throws a jwt error if token is invalid.
  * @returns payload {@link Token}.
  */
-export const verifyToken = async (token: string): Promise<jwt.VerifyErrors | Token> => {
+const verifyToken = async (token: string): Promise<jwt.VerifyErrors | Token> => {
   return new Promise((resolve, reject) => {
     jwt.verify(token, process.env.JWT_SECRET as jwt.Secret, (err, payload) => {
       if (err) return reject(err);
@@ -39,4 +39,4 @@ export const verifyToken = async (token: string): Promise<jwt.VerifyErrors | Tok
   });
 };
 
-export default { createToken, verifyToken };
+export { createToken, verifyToken };

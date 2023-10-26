@@ -1,6 +1,6 @@
-import PostModel from './post.model';
-import TagService from '../tag/tag.service';
-import PublicResource from '@/utils/interfaces/public-resource.interface';
+import { PostModel } from './post.model';
+import { TagService } from '../tag/tag.service';
+import { PublicResource } from '@/utils/interfaces/public-resource.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import { TPaginationDetails, TPaginationOptions } from '@/middleware/pagination.middleware';
 
@@ -161,4 +161,4 @@ class PostService implements PublicResource {
   }
 }
 
-export default PostService;
+export { PostService };

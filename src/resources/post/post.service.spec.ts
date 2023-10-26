@@ -1,6 +1,6 @@
-import PostService from './post.service';
-import PostModel from './post.model';
-import TagService from '../tag/tag.service';
+import { PostService } from './post.service';
+import { PostModel } from './post.model';
+import { TagService } from '../tag/tag.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions';
 import {
   objectId,

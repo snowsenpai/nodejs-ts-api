@@ -1,48 +1,46 @@
 import { Router } from 'express';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from '@/resources/post/post.validation';
-import authenticated from '@/middleware/authenticated.middleware';
-import paginationMiddleware from '@/middleware/pagination.middleware';
-import postController from './post.controller';
+import { validation } from '@/middleware/validation.middleware';
+import * as validate from '@/resources/post/post.validation';
+import { authenticated } from '@/middleware/authenticated.middleware';
+import { pagination } from '@/middleware/pagination.middleware';
+import * as postController from './post.controller';
 
-const postRouter = Router();
+export const postRouter = Router();
 
 const basePath = '/posts';
 
 postRouter.get(
   basePath,
-  validationMiddleware(validate.postPagination, 'query'),
-  paginationMiddleware(postController.postPaginationOptions),
+  validation(validate.postPagination, 'query'),
+  pagination(postController.postPaginationOptions),
   postController.getAllPosts,
 );
 
 postRouter.get(
   `${basePath}/:id`,
-  validationMiddleware(validate.findOnePost, 'params'),
-  validationMiddleware(validate.postCreator, 'query'),
+  validation(validate.findOnePost, 'params'),
+  validation(validate.postCreator, 'query'),
   postController.getPostById,
 );
 
 postRouter.post(
   basePath,
-  validationMiddleware(validate.create, 'body'),
+  validation(validate.create, 'body'),
   authenticated,
   postController.create,
 );
 
 postRouter.patch(
   `${basePath}/:id`,
-  validationMiddleware(validate.findOnePost, 'params'),
-  validationMiddleware(validate.modify, 'body'),
+  validation(validate.findOnePost, 'params'),
+  validation(validate.modify, 'body'),
   authenticated,
   postController.modifyPost,
 );
 
 postRouter.delete(
   `${basePath}/:id`,
-  validationMiddleware(validate.findOnePost, 'params'),
+  validation(validate.findOnePost, 'params'),
   authenticated,
   postController.deletePost,
 );
-
-export default postRouter;

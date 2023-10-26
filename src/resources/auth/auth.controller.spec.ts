@@ -1,5 +1,5 @@
-import authController from './auth.controller';
-import AuthService from './auth.service';
+import * as authController from './auth.controller';
+import { AuthService } from './auth.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { password, sampleUser } from 'tests/sample-data';

@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from 'express';
-import UserService from './user.service';
-import User from './user.interface';
+import { UserService } from './user.service';
+import { User } from './user.interface';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const userService = new UserService();
@@ -95,11 +95,4 @@ async function deleteUser(
   }
 }
 
-export default {
-  deleteUser,
-  findUser,
-  getUser,
-  register,
-  updateUser,
-  userPost,
-};
+export { deleteUser, findUser, getUser, register, updateUser, userPost };

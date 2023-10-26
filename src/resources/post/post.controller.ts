@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import PostService from '@/resources/post/post.service';
-import Post from './post.interface';
+import { PostService } from '@/resources/post/post.service';
+import { Post } from './post.interface';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const postService = new PostService();
@@ -111,11 +111,4 @@ async function deletePost(
   }
 }
 
-export default {
-  create,
-  deletePost,
-  getAllPosts,
-  getPostById,
-  modifyPost,
-  postPaginationOptions,
-};
+export { create, deletePost, getAllPosts, getPostById, modifyPost, postPaginationOptions };

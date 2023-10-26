@@ -1,8 +1,8 @@
-import AuthService from './auth.service';
-import UserService from '../user/user.service';
-import EmailService from '../email/email.service';
-import token from '@/utils/token.util';
-import cryptoHelpers from '@/utils/crypto-helpers.util';
+import { AuthService } from './auth.service';
+import { UserService } from '../user/user.service';
+import { EmailService } from '../email/email.service';
+import * as token from '@/utils/token.util';
+import * as cryptoUtil from '@/utils/crypto.util';
 import { HttpException, HttpStatus } from '@/utils/exceptions';
 import * as OTPAuth from 'otpauth';
 import { JsonWebTokenError } from 'jsonwebtoken';
@@ -93,14 +93,14 @@ describe('AuthService', () => {
           .spyOn(UserService.prototype, 'getFullUserById')
           // @ts-ignore
           .mockResolvedValue(testUser);
-        const cryptoHelperSpy = jest
-          .spyOn(cryptoHelpers, 'generateRandomBase32')
+        const cryptoUtilpy = jest
+          .spyOn(cryptoUtil, 'generateRandomBase32')
           .mockReturnValue('newbase32string');
 
         const result = await authService.generateOTP(testUser._id);
 
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
-        expect(cryptoHelperSpy).toHaveBeenCalledWith(24);
+        expect(cryptoUtilpy).toHaveBeenCalledWith(24);
         expect(generateTOTPSpy).toHaveBeenCalledWith('newbase32string', testUser.email);
         expect(otpAuthTOTPSpy).toHaveBeenCalled();
         expect(testUser.otpAuthUrl).toBe('newauthURLstring');
@@ -124,13 +124,13 @@ describe('AuthService', () => {
           .spyOn(UserService.prototype, 'getFullUserById')
           // @ts-ignore
           .mockResolvedValue(testUser);
-        const cryptoHelperSpy = jest.spyOn(cryptoHelpers, 'generateRandomBase32');
+        const cryptoUtilpy = jest.spyOn(cryptoUtil, 'generateRandomBase32');
 
         await expect(authService.generateOTP(testUser._id)).rejects.toThrow(
           new HttpException(HttpStatus.UNAUTHORIZED, 'only verified users can enable OTP'),
         );
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
-        expect(cryptoHelperSpy).not.toHaveBeenCalled();
+        expect(cryptoUtilpy).not.toHaveBeenCalled();
         expect(generateTOTPSpy).not.toHaveBeenCalled();
         expect(otpAuthTOTPSpy).not.toHaveBeenCalled();
       });
@@ -147,8 +147,8 @@ describe('AuthService', () => {
         const otpAuthTOTPSpy = jest.spyOn(OTPAuth.TOTP.prototype, 'validate').mockReturnValue(1);
 
         const mRandStrings = ['foo', 'bar', 'baz'];
-        const cryptoHelperSpy = jest
-          .spyOn(cryptoHelpers, 'randomStringArray')
+        const cryptoUtilpy = jest
+          .spyOn(cryptoUtil, 'randomStringArray')
           .mockReturnValue(mRandStrings);
         const mHashedRandStrings = [
           { hash: 'hashedFoo', used: false },
@@ -178,7 +178,7 @@ describe('AuthService', () => {
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(generateTOTPSpy).toHaveBeenCalledWith(testUser.otpBase32, testUser.email);
         expect(otpAuthTOTPSpy).toHaveBeenCalledWith({ token });
-        expect(cryptoHelperSpy).toHaveBeenCalledWith(8, 10);
+        expect(cryptoUtilpy).toHaveBeenCalledWith(8, 10);
         expect(hashRecoveryCodesSpy).toHaveBeenCalledWith(mRandStrings);
         expect(modifiedUser.save).toHaveBeenCalled();
         expect(modifiedUser.recoveryCodes).toEqual(mHashedRandStrings);
@@ -209,7 +209,7 @@ describe('AuthService', () => {
           .spyOn(UserService.prototype, 'getFullUserById')
           // @ts-ignore
           .mockResolvedValue(testUser);
-        const cryptoHelperSpy = jest.spyOn(cryptoHelpers, 'randomStringArray');
+        const cryptoUtilpy = jest.spyOn(cryptoUtil, 'randomStringArray');
         const hashRecoveryCodesSpy = jest.spyOn(AuthService.prototype, 'hashRecoveryCodes');
 
         const token = '123456';
@@ -219,7 +219,7 @@ describe('AuthService', () => {
         expect(getFullUserByIdSpy).toHaveBeenCalledWith(testUser._id);
         expect(generateTOTPSpy).toHaveBeenCalledWith(testUser.otpBase32, testUser.email);
         expect(otpAuthTOTPSpy).toHaveBeenCalledWith({ token });
-        expect(cryptoHelperSpy).not.toHaveBeenCalled();
+        expect(cryptoUtilpy).not.toHaveBeenCalled();
         expect(hashRecoveryCodesSpy).not.toHaveBeenCalled();
       });
     });
@@ -632,14 +632,14 @@ describe('AuthService', () => {
           }),
         });
       const randStringSpy = jest
-        .spyOn(cryptoHelpers, 'generateRandomString')
+        .spyOn(cryptoUtil, 'generateRandomString')
         .mockReturnValue(newSecretToken);
 
       const mEmailToken = { expiresIn: 123, token: 'newEmailToken' };
       const createTokenSpy = jest.spyOn(token, 'createToken').mockReturnValue(mEmailToken);
 
       const encryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'encryptData')
+        .spyOn(cryptoUtil, 'encryptData')
         .mockImplementation((data, inputType, outputType) => `${data}-${inputType}-${outputType}`);
       const sendVerifyMailSpy = jest.spyOn(EmailService.prototype, 'sendVerifyMail');
 
@@ -685,9 +685,9 @@ describe('AuthService', () => {
         .spyOn(UserService.prototype, 'getFullUserById')
         // @ts-ignore
         .mockResolvedValue(testUser);
-      const randStringSpy = jest.spyOn(cryptoHelpers, 'generateRandomString');
+      const randStringSpy = jest.spyOn(cryptoUtil, 'generateRandomString');
       const createTokenSpy = jest.spyOn(token, 'createToken');
-      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
       const sendVerifyMailSpy = jest.spyOn(EmailService.prototype, 'sendVerifyMail');
 
       await expect(authService.verifyEmail(testUser._id, fullUrl)).rejects.toThrow(
@@ -718,7 +718,7 @@ describe('AuthService', () => {
       });
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
 
       const getFullUserByEmailSpy = jest
@@ -763,7 +763,7 @@ describe('AuthService', () => {
         .mockResolvedValue(new JsonWebTokenError('Invalid Secret Token'));
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
 
       const getFullUserByEmailSpy = jest.spyOn(UserService.prototype, 'getFullUserByEmail');
@@ -794,7 +794,7 @@ describe('AuthService', () => {
       });
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
 
       const getFullUserByEmailSpy = jest
@@ -848,14 +848,14 @@ describe('AuthService', () => {
           }),
         });
       const randStringSpy = jest
-        .spyOn(cryptoHelpers, 'generateRandomString')
+        .spyOn(cryptoUtil, 'generateRandomString')
         .mockReturnValue(newSecretToken);
 
       const mPasswordToken = { expiresIn: 123, token: 'newEmailToken' };
       const createTokenSpy = jest.spyOn(token, 'createToken').mockReturnValue(mPasswordToken);
 
       const encryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'encryptData')
+        .spyOn(cryptoUtil, 'encryptData')
         .mockImplementation((data, inputType, outputType) => `${data}-${inputType}-${outputType}`);
       const sendPasswordResetMailSpy = jest.spyOn(EmailService.prototype, 'sendPasswordResetMail');
 
@@ -898,9 +898,9 @@ describe('AuthService', () => {
         .spyOn(UserService.prototype, 'getFullUserById')
         // @ts-ignore
         .mockResolvedValue(testUser);
-      const randStringSpy = jest.spyOn(cryptoHelpers, 'generateRandomString');
+      const randStringSpy = jest.spyOn(cryptoUtil, 'generateRandomString');
       const createTokenSpy = jest.spyOn(token, 'createToken');
-      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
       const sendPasswordResetMailSpy = jest.spyOn(EmailService.prototype, 'sendPasswordResetMail');
 
       await expect(authService.passwordResetRequest(testUser._id, fullUrl)).rejects.toThrow(
@@ -945,10 +945,10 @@ describe('AuthService', () => {
       });
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
       const encryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'encryptData')
+        .spyOn(cryptoUtil, 'encryptData')
         .mockImplementation((data, inputType, outputType) => `${data}-${inputType}-${outputType}`);
 
       const result = await authService.validatePasswordReset(encryptedEmail, passwordToken);
@@ -987,10 +987,10 @@ describe('AuthService', () => {
         .spyOn(token, 'verifyToken')
         .mockResolvedValue(new JsonWebTokenError('Invalid Secret Token'));
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
 
-      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
       const getFullUserByEmailSpy = jest.spyOn(UserService.prototype, 'getFullUserByEmail');
       await expect(
         authService.validatePasswordReset(encryptedEmail, passwordToken),
@@ -1020,9 +1020,9 @@ describe('AuthService', () => {
       });
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
-      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
 
       await expect(
         authService.validatePasswordReset(encryptedEmail, passwordToken),
@@ -1065,9 +1065,9 @@ describe('AuthService', () => {
       });
 
       const decryptDataSpy = jest
-        .spyOn(cryptoHelpers, 'decryptData')
+        .spyOn(cryptoUtil, 'decryptData')
         .mockImplementation((data, inputType, outputType) => data.split(`-${inputType}`)[0]);
-      const encryptDataSpy = jest.spyOn(cryptoHelpers, 'encryptData');
+      const encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
 
       await expect(
         authService.validatePasswordReset(encryptedEmail, passwordToken),

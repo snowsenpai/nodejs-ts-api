@@ -1,9 +1,5 @@
-import generateResetPasswordEmail from './reset-password';
-import generateVerifyEmail from './verify-email';
-import generateWelcomeEmail from './welcome';
+import { generateResetPasswordEmail } from './reset-password';
+import { generateVerifyEmail } from './verify-email';
+import { generateWelcomeEmail } from './welcome';
 
-export default {
-  generateResetPasswordEmail,
-  generateVerifyEmail,
-  generateWelcomeEmail,
-};
+export { generateResetPasswordEmail, generateVerifyEmail, generateWelcomeEmail };

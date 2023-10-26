@@ -1,5 +1,5 @@
-import postController from './post.controller';
-import PostService from './post.service';
+import * as postController from './post.controller';
+import { PostService } from './post.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import {

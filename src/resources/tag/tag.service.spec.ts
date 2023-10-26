@@ -1,5 +1,5 @@
-import TagService from './tag.service';
-import TagModel from './tag.model';
+import { TagService } from './tag.service';
+import { TagModel } from './tag.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 import { sampleTag } from 'tests/sample-data';
 

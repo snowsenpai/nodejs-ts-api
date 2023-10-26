@@ -1,4 +1,4 @@
-import TagModel from './tag.model';
+import { TagModel } from './tag.model';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 /**
@@ -54,4 +54,4 @@ class TagService {
   }
 }
 
-export default TagService;
+export { TagService };

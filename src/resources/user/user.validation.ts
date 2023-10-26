@@ -20,8 +20,4 @@ const findOneUser = Joi.object({
   id: Joi.string().hex().length(24),
 });
 
-export default {
-  findOneUser,
-  register,
-  updateUser,
-};
+export { findOneUser, register, updateUser };

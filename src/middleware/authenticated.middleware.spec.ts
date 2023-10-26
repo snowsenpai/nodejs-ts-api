@@ -1,6 +1,6 @@
-import authenticatedMiddleware from './authenticated.middleware';
-import UserModel from '@/resources/user/user.model';
-import token from '@/utils/token.util';
+import { authenticated } from './authenticated.middleware';
+import { UserModel } from '@/resources/user/user.model';
+import * as token from '@/utils/token.util';
 import { HttpStatus, HttpException } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { sampleUser } from 'tests/sample-data';
@@ -37,7 +37,7 @@ describe('Authentication middleware', () => {
   });
 
   it('should call next with an HttpException if authorization header is undefined', async () => {
-    await authenticatedMiddleware(req, res, next);
+    await authenticated(req, res, next);
 
     expect(verifyTokenSpy).not.toHaveBeenCalled();
     expect(findByIdSpy).not.toHaveBeenCalled();
@@ -48,7 +48,7 @@ describe('Authentication middleware', () => {
   it('should call next with an HttpException if authorization header does not start with `Bearer `', async () => {
     req.headers.authorization = 'bearer sustoken';
 
-    await authenticatedMiddleware(req, res, next);
+    await authenticated(req, res, next);
 
     expect(verifyTokenSpy).not.toHaveBeenCalled();
     expect(findByIdSpy).not.toHaveBeenCalled();
@@ -59,7 +59,7 @@ describe('Authentication middleware', () => {
   it('should call next with an HttpException if authorization header token is invalid', async () => {
     req.headers.authorization = 'Bearer sustoken';
 
-    await authenticatedMiddleware(req, res, next);
+    await authenticated(req, res, next);
 
     expect(verifyTokenSpy).toHaveBeenCalledWith('sustoken');
     expect(findByIdSpy).not.toHaveBeenCalled();
@@ -75,7 +75,7 @@ describe('Authentication middleware', () => {
       exec: jest.fn().mockResolvedValue(null),
     });
 
-    await authenticatedMiddleware(req, res, next);
+    await authenticated(req, res, next);
 
     expect(verifyTokenSpy).toHaveBeenCalledWith('accessToken');
     expect(findByIdSpy).toHaveBeenCalledWith(sampleUser._id);
@@ -86,7 +86,7 @@ describe('Authentication middleware', () => {
   it('should set the user in the request object and call next if token is valid', async () => {
     req.headers.authorization = 'Bearer accessToken';
 
-    await authenticatedMiddleware(req, res, next);
+    await authenticated(req, res, next);
 
     expect(verifyTokenSpy).toHaveBeenCalledWith('accessToken');
     expect(findByIdSpy).toHaveBeenCalledWith(sampleUser._id);

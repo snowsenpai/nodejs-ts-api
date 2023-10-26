@@ -2,10 +2,10 @@ import express, { Application, Router } from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
-import ErrorMiddleware from '@/middleware/error.middleware';
-import handelInvalidRoutes from './middleware/invalid-routes.middleware';
+import { errorMiddleware } from '@/middleware/error.middleware';
+import { handelInvalidRoutes } from './middleware/invalid-routes.middleware';
 import helmet from 'helmet';
-import logger from '@/utils/logger.util';
+import { logger } from '@/utils/logger.util';
 
 class App {
   public express: Application;
@@ -41,7 +41,7 @@ class App {
   }
 
   private initializeErrorHandling(): void {
-    this.express.use(ErrorMiddleware);
+    this.express.use(errorMiddleware);
   }
 
   public listen(): void {
@@ -51,4 +51,4 @@ class App {
   }
 }
 
-export default App;
+export { App };

@@ -1,4 +1,4 @@
-const generateWelcomeEmail = (firstName: string) => `<!DOCTYPE html>
+export const generateWelcomeEmail = (firstName: string) => `<!DOCTYPE html>
 
 <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 
@@ -338,4 +338,3 @@ const generateWelcomeEmail = (firstName: string) => `<!DOCTYPE html>
 </body>
 
 </html>`;
-export default generateWelcomeEmail;

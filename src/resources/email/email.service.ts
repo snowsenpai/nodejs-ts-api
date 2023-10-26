@@ -1,5 +1,5 @@
-import sendGrid from './providers/sendGrid';
-import templates from './templates';
+import { sendGrid } from './providers/sendGrid';
+import * as templates from './templates';
 
 /**
  * Methods to send emails from the server using API wrappers for email service providers.
@@ -49,4 +49,4 @@ class EmailService {
   // static method to send emails to admin.
 }
 
-export default EmailService;
+export { EmailService };

@@ -1,14 +1,12 @@
 import { Router } from 'express';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from './tag.validation';
-import tagController from './tag.controller';
+import { validation } from '@/middleware/validation.middleware';
+import * as validate from './tag.validation';
+import * as tagController from './tag.controller';
 
-const tagRouter = Router();
+export const tagRouter = Router();
 const basePath = '/tags';
 
 tagRouter.get(basePath, tagController.getAllTags);
 
 // roleAuth: admins manage available tags, users can request for new tag(s)
-tagRouter.post(basePath, validationMiddleware(validate.create, 'body'), tagController.create);
-
-export default tagRouter;
+tagRouter.post(basePath, validation(validate.create, 'body'), tagController.create);

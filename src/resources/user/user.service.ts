@@ -1,5 +1,5 @@
-import UserModel from './user.model';
-import EmailService from '../email/email.service';
+import { UserModel } from './user.model';
+import { EmailService } from '../email/email.service';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
 
 /**
@@ -173,4 +173,4 @@ class UserService {
   }
 }
 
-export default UserService;
+export { UserService };

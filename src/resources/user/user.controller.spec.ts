@@ -1,5 +1,5 @@
-import userController from './user.controller';
-import UserService from './user.service';
+import * as userController from './user.controller';
+import { UserService } from './user.service';
 import { HttpStatus, HttpException } from '@/utils/exceptions';
 import { getMockReq, getMockRes } from '@jest-mock/express';
 import { sampleUser, password, objectId, samplePost } from 'tests/sample-data';

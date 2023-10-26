@@ -14,7 +14,7 @@ export type TFieldMapping = {
  * @param schema - joi schema.
  * @param requestField - request field to validate {@link TRequestField}.
  */
-function validationMiddleware(schema: Joi.Schema, requestField: TRequestField): RequestHandler {
+export function validation(schema: Joi.Schema, requestField: TRequestField): RequestHandler {
   const fieldMapping: TFieldMapping = {
     body: 'body',
     params: 'params',
@@ -45,5 +45,4 @@ function validationMiddleware(schema: Joi.Schema, requestField: TRequestField): 
   };
 }
 
-export default validationMiddleware;
 //* validate req.headers from an extended Joi.schema

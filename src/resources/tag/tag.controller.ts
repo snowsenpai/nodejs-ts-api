@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import TagService from './tag.service';
+import { TagService } from './tag.service';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
 const tagService = new TagService();
@@ -36,7 +36,4 @@ async function getAllTags(
   }
 }
 
-export default {
-  create,
-  getAllTags,
-};
+export { create, getAllTags };

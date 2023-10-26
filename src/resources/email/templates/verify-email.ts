@@ -1,4 +1,4 @@
-const generateVerifyEmail = (firstName: string, url: string) => `<!DOCTYPE html>
+export const generateVerifyEmail = (firstName: string, url: string) => `<!DOCTYPE html>
 
 <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 
@@ -251,4 +251,3 @@ const generateVerifyEmail = (firstName: string, url: string) => `<!DOCTYPE html>
 </body>
 
 </html>`;
-export default generateVerifyEmail;

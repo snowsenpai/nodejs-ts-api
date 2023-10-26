@@ -4,7 +4,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
  * Generates a URL string by parsing information from the request object.
  * @param queryParams - Includes request's query parameter in the parsed url.
  */
-function getFullUrl(queryParams = true): RequestHandler {
+export function getFullUrl(queryParams = true): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     try {
       const { protocol, originalUrl } = req;
@@ -19,7 +19,5 @@ function getFullUrl(queryParams = true): RequestHandler {
     }
   };
 }
-
-export default getFullUrl;
 //! improvements
 //* validate req.headers.host ('host:port') to prevent host header attacks

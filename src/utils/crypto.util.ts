@@ -2,7 +2,7 @@ import { Buffer } from 'node:buffer';
 import { randomBytes, createCipheriv, createDecipheriv, createHash } from 'crypto';
 import { encode } from 'hi-base32';
 import { HttpException, HttpStatus } from './exceptions';
-import logger from './logger.util';
+import { logger } from './logger.util';
 
 // ref @types/node: crypto.d.ts
 export type BinaryToTextEncoding = 'base64' | 'base64url' | 'hex';
@@ -179,7 +179,7 @@ function decryptData(data: string, inputEncoding: Encoding, outputEncoding: Enco
 }
 
 //! improve security e.g avoid reuse of secret_keys and ivs (ref: OWASP AO2)
-export default {
+export {
   encryptData,
   decryptData,
   generateRandomString,

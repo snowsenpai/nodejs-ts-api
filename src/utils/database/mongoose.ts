@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
-import logger from '../logger.util';
+import { logger } from '../logger.util';
 
 /**
  * Connects to a mongodb database.
  *
  * Utilizes mongoose.
  */
-const mongooseConnect = (): void => {
+export const mongooseConnect = (): void => {
   const { MONGO_DATABASE, MONGO_PATH } = process.env;
 
   logger.info('Connecting to MongoDB...');
@@ -29,5 +29,3 @@ const handleReconnection = (): void => {
     mongooseConnect();
   }, reconnectionInterval);
 };
-
-export default mongooseConnect;

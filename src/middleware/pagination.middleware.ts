@@ -28,9 +28,7 @@ export type TPaginationDetails = {
  * @param paginationOptions - Pagination option ({@link TPaginationOptions}) for a resource.
  * @returns adds pagination details resolved from the incoming request and the pagination options to the request object.
  */
-function paginationMiddleware(
-  paginationOptions: () => Promise<TPaginationOptions>,
-): RequestHandler {
+export function pagination(paginationOptions: () => Promise<TPaginationOptions>): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const paginate = await paginationOptions();
@@ -86,7 +84,6 @@ function paginationMiddleware(
   };
 }
 
-export default paginationMiddleware;
 //! improvements:
 //* handling filter for other fields e.g dateField (createdAt for mongodb) or year and their filterValues
 //* filterValues should be passed by name not id reference.

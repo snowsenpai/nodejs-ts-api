@@ -3,7 +3,7 @@ import { cleanEnv, str, port } from 'envalid';
 /**
  * Ensures that the required the variables are present in `process.env`.
  */
-function validateEnv(): void {
+export function validateEnv(): void {
   cleanEnv(process.env, {
     NODE_ENV: str({
       choices: ['development', 'production', 'test'],
@@ -23,5 +23,3 @@ function validateEnv(): void {
     USER_SECRET_TOKEN_LENGTH: str(),
   });
 }
-
-export default validateEnv;

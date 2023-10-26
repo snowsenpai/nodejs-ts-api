@@ -34,10 +34,4 @@ const postPagination = Joi.object({
   filterValue: Joi.string(),
 });
 
-export default {
-  create,
-  findOnePost,
-  modify,
-  postCreator,
-  postPagination,
-};
+export { create, findOnePost, modify, postCreator, postPagination };

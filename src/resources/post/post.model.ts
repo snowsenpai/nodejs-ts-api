@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import Post from './post.interface';
+import { Post } from './post.interface';
 
 const PostSchema = new Schema(
   {
@@ -39,4 +39,4 @@ PostSchema.pre(['find', 'findOne', 'findOneAndUpdate'], function (next) {
   next();
 });
 
-export default model<Post>('Post', PostSchema);
+export const PostModel = model<Post>('Post', PostSchema);

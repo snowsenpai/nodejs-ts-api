@@ -1,6 +1,6 @@
 import { apiPaths, testApp } from 'tests/app-test';
 import request from 'supertest';
-import cryptoHelpersUtil from '@/utils/crypto-helpers.util';
+import * as cryptoUtil from '@/utils/crypto.util';
 import * as OTPAuth from 'otpauth';
 import { connectDB, dropCollection, closeDB } from '@/utils/database/mongoose-test.util';
 import { HttpStatus } from '@/utils/exceptions';
@@ -82,7 +82,7 @@ describe('/auth', () => {
 
   describe('GET /verify/email', () => {
     beforeEach(() => {
-      encryptDataSpy = jest.spyOn(cryptoHelpersUtil, 'encryptData');
+      encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
     });
 
     it('should send a verification link to a user`s email', async () => {
@@ -243,7 +243,7 @@ describe('/auth', () => {
 
   describe('GET /password-reset', () => {
     beforeEach(() => {
-      encryptDataSpy = jest.spyOn(cryptoHelpersUtil, 'encryptData');
+      encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
     });
 
     it('should send password reset mail to a user', async () => {
@@ -337,7 +337,7 @@ describe('/auth', () => {
   // all tests below still use the old access token(obtained before password reset and new login)
   describe('GET /cancel-password-reset', () => {
     beforeEach(() => {
-      encryptDataSpy = jest.spyOn(cryptoHelpersUtil, 'encryptData');
+      encryptDataSpy = jest.spyOn(cryptoUtil, 'encryptData');
     });
 
     it('should reset a user`s password reset request', async () => {

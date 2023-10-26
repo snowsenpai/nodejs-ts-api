@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
-import User from './user.interface';
+import { User } from './user.interface';
 
 const UserSchema = new Schema(
   {
@@ -96,4 +96,4 @@ UserSchema.methods.isValidPassword = async function (password: string): Promise<
   return await bcrypt.compare(password, this.password);
 };
 
-export default model<User>('User', UserSchema);
+export const UserModel = model<User>('User', UserSchema);

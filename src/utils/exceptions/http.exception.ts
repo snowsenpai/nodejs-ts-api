@@ -1,5 +1,5 @@
 /**
- * Subclass of JavaScript {@link Error}.
+ * Subclass of JavaScript's {@link Error}.
  */
 class HttpException extends Error {
   public status: number;
@@ -16,4 +16,4 @@ class HttpException extends Error {
   }
 }
 
-export default HttpException;
+export { HttpException };

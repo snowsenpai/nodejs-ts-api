@@ -4,12 +4,12 @@ import * as QRCOde from 'qrcode';
 import { PassThrough } from 'stream';
 import { hash, compare } from 'bcrypt';
 import { JsonWebTokenError } from 'jsonwebtoken';
-import UserService from '../user/user.service';
-import EmailService from '../email/email.service';
-import token from '@/utils/token.util';
+import { UserService } from '../user/user.service';
+import { EmailService } from '../email/email.service';
+import * as token from '@/utils/token.util';
 import { Token } from '@/utils/interfaces/token.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
-import cryptoHelper from '@/utils/crypto-helpers.util';
+import * as cryptoUtil from '@/utils/crypto.util';
 
 /**
  * Methods for user security and authentication processes.
@@ -37,6 +37,7 @@ class AuthService {
     }
     const accessToken = token.createToken({ id: user._id });
 
+    //? add user.otpVerified instead, or both?
     return {
       accessToken,
       userOtpEnabled: user.otpEnabled,
@@ -75,7 +76,7 @@ class AuthService {
       throw new HttpException(HttpStatus.UNAUTHORIZED, 'only verified users can enable OTP');
     }
 
-    const base32Secret = cryptoHelper.generateRandomBase32(24);
+    const base32Secret = cryptoUtil.generateRandomBase32(24);
 
     const totp = this.generateTOTP(base32Secret, user.email);
 
@@ -113,7 +114,7 @@ class AuthService {
     user.otpEnabled = true;
     user.otpVerified = true;
 
-    const recoveryCodes = cryptoHelper.randomStringArray(8, 10);
+    const recoveryCodes = cryptoUtil.randomStringArray(8, 10);
 
     const hashedRecoveryCodes = await this.hashRecoveryCodes(recoveryCodes);
 
@@ -342,7 +343,7 @@ class AuthService {
     }
 
     const lengthOfSecretToken = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secretToken = cryptoHelper.generateRandomString(lengthOfSecretToken);
+    const secretToken = cryptoUtil.generateRandomString(lengthOfSecretToken);
 
     user.secretToken = secretToken;
     const updatedUser = await user.save();
@@ -350,9 +351,9 @@ class AuthService {
     const tokenExpiry = 60 * 60; // an hour
     const emailJWT = token.createToken({ secret: secretToken }, tokenExpiry).token;
 
-    const emailToken = cryptoHelper.encryptData(emailJWT, 'utf-8', 'hex');
+    const emailToken = cryptoUtil.encryptData(emailJWT, 'utf-8', 'hex');
 
-    const encryptedUserEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
+    const encryptedUserEmail = cryptoUtil.encryptData(updatedUser.email, 'utf-8', 'hex');
 
     //! dynamically send frontend url with concatenated data rather than backend url
     const verificationURL = `${fullURL}/${encryptedUserEmail}/${emailToken}`;
@@ -379,7 +380,7 @@ class AuthService {
    * @throws HttpException (400) if payload secret does not match user's secret token.
    */
   public async validateEmail(encryptedEmail: string, emailToken: string) {
-    const emailJWT = cryptoHelper.decryptData(emailToken, 'hex', 'utf-8');
+    const emailJWT = cryptoUtil.decryptData(emailToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(emailJWT);
 
     const errorMessage = 'verification failed, possibly link is invalid or expired';
@@ -387,8 +388,8 @@ class AuthService {
     if (payload instanceof JsonWebTokenError) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
     }
-    // TODO prevent access for verified users
-    const unverifiedUserEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
+    // TODO deny access for verified users
+    const unverifiedUserEmail = cryptoUtil.decryptData(encryptedEmail, 'hex', 'utf-8');
 
     const existingUser = await this.UserService.getFullUserByEmail(unverifiedUserEmail);
 
@@ -424,17 +425,17 @@ class AuthService {
     }
 
     const secretTokenLength = Number(process.env.USER_SECRET_TOKEN_LENGTH);
-    const secretToken = cryptoHelper.generateRandomString(secretTokenLength);
+    const secretToken = cryptoUtil.generateRandomString(secretTokenLength);
 
     user.secretToken = secretToken;
     user.passwordResetRequest = true;
     const updatedUser = await user.save();
 
-    const encryptedEmail = cryptoHelper.encryptData(updatedUser.email, 'utf-8', 'hex');
+    const encryptedEmail = cryptoUtil.encryptData(updatedUser.email, 'utf-8', 'hex');
 
     const tokenExpiry = 60 * 60; // one hour
     const passwordJWT = token.createToken({ secret: secretToken }, tokenExpiry).token;
-    const passwordToken = cryptoHelper.encryptData(passwordJWT, 'utf-8', 'hex');
+    const passwordToken = cryptoUtil.encryptData(passwordJWT, 'utf-8', 'hex');
 
     const passwordResetURL = `${fullURL}/${encryptedEmail}/${passwordToken}`;
 
@@ -459,7 +460,7 @@ class AuthService {
    * @throws HttpException (400) if payload secret does not match user's secret token.
    */
   public async validatePasswordReset(encryptedEmail: string, passwordToken: string) {
-    const passwordJWT = cryptoHelper.decryptData(passwordToken, 'hex', 'utf-8');
+    const passwordJWT = cryptoUtil.decryptData(passwordToken, 'hex', 'utf-8');
     const payload: Token | JsonWebTokenError = await token.verifyToken(passwordJWT);
 
     const errorMessage =
@@ -468,7 +469,7 @@ class AuthService {
     if (payload instanceof JsonWebTokenError) {
       throw new HttpException(HttpStatus.BAD_REQUEST, errorMessage);
     }
-    const usersEmail = cryptoHelper.decryptData(encryptedEmail, 'hex', 'utf-8');
+    const usersEmail = cryptoUtil.decryptData(encryptedEmail, 'hex', 'utf-8');
 
     const user = await this.UserService.getFullUserByEmail(usersEmail);
 
@@ -485,7 +486,7 @@ class AuthService {
     user.grantPasswordReset = true;
     const updatedUser = await user.save();
 
-    const base64SecretToken = cryptoHelper.encryptData(receivedSecret, 'utf-8', 'base64');
+    const base64SecretToken = cryptoUtil.encryptData(receivedSecret, 'utf-8', 'base64');
 
     return {
       grantPasswordReset: updatedUser.grantPasswordReset,
@@ -562,4 +563,4 @@ class AuthService {
   }
 }
 
-export default AuthService;
+export { AuthService };

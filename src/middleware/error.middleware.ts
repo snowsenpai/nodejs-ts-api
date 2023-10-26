@@ -1,12 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import HttpException from '@/utils/exceptions/http.exception';
+import { HttpException } from '@/utils/exceptions/http.exception';
 import { HttpStatus } from '@/utils/exceptions/http-status.enum';
-import logger from '@/utils/logger.util';
+import { logger } from '@/utils/logger.util';
 
 /**
  * Error handling middleware.
  */
-function errorMiddleware(
+export function errorMiddleware(
   error: HttpException,
   req: Request,
   res: Response,
@@ -21,5 +21,3 @@ function errorMiddleware(
 
   res.status(status).send({ message });
 }
-
-export default errorMiddleware;
