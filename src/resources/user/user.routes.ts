@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { validation } from '@/middleware/validation.middleware';
+import { validation } from '@/middlewares/validation.middleware';
 import * as validate from '@/resources/user/user.validation';
-import { authenticated } from '@/middleware/authenticated.middleware';
+import { authenticated } from '@/middlewares/authenticated.middleware';
 import * as userController from './user.controller';
 
 export const userRouter = Router();

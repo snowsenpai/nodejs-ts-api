@@ -2,7 +2,7 @@ import { PostModel } from './post.model';
 import { TagService } from '../tag/tag.service';
 import { PublicResource } from '@/utils/interfaces/public-resource.interface';
 import { HttpException, HttpStatus } from '@/utils/exceptions/index';
-import { TPaginationDetails, TPaginationOptions } from '@/middleware/pagination.middleware';
+import { TPaginationDetails, TPaginationOptions } from '@/middlewares/pagination.middleware';
 
 /**
  * Encapsulates methods for interacting with the database to facilitate read, write,

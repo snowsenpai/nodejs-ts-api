@@ -1,8 +1,8 @@
 {
   "name": "nodejs-ts-api",
   "version": "1.0.0",
-  "description": "nodejs api using typescript",
-  "main": "index.js",
+  "description": "A restful node express api",
+  "main": "./src/index.ts",
   "scripts": {
     "build:clean": "rimraf ./dist/",
     "build:compile": "tsc",
@@ -25,7 +25,7 @@
       "eslint --fix"
     ]
   },
-  "author": "SnowSenpai",
+  "author": "Samuel Umoh",
   "license": "ISC",
   "devDependencies": {
     "@jest-mock/express": "^2.0.2",
@@ -86,6 +86,6 @@
   "_moduleAliases": {
     "@/resources": "dist/resources",
     "@/utils": "dist/utils",
-    "@/middleware": "dist/middleware"
+    "@/middlewares": "dist/middlewares"
   }
 }

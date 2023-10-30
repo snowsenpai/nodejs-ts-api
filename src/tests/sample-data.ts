@@ -1,4 +1,4 @@
-import { TSortBy } from '@/middleware/pagination.middleware';
+import { TSortBy } from '@/middlewares/pagination.middleware';
 import { Types } from 'mongoose';
 
 const objectId = new Types.ObjectId().toString();

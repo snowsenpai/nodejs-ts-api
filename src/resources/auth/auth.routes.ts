@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { validation } from '@/middleware/validation.middleware';
+import { validation } from '@/middlewares/validation.middleware';
 import * as validate from '@/resources/auth/auth.validation';
-import { authenticated } from '@/middleware/authenticated.middleware';
-import { passwordReset } from '@/middleware/password-reset.middleware';
-import { getFullUrl } from '@/middleware/full-url.middleware';
+import { authenticated } from '@/middlewares/authenticated.middleware';
+import { passwordReset } from '@/middlewares/password-reset.middleware';
+import { getFullUrl } from '@/middlewares/full-url.middleware';
 import * as authController from './auth.controller';
 
 export const authRouter = Router();

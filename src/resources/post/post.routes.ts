@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { validation } from '@/middleware/validation.middleware';
+import { validation } from '@/middlewares/validation.middleware';
 import * as validate from '@/resources/post/post.validation';
-import { authenticated } from '@/middleware/authenticated.middleware';
-import { pagination } from '@/middleware/pagination.middleware';
+import { authenticated } from '@/middlewares/authenticated.middleware';
+import { pagination } from '@/middlewares/pagination.middleware';
 import * as postController from './post.controller';
 
 export const postRouter = Router();

@@ -6,7 +6,7 @@
     "paths": {
       "@/resources/*" : ["resources/*"],
       "@/utils/*" : ["utils/*"],
-      "@/middleware/*" : ["middleware/*"]
+      "@/middlewares/*" : ["middlewares/*"]
     },
     "outDir": "dist",
     "esModuleInterop": true,

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validation } from '@/middleware/validation.middleware';
+import { validation } from '@/middlewares/validation.middleware';
 import * as validate from './tag.validation';
 import * as tagController from './tag.controller';
 
