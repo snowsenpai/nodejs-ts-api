@@ -8,7 +8,7 @@
   "theme": "hierarchy",
   "name": "Node TypeScript API",
   "includeVersion": true,
-  "readme": "./docs/index.md",
+  "readme": "./README.md",
   "exclude": [
     "./src/tests/*",
     "./src/middleware/*.*.spec.ts",
