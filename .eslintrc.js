@@ -8,7 +8,7 @@ module.exports = {
   ],
   parserOptions: {
     project: true,
-    tsconsifRootDir: __dirname,
+    tsconfigRootDir: __dirname,
     ecmaVersion: 2018,
     sourceType: 'module',
   },
