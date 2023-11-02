@@ -164,7 +164,7 @@ An access token can be generated for a registered user by making a request to `(
 
 ### Code Documentation
 
-Code documentation in generated using [TypeDoc](https://typedoc.org).
+Open [index.html](/docs//code//index.html) in your browser to view the generated code documentation.
 
 ### API Documentation
 
