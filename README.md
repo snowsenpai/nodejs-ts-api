@@ -12,7 +12,7 @@ To run the project you will need the following installed on your device:
 
 To send emails you'll need a verified [SendGrid](https://sendgrid.com) account, create a verified sender and a sendgrid API key. Currently there is no option to opt out of sending emails using sendgrid, if you wish to send emails you can try [nodemailer](https://www.npmjs.com/package/nodemailer), it will be added in the future (oh look a possible contribution :wink:).
 
-[//]: # (add contribution.md and link)
+<!-- add contribution.md and link -->
 
 ## Table of Contents
 
@@ -24,7 +24,6 @@ To send emails you'll need a verified [SendGrid](https://sendgrid.com) account, 
   - [Features](#features)
   - [Scripts](#scripts)
   - [Authentication](#scripts)
-  - [Validation](#validation)
   - [Documentation](#documentation)
     - [Code Documentation](#code-documentation)
     - [API Documentation](#api-documentation)
@@ -38,7 +37,6 @@ To send emails you'll need a verified [SendGrid](https://sendgrid.com) account, 
   - [Security](#security)
   - [Error Handling](#error-handling)
   - [Logging](#logging)
-  - [Linting](#linting-and-code-formatting)
   - [Inspirations](#inspirations)
 
 ## Running Locally
@@ -97,7 +95,7 @@ SECRET_IV=                  # secret iv for crypto apis
 USER_SECRET_TOKEN_LENGTH=   # length of secret for users
 ```
 
-Depending on the security settings of your mongodb connection just `MONGO_PATH` and `MONGO_DATABASE` are needed, if admin credentials are required you can modify the string used in the [mongoose](/src/utils/database/mongoose.ts) connection. 
+Depending on the security settings of your mongodb connection just `MONGO_PATH` and `MONGO_DATABASE` are needed, if admin credentials are required you can modify the string used in the [mongoose](/src/utils/database/mongoose.ts) connection.
 
 ## Project Structure
 
@@ -135,9 +133,26 @@ src/
 - **API documentation**: via [postman](https://learning.postman.com/docs/publishing-your-api/api-documentation-overview/)
 - **Dependency management**: using [npm](https://www.npmjs.com/)
 - **Environment variables**: via [dotenv](https://www.npmjs.com/package/dotenv)
-- **Cross-origin resource sharing**: enabled via [cors](https://www.npmjs.com/package/cors).
+- **Cross-origin resource sharing**: enabled via [cors](https://www.npmjs.com/package/cors)
+- **Linting**: using [ESlint](https://eslint.org) and [Prettier](https://prettier.io)
 
 ## Scripts
+
+| Name          | Description                                               |
+| ---           | ---                                                       |
+| start         | runs compiled JavaScript source from app's entry point    |
+| dev           | watches TypeScript files for changes then recompile       |
+| build:compile | compiles TypeScript files via options in tsconfig.json    |
+| build:clean   | deletes the compiled JavaScript output folder             |
+| build         | sequentially runs `build:clean` and `build:compile`       |
+| docs:compile  | generates code documentation using TypeDoc                |
+| docs:clean    | deletes the generated documentation folder                |
+| docs          | sequentially runs `docs:clean` and `docs:compile`         |
+| lint          | lints TypeScript files using eslint                       |
+| pretty        | formats code using prettier                               |
+| format        | sequentially runs `pretty` and `lint`                     |
+| prepare       | setup Git hooks when `npm install` command is run         |
+| test          | runs tests using jest                                  |
 
 ## Authentication
 
@@ -145,17 +160,19 @@ Certain routes require a valid JWT access token in the Authorization request hea
 
 An access token can be generated for a registered user by making a request to `(POST api/v1/auth/login)` endpoint.
 
-## Validation
-
 ## Documentation
 
 ### Code Documentation
 
+Code documentation in generated using [TypeDoc](https://typedoc.org).
+
 ### API Documentation
 
-Sample api [documentation](https://documenter.getpostman.com/view/20696731/2s9Y5ZuMEM), full api documentation will be available soon, please be patient :wink:
+Sample postman [documentation](https://documenter.getpostman.com/view/20696731/2s9Y5ZuMEM), full api documentation will be available soon, please be patient :wink:.
 
 ## Testing
+
+[Jest](https://jestjs.io/) in used for assertions and mocks while [supertest](https://www.npmjs.com/package/supertest) is used to test the server's endpoints and routes.
 
 ### Setup
 
@@ -163,8 +180,6 @@ Create a new .test.env file and copy the contents form .env but **use specific t
 Test files end with **.spec.ts** for unit tests and **.test.ts** for integration tests, see [project structure](#project-structure).
 
 ### Running tests
-
-[Jest](https://jestjs.io/) in used for assertions and mocks while [supertest](https://www.npmjs.com/package/supertest) is used to test the servers endpoints and routes.
 
 ##### Run a single test file
 
@@ -184,7 +199,7 @@ npm test
 
 The debugging environment is setup using [ts-node](https://www.npmjs.com/package/ts-node), [tsconfig-paths](https://www.npmjs.com/package/tsconfig-paths) and TypeScript [sourceMaps](https://www.typescriptlang.org/tsconfig#sourceMap), see [launch.json](/.vscode/launch.json).
 
-The debugger starts up the server which will listen to incoming HTTP requests and sends a response when the request is completed. Breakpoints can be set within modules and functions that handle specific requests.
+The debugger starts up the server, in development environment, which will listen to incoming HTTP requests and sends a response when the request is completed. Breakpoints can be set within modules and functions that handle or interacts with a specific request.
 
 #### Steps to debug
 
@@ -200,8 +215,25 @@ One reason i don't consider this project ready for production is mainly because 
 
 ## Error Handling
 
-## Logging
+All errors thrown are caught by an error handling middleware function by calling the express's next function, in a request handler, and passing the error as an argument `next(error)`. Errors from asynchronous operations are caught using `try catch` blocks.
 
-## Linting and Code Formatting
+## Logging
+All HTTP requests are logged to the console using [morgan](https://www.npmjs.com/package/morgan).
+
+A custom [logger](/src//utils//logger.util.ts) is available for logging messages to the console using [pino](https://www.npmjs.com/package/pino). 
+
+```ts
+import { logger } from '@utils/logger.util';
+
+logger.info('message');
+logger.warn('message');
+logger.error('message');
+logger.error(errorObject, 'message');
+```
+
+Currently all logs done using the logger, regardless of log levels, are stored in a **app.log** file within a **logs** folder. app.log is rotated every 7 days or if it's size reaches 300kb. In the future i'll try to save http logs from morgan and other log levels from the logger into separate log files.
 
 ## Inspirations
+- [JsonMerrett/nodejs-api-from-scratch](https://github.com/JsonMerrett/nodejs-api-from-scratch)
+- [mwanago/express-typescript](https://github.com/mwanago/express-typescript)
+- [sujeet-agrahari/node-express-modular-architecture](https://github.com/sujeet-agrahari/node-express-modular-architecture)
