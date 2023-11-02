@@ -6,12 +6,12 @@
   "out": "./docs/code",
   "plugin": ["typedoc-theme-hierarchy"],
   "theme": "hierarchy",
-  "name": "Node TypeScript API",
+  "name": "Node TypeScript Rest API",
   "includeVersion": true,
-  "readme": "./README.md",
+  "readme": "./docs/code.md",
   "exclude": [
     "./src/tests/*",
-    "./src/middleware/*.*.spec.ts",
+    "./src/middlewares/*.*.spec.ts",
     "./src/resources/**/*.*.spec.ts",
     "./src/resources/**/*.*.test.ts"
   ]
