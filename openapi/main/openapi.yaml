@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Node express api
+  description:
+    OpenApi specification for snowsenpai/node-ts-api
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api/v1
+    description: The local implementation
+tags:
+  - name: User
+  - name: Post
+  - name: Tag
+paths:
+  /user/register:
+    description: register a new user
+    #post
+  /user:
+    description: get, update or delete user data
+    # get patch delete
+  /user/{id}:
+    description: find a user
+    #get
+  /user/{id}/posts:
+    description: user's posts
+    #get
+components:
+  schemas:
+    Response:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+    ValidationErrors:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+          minItems: 1
+  responses:
+    Ok:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Response'
+    Created:
+      description: Resource Created
+      content:
+        application/json:
+          schema:
+            $ref: './responses/response.yaml'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: post not found
+    Unauthorized:
+      description: Unauthorized operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: You are not authorized
+    Unacceptable:
+      description: Unacceptable operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ValidationErrors:
+      description: Request validation error
+      content:
+        application/json:
+          schema:
+            $ref: './responses/validation-error.yaml' 
+    GeneralError:
+      description: General Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  -  bearerAuth: []

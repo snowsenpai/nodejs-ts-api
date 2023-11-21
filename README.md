@@ -1,10 +1,11 @@
 # Node Express TypeScript REST API
 
-This project started as a quest to learn how to use [TypeScript](https://www.typescriptlang.org/) to build a restful API using [Node.js](https://nodejs.org/en/docs) and the [Express](https://expressjs.com/en/starter/installing.html) Framework. While i am happy with the progress i've made, i do not think it is ready for a production environment but feel free to clone and modify it to your need.
+This project is a quest to learn how to use [TypeScript](https://www.typescriptlang.org/) to build a restful API using [Node.js](https://nodejs.org/en/docs), the [express](https://expressjs.com/en/starter/installing.html) framework. While i am happy with the progress i've made, i do not think it is ready for a production environment yet, (see [security](#security)), but feel free to clone and modify it to your need.
 
 ## Prerequisites
 
 To run the project you will need the following installed on your device:
+
 - [Git](https://git-scm.com/downloads)
 - [Node.js](https://nodejs.org/en)
 - [MongoDB](https://www.mongodb.com/try/download/community)
@@ -234,6 +235,6 @@ logger.error(errorObject, 'message');
 Currently all logs done using the logger, regardless of log levels, are stored in a **app.log** file within a **logs** folder. app.log is rotated every 7 days or if it's size reaches 300kb. In the future i'll try to save http logs from morgan and other log levels from the logger into separate log files.
 
 ## Inspirations
-- [JsonMerrett/nodejs-api-from-scratch](https://github.com/JsonMerrett/nodejs-api-from-scratch)
+- [JasonMerrett/nodejs-api-from-scratch](https://github.com/JasonMerrett/nodejs-api-from-scratch)
 - [mwanago/express-typescript](https://github.com/mwanago/express-typescript)
 - [sujeet-agrahari/node-express-modular-architecture](https://github.com/sujeet-agrahari/node-express-modular-architecture)
