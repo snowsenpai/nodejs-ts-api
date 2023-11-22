@@ -1,0 +1,21 @@
+allOf:
+  - type: object
+    properties:
+      _id:
+        $ref: '../id.yaml'
+      title:
+        description: Post's title
+        type: string
+      body:
+        description: Post's body
+        type: string
+      creator:
+        $ref: '../id.yaml'
+  - type: object
+    properties:
+      tags:
+        type: array
+        items:
+          $ref: '../tag/tag.yaml'
+        minItems: 1
+  - $ref: '../timestamp.yaml'

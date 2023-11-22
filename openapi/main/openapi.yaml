@@ -26,6 +26,14 @@ paths:
     #get
 components:
   schemas:
+    Id:
+      $ref: './schemas/id.yaml'
+    User:
+      $ref: './schemas/user/user.yaml'
+    Post:
+      $ref: './schemas/post/post.yaml'
+    Tag:
+      $ref: './schemas/tag/tag.yaml'
     Response:
       type: object
       properties:
@@ -82,7 +90,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     ValidationErrors:
-      description: Request validation error
+      description: Request validation errors
       content:
         application/json:
           schema:

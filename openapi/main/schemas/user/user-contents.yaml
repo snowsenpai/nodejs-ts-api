@@ -1,0 +1,6 @@
+type: object
+properties:
+  posts:
+    type: array
+    items:
+      $ref: '../post/post.yaml'

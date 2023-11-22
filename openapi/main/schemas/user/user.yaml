@@ -1,0 +1,10 @@
+allOf:
+  - type: object
+    properties:
+      _id:
+        $ref: '../id.yaml'
+  - $ref: './user-base.yaml'
+  - $ref: './user-required.yaml'
+  - $ref: './user-authentication.yaml'
+  - $ref: './user-contents.yaml'
+  - $ref: '../timestamp.yaml'

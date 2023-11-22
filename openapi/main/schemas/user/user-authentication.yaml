@@ -1,0 +1,43 @@
+type: object
+properties:
+  role:
+    description: User's role
+    type: string
+  verified:
+    description: Indicates if a user's email address is verified
+    type: boolean
+  secretToken:
+    description: Secret used for authentication processes
+    type: string
+  passwordResetRequest:
+    description: Indicates if a user made a request to reset their password
+    type: boolean
+  grantPasswordReset:
+    description: Indicates if a password reset permission is given
+    type: boolean
+  otpEnabled:
+    description: Indicates if a user has OTP generation enabled
+    type: boolean
+  otpVerified:
+    description: Indicates if a user's OTP generation method is verified
+    type: boolean
+  otpBase32:
+    description: Base32 secret for generating OTP
+    type: string
+  otpAuthUrl:
+    description: Google authenticator key URI
+    type: string
+  recoveryCodes:
+    description: Recovery code objects for a user with otp enabled
+    type: array
+    items:
+      type: object
+      properties:
+        hash:
+          description: Hashed recovery code, plain text codes will be sent to client if user's OTP generation method is verified
+          type: string
+        used:
+          description: Indicates if a recovery code has been used by user
+          type: boolean
+    minItems: 1
+    maxItems: 12

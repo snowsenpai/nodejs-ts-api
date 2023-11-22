@@ -1,0 +1,14 @@
+type: object
+properties:
+  firstName:
+    description: User's first name
+    type: string
+    example: John
+  lastName:
+    description: User's last name
+    type: string
+    example: Smith
+  fullName:
+    description: User's full name
+    type: string
+    example: John Smith

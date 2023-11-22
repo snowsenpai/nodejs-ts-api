@@ -1,0 +1,12 @@
+allOf:
+  - type: object
+    properties:
+      _id:
+        $ref: '../id.yaml'
+      name:
+        description: Tag's name
+        type: string
+      description:
+        description: Tag's description
+        type: string
+  - $ref: '../timestamp.yaml'  
