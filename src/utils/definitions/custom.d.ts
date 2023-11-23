@@ -1,5 +1,5 @@
 import User from '@/resources/user/user.interface';
-import { TPaginationDetails } from '@/middleware/pagination.middleware';
+import { TPaginationDetails } from '@/middlewares/pagination.middleware';
 
 declare global {
   namespace Express {
