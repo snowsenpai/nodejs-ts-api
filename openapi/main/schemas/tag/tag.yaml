@@ -9,4 +9,4 @@ allOf:
       description:
         description: Tag's description
         type: string
-  - $ref: '../timestamp.yaml'  
+  - $ref: '../timestamp.yaml'

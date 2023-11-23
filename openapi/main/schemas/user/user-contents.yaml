@@ -3,4 +3,6 @@ properties:
   posts:
     type: array
     items:
-      $ref: '../post/post.yaml'
+      anyOf: 
+        - $ref: '../id.yaml'
+        - $ref: '../post/post.yaml'
