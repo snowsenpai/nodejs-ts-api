@@ -1,7 +1,7 @@
-description: Retrieved user data
+description: User's posts
 content:
   application/json:
     schema:
       $ref: '../response.yaml'
     example:
-      $ref: '../../examples/user/fetch.yaml'
+      $ref: '../../examples/user/populated.yaml'

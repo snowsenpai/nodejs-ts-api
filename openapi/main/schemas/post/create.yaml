@@ -1,8 +1,4 @@
 type: object
-required:
-  - title
-  - body
-  - tags
 properties:
   title:
     description: Post's title

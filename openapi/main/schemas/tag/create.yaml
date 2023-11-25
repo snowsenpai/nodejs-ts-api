@@ -1,7 +1,4 @@
 type: object
-required:
-  - name
-  - description
 properties:
   name:
     description: Tag's name

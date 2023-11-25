@@ -1,0 +1,7 @@
+description: Posts retrieved
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/post/pagination.yaml'

@@ -1,5 +1,5 @@
 value:
-  message: Post retrieved
+  message: Posts retrieved
   data:
     totalPostsFound: 1
     currentPage: 1

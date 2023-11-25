@@ -1,0 +1,7 @@
+description: Tag created
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/tag/create.yaml'
