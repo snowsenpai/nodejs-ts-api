@@ -1,4 +1,6 @@
 get:
+  tags: 
+    - Users
   summary: Get user information
   operationId: getUser
   responses:
@@ -11,6 +13,8 @@ get:
     default:
       $ref: '../../responses/error-response.yaml'
 patch:
+  tags: 
+    - Users
   summary: Update base user data
   operationId: updateUser
   requestBody:
@@ -34,6 +38,8 @@ patch:
     default:
       $ref: '../../responses/error-response.yaml'
 delete:
+  tags: 
+    - Users
   summary: Delete user data
   operationId: deleteUser
   responses:

@@ -1,4 +1,6 @@
 post:
+  tags: 
+    - Users
   summary: Register a new user
   security: []
   operationId: registerUser

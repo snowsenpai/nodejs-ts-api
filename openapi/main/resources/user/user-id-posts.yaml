@@ -1,4 +1,6 @@
 get:
+  tags: 
+    - Users
   summary: Get a single user and posts
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'

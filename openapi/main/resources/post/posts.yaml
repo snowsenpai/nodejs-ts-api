@@ -1,4 +1,6 @@
 get:
+  tags: 
+    - Posts
   summary: Get paginated list of available posts
   security: []
   operationId: getAllPosts
@@ -12,6 +14,8 @@ get:
     default:
       $ref: '../../responses/error-response.yaml'
 post:
+  tags: 
+    - Posts
   summary: Create a new post
   operationId: createPost
   requestBody:

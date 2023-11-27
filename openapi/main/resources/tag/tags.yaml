@@ -1,4 +1,6 @@
 get:
+  tags: 
+    - Tags
   summary: Get all available tags
   security: []
   operationId: getAllTags
@@ -10,6 +12,8 @@ get:
     default:
       $ref: '../../responses/error-response.yaml'
 post:
+  tags: 
+    - Tags
   summary: Create a new tag
   security: []
   operationId: createTag

@@ -1,4 +1,6 @@
 get:
+  tags: 
+    - Posts
   summary: Get a single post
   parameters:
     - name: creator
@@ -20,6 +22,8 @@ get:
     default:
       $ref: '../../responses/error-response.yaml'
 patch:
+  tags: 
+    - Posts
   summary: Update a single post
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'
@@ -45,6 +49,8 @@ patch:
     default:
       $ref: '../../responses/error-response.yaml'
 delete:
+  tags: 
+    - Posts
   summary: Delete a single post
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'
