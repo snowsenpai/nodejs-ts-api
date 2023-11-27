@@ -1,1 +1,15 @@
 get:
+  summary: Get a single user and posts
+  parameters:
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  security: []
+  operationId: getUserPosts
+  responses:
+    '200':
+      $ref: '../../responses/user/populated.yaml'
+    '400':
+      $ref: '../../responses/validation-error.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

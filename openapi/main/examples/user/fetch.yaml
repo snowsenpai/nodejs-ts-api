@@ -1,16 +1,15 @@
-value:
-  message: User data
-  data:
-    _id: 55fbsre671
-    email: smithjohn@exapmle.com
-    fullName: John Smith
-    firstName: John
-    lastName: Smith
-    role: user
-    verified: false
-    passwordResetRequest: false
-    grantPasswordReset: false
-    otpEnabled: false
-    otpVerified: false
-    createdAt: '2023-11-23T08:36:45.838Z'
-    updatedAt: '2023-11-23T08:36:45.838Z'
+message: User data
+data:
+  _id: 55fbsre671
+  email: smithjohn@exapmle.com
+  fullName: John Smith
+  firstName: John
+  lastName: Smith
+  role: user
+  verified: false
+  passwordResetRequest: false
+  grantPasswordReset: false
+  otpEnabled: false
+  otpVerified: false
+  createdAt: '2023-11-23T08:36:45.838Z'
+  updatedAt: '2023-11-23T08:36:45.838Z'

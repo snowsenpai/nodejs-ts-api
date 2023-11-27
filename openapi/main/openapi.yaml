@@ -8,22 +8,24 @@ servers:
   - url: http://localhost:3000/api/v1
     description: The local implementation
 tags:
-  - name: User
-  - name: Post
-  - name: Tag
+  - name: Users
+  - name: Posts
+  - name: Tags
 paths:
   /user/register:
-    description: register a new user
-    #post
+    $ref: './resources/user/register.yaml'
   /user:
-    description: get, update or delete user data
-    # get patch delete
+    $ref: './resources/user/user.yaml'
   /user/{id}:
-    description: find a user
-    #get
+    $ref: './resources/user/user-id.yaml'
   /user/{id}/posts:
-    description: user's posts
-    #get
+    $ref: './resources/user/user-id-posts.yaml'
+  /posts:
+    $ref: './resources/post/posts.yaml'
+  /posts/{id}:
+    $ref: './resources/post/posts-id.yaml'
+  /tags:
+    $ref: './resources/tag/tags.yaml'
 components:
   schemas:
     Id:
@@ -101,6 +103,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    CombinedErrorResponse:
+      description: Bad request 400 resulting from request validation errors or thrown by the server
+      content:
+        application/json:
+          schema: 
+            oneOf: 
+              - $ref: "#/components/schemas/ValidationErrors"
+              - $ref: "#/components/schemas/Error"
+  parameters:
+    ResourceIdPathParameter:
+      $ref: './schemas/parameters/resource-id.yaml'
   securitySchemes:
     bearerAuth:
       type: http

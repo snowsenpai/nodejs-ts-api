@@ -1,1 +1,20 @@
 post:
+  summary: Register a new user
+  security: []
+  operationId: registerUser
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: '../../schemas/user/create.yaml'
+      application/json:
+        schema:
+          $ref: '../../schemas/user/create.yaml'
+  responses:
+    '201':
+      $ref: '../../responses/ok.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
