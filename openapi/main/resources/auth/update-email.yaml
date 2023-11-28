@@ -1,4 +1,4 @@
-post:
+patch:
   tags: 
     - Auth
   summary: Update user's email address
@@ -16,7 +16,7 @@ post:
     '200':
       $ref: '../../responses/auth/update-email.yaml'
     '400':
-        $ref: '../../responses/combined-error.yaml'
+      $ref: '../../responses/combined-error.yaml'
     '401':
       $ref: '../../responses/unauthorized.yaml'
     '404':

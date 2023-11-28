@@ -16,7 +16,7 @@ post:
     '200':
       $ref: '../../responses/auth/login.yaml'
     '400':
-        $ref: '../../responses/combined-error.yaml'
+      $ref: '../../responses/combined-error.yaml'
     '401':
       $ref: '../../responses/unauthorized.yaml'
     '404':

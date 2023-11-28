@@ -30,7 +30,7 @@ patch:
     '200':
       $ref: '../../responses/ok.yaml'
     '400':
-        $ref: '../../responses/combined-error.yaml'
+      $ref: '../../responses/combined-error.yaml'
     '401':
       $ref: '../../responses/unauthorized.yaml'
     '404':
