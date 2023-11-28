@@ -1,0 +1,4 @@
+value:
+  message: a verification link has been sent to johndoe@example.com
+  data:
+    sendVerifyEmail: true

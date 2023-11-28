@@ -1,0 +1,14 @@
+get:
+  tags: 
+    - Auth
+  summary: Generate otp credentials
+  operationId: generateOtp
+  responses:
+    '200':
+      $ref: '../../responses/auth/generate-otp.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

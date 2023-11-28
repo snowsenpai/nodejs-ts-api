@@ -1,0 +1,27 @@
+post:
+  tags: 
+    - Auth
+  summary: Verify recovery code
+  operationId: verifyRecoveryCode
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: '../../schemas/auth/recovery-code.yaml'
+      application/json:
+        schema:
+          $ref: '../../schemas/auth/recovery-code.yaml'
+  responses:
+    '200':
+      $ref: '../../responses/auth/validate-recovery-code.yaml'
+    '400':
+        $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '403':
+      $ref: '../../responses/error-response.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

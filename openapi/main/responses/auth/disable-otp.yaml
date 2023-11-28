@@ -1,0 +1,7 @@
+description: Disable otp
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/auth/disable-otp.yaml'

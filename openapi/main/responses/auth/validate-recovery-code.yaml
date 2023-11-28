@@ -1,0 +1,7 @@
+description: Verify recovery code
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/auth/validate-recovery-code.yaml'

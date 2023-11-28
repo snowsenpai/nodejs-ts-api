@@ -1,0 +1,4 @@
+message: recovery code is valid and cannot be used again
+data:
+  validCode: true
+  recoveryCode: bjahvdkj

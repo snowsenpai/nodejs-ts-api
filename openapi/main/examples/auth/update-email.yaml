@@ -1,0 +1,6 @@
+value:
+  message: your email has been updated
+  data:
+    emailUpdated: true
+    newEmail: johndoe@example.com
+    verifiedEmail: false

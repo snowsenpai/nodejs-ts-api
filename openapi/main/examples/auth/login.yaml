@@ -1,0 +1,6 @@
+message: Login successful
+data:
+  accessToken:
+    expiresIn: 86787
+    token: xxxxxxxxxToken
+  userOtpEnabled: false

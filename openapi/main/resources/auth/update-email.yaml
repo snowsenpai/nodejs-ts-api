@@ -1,0 +1,25 @@
+post:
+  tags: 
+    - Auth
+  summary: Update user's email address
+  operationId: updateEmail
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: '../../schemas/user/user-email.yaml'
+      application/json:
+        schema:
+          $ref: '../../schemas/user/user-email.yaml'
+  responses:
+    '200':
+      $ref: '../../responses/auth/update-email.yaml'
+    '400':
+        $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

@@ -1,0 +1,8 @@
+message: otp and two factor authentication disabled successfully
+data:
+  otpDisabled: true
+  user:
+    id: 55fbsre671
+    firstName: John
+    email: smithjohn@exapmle.com
+    otpEnabled: false

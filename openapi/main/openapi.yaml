@@ -11,6 +11,7 @@ tags:
   - name: Users
   - name: Posts
   - name: Tags
+  - name: Auth
 paths:
   /user/register:
     $ref: './resources/user/register.yaml'
@@ -26,6 +27,32 @@ paths:
     $ref: './resources/post/posts-id.yaml'
   /tags:
     $ref: './resources/tag/tags.yaml'
+  /auth/login:
+    $ref: './resources/auth/login.yaml'
+  /auth/otp/generate:
+    $ref: './resources/auth/otp-generate.yaml'
+  /auth/verify/otp:
+    $ref: './resources/auth/verify-otp.yaml'
+  /auth/validate/otp:
+    $ref: './resources/auth/validate-otp.yaml'
+  /auth/disable/otp:
+    $ref: './resources/auth/disable-otp.yaml'
+  /auth/verify/recovery-code:
+    $ref: './resources/auth/verify-recovery-code.yaml'
+  /auth/verify/email:
+    $ref: './resources/auth/verify-email.yaml'
+  /auth/verify/email/{encryptedEmail}/{emailToken}:
+    $ref: './resources/auth/verify-email-token.yaml'
+  /auth/email:
+    $ref: './resources/auth/update-email.yaml'
+  /auth/password-reset:
+    $ref: './resources/auth/password-reset.yaml'
+  /auth/password-reset/{encryptedEmail}/{passwordToken}:
+    $ref: './resources/auth/password-reset-token.yaml'
+  /auth/reset-password:
+    $ref: './resources/auth/reset-password.yaml'
+  /auth/cancel-password-reset:
+    $ref: './resources/auth/cancel-password-reset.yaml'
 components:
   schemas:
     Id:
@@ -114,6 +141,12 @@ components:
   parameters:
     ResourceIdPathParameter:
       $ref: './schemas/parameters/resource-id.yaml'
+    EncryptedEmail:
+      $ref: './schemas/parameters/encrypted-email.yaml'
+    EmailToken:
+      $ref: './schemas/parameters/email-token.yaml'
+    PasswordToken:
+      $ref: './schemas/parameters/password-token.yaml'
   securitySchemes:
     bearerAuth:
       type: http

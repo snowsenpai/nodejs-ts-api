@@ -1,0 +1,7 @@
+description: Verify otp generation method
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/auth/verify-otp.yaml'

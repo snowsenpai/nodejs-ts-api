@@ -22,10 +22,10 @@ patch:
     content:
       application/x-www-form-urlencoded:
         schema:
-          $ref: '../../schemas/user/create.yaml'
+          $ref: '../../schemas/user/user-base.yaml'
       application/json:
         schema:
-          $ref: '../../schemas/user/create.yaml'
+          $ref: '../../schemas/user/user-base.yaml'
   responses:
     '200':
       $ref: '../../responses/ok.yaml'

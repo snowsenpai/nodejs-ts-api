@@ -1,0 +1,25 @@
+post:
+  tags: 
+    - Auth
+  summary: Verify user's otp generation method
+  operationId: verifyOtp
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: '../../schemas/auth/otp-token.yaml'
+      application/json:
+        schema:
+          $ref: '../../schemas/auth/otp-token.yaml'
+  responses:
+    '200':
+      $ref: '../../responses/auth/verify-otp.yaml'
+    '400':
+        $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

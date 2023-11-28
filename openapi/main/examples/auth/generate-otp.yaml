@@ -1,0 +1,4 @@
+message: generated otp credentials successfully
+data:
+  otpUrl: 'otpauth://totp/SnowSenpai:smithjohn@exapmle.com?issuer=SnowSenpai&secret=xxxxxxxxxSecret&algorithm=SHA1&digits=6&period=30'
+  base32Secret: xxxxxxxxxSecret

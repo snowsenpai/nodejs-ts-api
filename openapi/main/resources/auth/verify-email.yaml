@@ -1,0 +1,14 @@
+get:
+  tags: 
+    - Auth
+  summary: Verify a user's email address
+  operationId: verifyEmail
+  responses:
+    '200':
+      $ref: '../../responses/auth/verify-email.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

@@ -1,12 +1,3 @@
-type: object
-required:
-  - email
-  - password
-properties:
-  email:
-    description: User's email address
-    type: string
-  password:
-    description: User's password
-    type: string
-    format: password
+allOf: 
+  - $ref: './user-email.yaml'
+  - $ref: './user-password.yaml'

@@ -28,7 +28,7 @@ post:
           $ref: '../../schemas/tag/create.yaml'
   responses:
     '201':
-      $ref: '../../responses/post/create.yaml'
+      $ref: '../../responses/tag/create.yaml'
     '400':
       $ref: '../../responses/error-response.yaml'
     default:
