@@ -10,7 +10,7 @@ get:
     '200':
       $ref: '../../responses/user/populated.yaml'
     '400':
-      $ref: '../../responses/validation-error.yaml'
+      $ref: '../../responses/combined-error.yaml'
     '404':
       $ref: '../../responses/error-response.yaml'
     default:
