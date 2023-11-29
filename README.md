@@ -1,6 +1,6 @@
 # Node Express TypeScript REST API
 
-This project is a quest to learn how to use [TypeScript](https://www.typescriptlang.org/) to build a restful API using [Node.js](https://nodejs.org/en/docs), the [express](https://expressjs.com/en/starter/installing.html) framework. While i am happy with the progress i've made, i do not think it is ready for a production environment yet, (see [security](#security)), but feel free to clone and modify it to your need.
+This project is a quest to learn how to use [TypeScript](https://www.typescriptlang.org/) to build a restful API using [node.js](https://nodejs.org/en/docs) and [express](https://expressjs.com/en/starter/installing.html) framework. While i am happy with the progress i've made, i do not think it is ready for a production environment yet, (see [security](#security)), but feel free to clone and modify it to your need.
 
 ## Prerequisites
 
@@ -146,11 +146,12 @@ src/
 | build:compile | compiles TypeScript files via options in tsconfig.json    |
 | build:clean   | deletes the compiled JavaScript output folder             |
 | build         | sequentially runs `build:clean` and `build:compile`       |
+| build:openapi | use bundle openapi files                                  |
 | docs:compile  | generates code documentation using TypeDoc                |
 | docs:clean    | deletes the generated documentation folder                |
 | docs          | sequentially runs `docs:clean` and `docs:compile`         |
 | lint          | lints TypeScript files using eslint                       |
-| pretty        | formats code using prettier                               |
+| pretty        | formats TypeScript files using prettier rules                         |
 | format        | sequentially runs `pretty` and `lint`                     |
 | prepare       | setup Git hooks when `npm install` command is run         |
 | test          | runs tests using jest                                  |
@@ -238,3 +239,4 @@ Currently all logs done using the logger, regardless of log levels, are stored i
 - [JasonMerrett/nodejs-api-from-scratch](https://github.com/JasonMerrett/nodejs-api-from-scratch)
 - [mwanago/express-typescript](https://github.com/mwanago/express-typescript)
 - [sujeet-agrahari/node-express-modular-architecture](https://github.com/sujeet-agrahari/node-express-modular-architecture)
+- [PaystackOSS/openapi](https://github.com/PaystackOSS/openapi)
