@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: Node express api
   description:
-    OpenApi specification for (https://github.com/snowsenpai/node-ts-api/tree/main)[snowsenpai/node-ts-api]
+    OpenApi specification for [snowsenpai/node-ts-api](https://github.com/snowsenpai/node-ts-api/tree/main)
   version: 1.0.0
 servers:
   - url: http://localhost:3000/api/v1
