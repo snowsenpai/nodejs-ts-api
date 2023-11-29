@@ -1,6 +1,7 @@
 post:
   tags: 
     - Auth
+  description: Verify recovery code
   summary: Verify recovery code
   operationId: verifyRecoveryCode
   requestBody:

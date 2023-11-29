@@ -1,7 +1,8 @@
 post:
   tags: 
     - Auth
-  summary: Disable otp verification
+  description: Disable otp verification
+  summary: Disable otp
   operationId: disableOtp
   requestBody:
     required: true

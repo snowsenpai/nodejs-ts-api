@@ -1,6 +1,7 @@
 post:
   tags: 
     - Auth
+  description: Validate otp token
   summary: Validate otp token
   operationId: validateOtp
   requestBody:

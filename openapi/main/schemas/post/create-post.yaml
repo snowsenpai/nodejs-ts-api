@@ -9,4 +9,4 @@ properties:
   tags:
     type: array
     items:
-      - $ref: '../id.yaml'
+      $ref: '../id.yaml'

@@ -1,6 +1,7 @@
 get:
   tags: 
     - Auth
+  description: Verify a user's email address
   summary: Verify a user's email address
   operationId: verifyEmail
   responses:

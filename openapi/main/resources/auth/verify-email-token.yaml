@@ -1,6 +1,7 @@
 get:
   tags: 
     - Auth
+  description: Validate email verification link
   summary: Validate email verification link
   parameters:
     - $ref: '../../schemas/parameters/encrypted-email.yaml'

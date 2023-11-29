@@ -1,6 +1,7 @@
 get:
   tags: 
     - Posts
+  description: Get a single post
   summary: Get a single post
   parameters:
     - name: creator
@@ -12,7 +13,7 @@ get:
   operationId: getPost
   responses:
     '200':
-      $ref: '../../responses/post/populated.yaml'
+      $ref: '../../responses/post/populated-post.yaml'
     '400':
       $ref: '../../responses/combined-error.yaml'
     '401':
@@ -24,6 +25,7 @@ get:
 patch:
   tags: 
     - Posts
+  description: Update a single post
   summary: Update a single post
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'
@@ -33,13 +35,13 @@ patch:
     content:
       application/x-www-form-urlencoded:
         schema: 
-          $ref: '../../schemas/post/create.yaml'
+          $ref: '../../schemas/post/create-post.yaml'
       application/json:
         schema: 
-          $ref: '../../schemas/post/create.yaml'
+          $ref: '../../schemas/post/create-post.yaml'
   responses:
     '200':
-      $ref: '../../responses/post/create.yaml'
+      $ref: '../../responses/post/create-post.yaml'
     '400':
       $ref: '../../responses/combined-error.yaml'
     '401':
@@ -51,6 +53,7 @@ patch:
 delete:
   tags: 
     - Posts
+  description: Delete a single post
   summary: Delete a single post
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'

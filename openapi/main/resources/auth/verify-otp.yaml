@@ -1,6 +1,7 @@
 post:
   tags: 
     - Auth
+  description: Verify user's otp generation method
   summary: Verify user's otp generation method
   operationId: verifyOtp
   requestBody:

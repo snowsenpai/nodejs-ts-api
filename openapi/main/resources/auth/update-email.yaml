@@ -1,6 +1,7 @@
 patch:
   tags: 
     - Auth
+  description: Update user's email address
   summary: Update user's email address
   operationId: updateEmail
   requestBody:

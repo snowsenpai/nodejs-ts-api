@@ -1,7 +1,7 @@
-description: Post created
+description: User's posts
 content:
   application/json:
     schema:
       $ref: '../response.yaml'
     example:
-      $ref: '../../examples/post/create.yaml'
+      $ref: '../../examples/user/populated-user.yaml'

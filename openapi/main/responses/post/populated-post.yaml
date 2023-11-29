@@ -4,4 +4,4 @@ content:
     schema:
       $ref: '../response.yaml'
     example:
-      $ref: '../../examples/post/populated.yaml'
+      $ref: '../../examples/post/populated-post.yaml'

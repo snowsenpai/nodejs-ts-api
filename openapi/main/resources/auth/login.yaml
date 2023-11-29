@@ -1,7 +1,8 @@
 post:
   tags: 
     - Auth
-  summary: Login to receive access token
+  description: Login to receive access token
+  summary: Login
   operationId: login
   requestBody:
     required: true

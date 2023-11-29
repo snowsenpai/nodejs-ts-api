@@ -1,6 +1,7 @@
 get:
   tags: 
     - Auth
+  description: Generate otp credentials
   summary: Generate otp credentials
   operationId: generateOtp
   responses:

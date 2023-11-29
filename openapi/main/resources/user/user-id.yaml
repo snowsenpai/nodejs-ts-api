@@ -1,6 +1,7 @@
 get:
   tags: 
     - Users
+  description: Find a single user
   summary: Find a single user
   parameters:
     - $ref: '../../schemas/parameters/resource-id.yaml'

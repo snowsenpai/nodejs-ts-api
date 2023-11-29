@@ -1,7 +1,7 @@
-description: Tag created
+description: Posts retrieved
 content:
   application/json:
     schema:
       $ref: '../response.yaml'
     example:
-      $ref: '../../examples/tag/create.yaml'
+      $ref: '../../examples/post/post-pagination.yaml'

@@ -1,6 +1,7 @@
 get:
   tags: 
     - Users
+  description: Get user information
   summary: Get user information
   operationId: getUser
   responses:
@@ -15,7 +16,8 @@ get:
 patch:
   tags: 
     - Users
-  summary: Update base user data
+  description: Update base user data
+  summary: Update user
   operationId: updateUser
   requestBody:
     required: true
@@ -40,7 +42,8 @@ patch:
 delete:
   tags: 
     - Users
-  summary: Delete user data
+  description: Delete user data
+  summary: Delete user
   operationId: deleteUser
   responses:
     '200':

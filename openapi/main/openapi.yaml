@@ -2,16 +2,20 @@ openapi: 3.0.3
 info:
   title: Node express api
   description:
-    OpenApi specification for snowsenpai/node-ts-api
+    OpenApi specification for (https://github.com/snowsenpai/node-ts-api/tree/main)[snowsenpai/node-ts-api]
   version: 1.0.0
 servers:
   - url: http://localhost:3000/api/v1
     description: The local implementation
 tags:
   - name: Users
+    description: Operations for users
   - name: Posts
+    description: Operations for posts
   - name: Tags
+    description: Operations for tags
   - name: Auth
+    description: Authentication operations
 paths:
   /user/register:
     $ref: './resources/user/register.yaml'
@@ -63,81 +67,6 @@ components:
       $ref: './schemas/post/post.yaml'
     Tag:
       $ref: './schemas/tag/tag.yaml'
-    Response:
-      type: object
-      properties:
-        message:
-          type: string
-        data:
-          type: object
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-    ValidationErrors:
-      type: object
-      properties:
-        errors:
-          type: array
-          items:
-            type: string
-          minItems: 1
-  responses:
-    Ok:
-      description: Successful operation
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Response'
-    Created:
-      description: Resource Created
-      content:
-        application/json:
-          schema:
-            $ref: './responses/response.yaml'
-    NotFound:
-      description: Resource not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: post not found
-    Unauthorized:
-      description: Unauthorized operation
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            message: You are not authorized
-    Unacceptable:
-      description: Unacceptable operation
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    ValidationErrors:
-      description: Request validation errors
-      content:
-        application/json:
-          schema:
-            $ref: './responses/validation-error.yaml' 
-    GeneralError:
-      description: General Error
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    CombinedErrorResponse:
-      description: Bad request 400 resulting from request validation errors or thrown by the server
-      content:
-        application/json:
-          schema: 
-            oneOf: 
-              - $ref: "#/components/schemas/ValidationErrors"
-              - $ref: "#/components/schemas/Error"
   parameters:
     ResourceIdPathParameter:
       $ref: './schemas/parameters/resource-id.yaml'
