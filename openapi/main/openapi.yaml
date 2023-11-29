@@ -4,6 +4,9 @@ info:
   description:
     OpenApi specification for [snowsenpai/node-ts-api](https://github.com/snowsenpai/node-ts-api/tree/main)
   version: 1.0.0
+  license: 
+    name: MIT
+    url: https://opensource.org/license/mit/
 servers:
   - url: http://localhost:3000/api/v1
     description: The local implementation
