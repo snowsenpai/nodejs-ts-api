@@ -1,0 +1,5 @@
+description: Successful operation
+content:
+  application/json:
+    schema:
+      $ref: './response.yaml'

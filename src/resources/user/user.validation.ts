@@ -1,23 +1,23 @@
-import Joi from "joi";
+import Joi from 'joi';
 
 const register = Joi.object({
-  name: Joi.string().max(20).required(),
+  firstName: Joi.string().max(20).required(),
+
+  lastName: Joi.string().max(20).required(),
 
   email: Joi.string().email().required(),
 
   password: Joi.string().min(6).required(),
 });
 
-const login = Joi.object({
-  email: Joi.string().required(),
-
-  password: Joi.string().required(),
-});
-
 const updateUser = Joi.object({
-  name: Joi.string().max(20),
+  firstName: Joi.string().max(20),
 
-  email: Joi.string().email(),
+  lastName: Joi.string().max(20),
 });
 
-export default { register, login, updateUser };
+const findOneUser = Joi.object({
+  id: Joi.string().hex().length(24),
+});
+
+export { findOneUser, register, updateUser };

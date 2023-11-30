@@ -1,0 +1,71 @@
+get:
+  tags: 
+    - Posts
+  description: Get a single post
+  summary: Get a single post
+  parameters:
+    - name: creator
+      in: query
+      schema:
+        type: string
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  security: []
+  operationId: getPost
+  responses:
+    '200':
+      $ref: '../../responses/post/populated-post.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+patch:
+  tags: 
+    - Posts
+  description: Update a single post
+  summary: Update a single post
+  parameters:
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  operationId: updatePost
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema: 
+          $ref: '../../schemas/post/create-post.yaml'
+      application/json:
+        schema: 
+          $ref: '../../schemas/post/create-post.yaml'
+  responses:
+    '200':
+      $ref: '../../responses/post/create-post.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+delete:
+  tags: 
+    - Posts
+  description: Delete a single post
+  summary: Delete a single post
+  parameters:
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  operationId: deletePost
+  responses:
+    '200':
+      $ref: '../../responses/ok.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

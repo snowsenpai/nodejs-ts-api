@@ -1,0 +1,42 @@
+get:
+  tags: 
+    - Posts
+  description: Get paginated list of available posts
+  summary: Get paginated list of available posts
+  security: []
+  operationId: getAllPosts
+  responses:
+    '200':
+      $ref: '../../responses/post/post-pagination.yaml'
+    '400':
+      $ref: '../../responses/error-response.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+post:
+  tags: 
+    - Posts
+  description: Create a new post
+  summary: Create a new post
+  operationId: createPost
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema: 
+          $ref: '../../schemas/post/create-post.yaml'
+      application/json:
+        schema: 
+          $ref: '../../schemas/post/create-post.yaml'
+  responses:
+    '201':
+      $ref: '../../responses/post/create-post.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '400':
+      $ref: '../../responses/error-response.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

@@ -1,0 +1,6 @@
+type: object
+properties:
+  otpToken:
+    description: One time password token
+    type: string
+    minLength: 6

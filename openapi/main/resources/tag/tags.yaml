@@ -1,0 +1,37 @@
+get:
+  tags: 
+    - Tags
+  description: Get all available tags
+  summary: Get all available tags
+  security: []
+  operationId: getAllTags
+  responses:
+    '200':
+      $ref: '../../responses/tag/create-tag.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+post:
+  tags: 
+    - Tags
+  description: Create a new tag
+  summary: Create a new tag
+  security: []
+  operationId: createTag
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema: 
+          $ref: '../../schemas/tag/create-tag.yaml'
+      application/json:
+        schema: 
+          $ref: '../../schemas/tag/create-tag.yaml'
+  responses:
+    '201':
+      $ref: '../../responses/tag/create-tag.yaml'
+    '400':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

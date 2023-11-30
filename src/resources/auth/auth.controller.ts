@@ -1,160 +1,285 @@
-import { Router, Response, Request, NextFunction } from 'express';
-import Controller from '@/utils/interfaces/controller.interface';
-import validationMiddleware from '@/middleware/validation.middleware';
-import validate from '@/resources/auth/auth.validation';
-import AuthService from './auth.service';
-import authenticated from '@/middleware/authenticated.middleware';
+import { Response, Request, NextFunction } from 'express';
+import { AuthService } from './auth.service';
+import { HttpStatus } from '@/utils/exceptions/http-status.enum';
 
-class AuthController implements Controller{
-  public path = '/auth';
-  public router = Router();
-  private AuthService = new AuthService();
+const authService = new AuthService();
 
-  constructor() {
-    this.initialiseRoutes();
-  }
+async function login(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+  try {
+    const { email, password } = req.body;
 
-  private initialiseRoutes(): void {
-    this.router.get(
-      `${this.path}/otp/auth-qrcode`,
-      authenticated,
-      this.otpQRCode.bind(this)
-    );
+    const data = await authService.login(email, password);
 
-    this.router.post(
-      `${this.path}/otp/generate`,
-      authenticated,
-      this.generateOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/verify`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.verifyOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/validate`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.validateOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/otp/disable`,
-      authenticated,
-      validationMiddleware(validate.otpToken),
-      this.disableOTP.bind(this)
-    );
-
-    this.router.post(
-      `${this.path}/verify/recovery-code`,
-      authenticated,
-      validationMiddleware(validate.recoveryCode),
-      this.validateRecoveryCode.bind(this)
-    )
-  }
-
-  private async generateOTP(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id;
-
-      const data = await this.AuthService.generateOTP(userId);
-
-      res.status(201).json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async verifyOTP(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id
-      const { token } = req.body;
-
-      const result = await this.AuthService.verifyOTP(userId, token);
-
-      res.status(201).json({ result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async validateOTP(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id;
-      const { token } = req.body;
-
-      const result = await this.AuthService.validateOTP(userId, token);
-
-      res.status(200).json({ result });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async disableOTP(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id;
-      const { token } = req.body;
-
-      const result = await this.AuthService.disabelOTP(userId, token);
-
-      res.status(201).json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async otpQRCode(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id;
-
-      const { otp_auth_url } = await this.AuthService.otpData(userId);
-
-      this.AuthService.responseWithQRCode(otp_auth_url, res);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  private async validateRecoveryCode(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> {
-    try {
-      const userId = req.user._id;
-      const { code } = req.body;
-  
-      const result = await this.AuthService.validCode(userId, code);
-
-      res.status(201).json(result)
-    } catch (error) {
-      next(error);
-    }
+    res.status(HttpStatus.OK).json({
+      message: 'login successful, use your access token to send request to protected resources',
+      data,
+    });
+  } catch (error) {
+    next(error);
   }
 }
 
-export default AuthController;
+async function generateOTP(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+
+    const data = await authService.generateOTP(userId);
+
+    res.status(HttpStatus.OK).json({
+      message: 'generated otp credentials successfully',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function verifyOTP(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const { token } = req.body;
+
+    const data = await authService.verifyOTP(userId, token);
+
+    res.status(HttpStatus.OK).json({
+      message: 'otp verified, two factor authentication is enabled',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function validateOTP(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const { token } = req.body;
+
+    const data = await authService.validateOTP(userId, token);
+
+    res.status(HttpStatus.OK).json({
+      message: 'otp is valid',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function disableOTP(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const { token } = req.body;
+
+    const data = await authService.disableOTP(userId, token);
+
+    res.status(HttpStatus.OK).json({
+      message: 'otp and two factor authentication disabled successfully',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function otpQRCode(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+
+    const { otpAuthUrl } = await authService.otpData(userId);
+
+    authService.responseWithQRCode(otpAuthUrl, res);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function validateRecoveryCode(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const { code } = req.body;
+
+    const data = await authService.validCode(userId, code);
+
+    res.status(HttpStatus.OK).json({
+      message: 'recovery code is valid and cannot be used again',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function verifyEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const fullUrl = req.completeUrl!;
+    const data = await authService.verifyEmail(userId, fullUrl);
+
+    res.status(HttpStatus.OK).json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function validateEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const { encryptedEmail, emailToken } = req.params;
+
+    const data = await authService.validateEmail(encryptedEmail, emailToken);
+
+    res.status(HttpStatus.OK).json({
+      message: 'email account verified successfully',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function passwordResetRequest(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const fullUrl = req.completeUrl!;
+
+    const data = await authService.passwordResetRequest(userId, fullUrl);
+
+    res.status(HttpStatus.OK).json({
+      message: 'a password reset email has been sent',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function validatePasswordReset(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const { encryptedEmail, passwordToken } = req.params;
+
+    const data = await authService.validatePasswordReset(encryptedEmail, passwordToken);
+
+    res.status(HttpStatus.OK).json({
+      message: 'password reset permission granted',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function resetPassword(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const { newPassword } = req.body;
+    const userId = req.user?._id;
+    const passwordToken = req.passwordResetSecret!;
+
+    const data = await authService.resetPassword(userId, passwordToken, newPassword);
+
+    res.status(HttpStatus.OK).json({
+      message: 'password reset successful, please login with your new credentials',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function cancelPasswordReset(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const userId = req.user?._id;
+    const passwordToken = req.passwordResetSecret!;
+
+    const data = await authService.cancelPasswordReset(userId, passwordToken);
+
+    res.status(HttpStatus.OK).json({
+      message: 'password reset has been canceled',
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function updateEmail(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<Response | void> {
+  try {
+    const { _id: userId, email: oldEmail } = req.user!;
+    const { newEmail } = req.body;
+    const fullUrl = req.completeUrl!;
+
+    const data = await authService.updateEmail(userId, oldEmail, newEmail, fullUrl);
+
+    res.status(HttpStatus.OK).json(data);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export {
+  cancelPasswordReset,
+  disableOTP,
+  generateOTP,
+  login,
+  otpQRCode,
+  passwordResetRequest,
+  resetPassword,
+  updateEmail,
+  validateEmail,
+  validateOTP,
+  validatePasswordReset,
+  validateRecoveryCode,
+  verifyEmail,
+  verifyOTP,
+};

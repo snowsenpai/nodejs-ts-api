@@ -1,0 +1,18 @@
+get:
+  tags: 
+    - Users
+  description: Find a single user
+  summary: Find a single user
+  parameters:
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  security: []
+  operationId: findUser
+  responses:
+    '200':
+      $ref: '../../responses/user/fetch.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

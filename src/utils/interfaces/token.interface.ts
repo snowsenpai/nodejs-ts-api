@@ -1,8 +1,15 @@
 import { Schema } from 'mongoose';
 
-interface Token extends Object{
-  id: Schema.Types.ObjectId;
+export interface Token extends EncodedData {
   expiresIn: number;
 }
 
-export default Token;
+export interface TokenData {
+  token: string;
+  expiresIn: number;
+}
+
+export interface EncodedData extends Object {
+  id?: Schema.Types.ObjectId;
+  secret?: string;
+}

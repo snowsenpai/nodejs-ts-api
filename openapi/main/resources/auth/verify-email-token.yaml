@@ -1,0 +1,18 @@
+get:
+  tags: 
+    - Auth
+  description: Validate email verification link
+  summary: Validate email verification link
+  parameters:
+    - $ref: '../../schemas/parameters/encrypted-email.yaml'
+    - $ref: '../../schemas/parameters/email-token.yaml'
+  operationId: validateEmail
+  responses:
+    '200':
+      $ref: '../../responses/auth/validate-email.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

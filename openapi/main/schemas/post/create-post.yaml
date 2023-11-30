@@ -1,0 +1,12 @@
+type: object
+properties:
+  title:
+    description: Post's title
+    type: string
+  body:
+    description: Post's body
+    type: string
+  tags:
+    type: array
+    items:
+      $ref: '../id.yaml'

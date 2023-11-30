@@ -1,0 +1,22 @@
+message: Posts retrieved
+data:
+  totalPostsFound: 1
+  currentPage: 1
+  nextPage: null
+  prevPage: null
+  lastPage: 1
+  limit: 1
+  filterOptions:
+    - 123ksjdnv43
+    - 672jdnjsu89
+  posts:
+    - title: New post
+      body: May contain details about rocket science
+      creator: 55678abcde
+      tags:
+        - _id: 32ifbsaj02
+          name: Science
+        - _id: 56hsggh562
+          name: Art
+      createdAt: '2023-11-23T08:36:45.838Z'
+      updatedAt: '2023-11-23T08:36:45.838Z'

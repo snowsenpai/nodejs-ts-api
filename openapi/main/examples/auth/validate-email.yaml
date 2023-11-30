@@ -1,0 +1,4 @@
+message: email account verified successfully
+data:
+  email: johndoe@example.com
+  emailVerified: true

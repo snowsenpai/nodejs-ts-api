@@ -1,0 +1,56 @@
+get:
+  tags: 
+    - Users
+  description: Get user information
+  summary: Get user information
+  operationId: getUser
+  responses:
+    '200':
+      $ref: '../../responses/user/fetch.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+patch:
+  tags: 
+    - Users
+  description: Update base user data
+  summary: Update user
+  operationId: updateUser
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: '../../schemas/user/user-base.yaml'
+      application/json:
+        schema:
+          $ref: '../../schemas/user/user-base.yaml'
+  responses:
+    '200':
+      $ref: '../../responses/ok.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'
+delete:
+  tags: 
+    - Users
+  description: Delete user data
+  summary: Delete user
+  operationId: deleteUser
+  responses:
+    '200':
+      $ref: '../../responses/ok.yaml'
+    '401':
+      $ref: '../../responses/unauthorized.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

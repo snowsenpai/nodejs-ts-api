@@ -1,0 +1,8 @@
+description: Verify an email address
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    examples:
+      EmailVerified:
+        $ref: '../../examples/auth/verify-email.yaml'

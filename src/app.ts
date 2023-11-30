@@ -1,27 +1,30 @@
-import express, { Application } from 'express';
+import express, { Application, Router } from 'express';
 import compression from 'compression';
 import cors from 'cors';
 import morgan from 'morgan';
-import Controller from '@/utils/interfaces/controller.interface';
-import ErrorMiddleware from '@/middleware/error.middleware';
+import { errorMiddleware } from '@/middlewares/error.middleware';
+import { handelInvalidRoutes } from './middlewares/invalid-routes.middleware';
 import helmet from 'helmet';
-import logger from '@/utils/logger';
+import { logger } from '@/utils/logger.util';
 
 class App {
   public express: Application;
   public port: number;
 
-  // remove port arg, move to listen() method
-  constructor(controllers: Controller[], port: number) {
+  /**
+   * @param apiRoutes - App Routes.
+   * @param port - Port number to listen for connections.
+   */
+  constructor(apiRoutes: Router[], port: number) {
     this.express = express();
     this.port = port;
 
-    this.initialiseMiddleware();
-    this.initialiseControllers(controllers);
-    this.initialiseErrorHandling();
+    this.initializeMiddleware();
+    this.initializeRoutes(apiRoutes);
+    this.initializeErrorHandling();
   }
 
-  private initialiseMiddleware(): void {
+  private initializeMiddleware(): void {
     this.express.use(helmet());
     this.express.use(cors());
     this.express.use(morgan('dev'));
@@ -30,17 +33,17 @@ class App {
     this.express.use(compression());
   }
 
-  private initialiseControllers(controllers: Controller[]): void {
-    controllers.forEach((controller: Controller) => {
-      this.express.use('/api', controller.router);
+  private initializeRoutes(apiRoutes: Router[]): void {
+    apiRoutes.forEach((apiRoute: Router) => {
+      this.express.use('/api/v1', apiRoute);
     });
+    this.express.use('*', handelInvalidRoutes);
   }
 
-  private initialiseErrorHandling(): void {
-    this.express.use(ErrorMiddleware);
+  private initializeErrorHandling(): void {
+    this.express.use(errorMiddleware);
   }
 
-  // TODO listen should recive a PORT param -> listen(port)
   public listen(): void {
     this.express.listen(this.port, () => {
       logger.info(`App listening on the port ${this.port}`);
@@ -48,4 +51,4 @@ class App {
   }
 }
 
-export default App;
+export { App };

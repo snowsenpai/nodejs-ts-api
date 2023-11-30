@@ -1,0 +1,88 @@
+openapi: 3.0.3
+info:
+  title: Node express api
+  description:
+    OpenApi specification for [snowsenpai/node-ts-api](https://github.com/snowsenpai/node-ts-api/tree/main)
+  version: 1.0.0
+  license: 
+    name: MIT
+    url: https://opensource.org/license/mit/
+servers:
+  - url: http://localhost:3000/api/v1
+    description: The local implementation
+tags:
+  - name: Users
+    description: Operations for users
+  - name: Posts
+    description: Operations for posts
+  - name: Tags
+    description: Operations for tags
+  - name: Auth
+    description: Authentication operations
+paths:
+  /user/register:
+    $ref: './resources/user/register.yaml'
+  /user:
+    $ref: './resources/user/user.yaml'
+  /user/{id}:
+    $ref: './resources/user/user-id.yaml'
+  /user/{id}/posts:
+    $ref: './resources/user/user-id-posts.yaml'
+  /posts:
+    $ref: './resources/post/posts.yaml'
+  /posts/{id}:
+    $ref: './resources/post/posts-id.yaml'
+  /tags:
+    $ref: './resources/tag/tags.yaml'
+  /auth/login:
+    $ref: './resources/auth/login.yaml'
+  /auth/otp/generate:
+    $ref: './resources/auth/otp-generate.yaml'
+  /auth/verify/otp:
+    $ref: './resources/auth/verify-otp.yaml'
+  /auth/validate/otp:
+    $ref: './resources/auth/validate-otp.yaml'
+  /auth/disable/otp:
+    $ref: './resources/auth/disable-otp.yaml'
+  /auth/verify/recovery-code:
+    $ref: './resources/auth/verify-recovery-code.yaml'
+  /auth/verify/email:
+    $ref: './resources/auth/verify-email.yaml'
+  /auth/verify/email/{encryptedEmail}/{emailToken}:
+    $ref: './resources/auth/verify-email-token.yaml'
+  /auth/email:
+    $ref: './resources/auth/update-email.yaml'
+  /auth/password-reset:
+    $ref: './resources/auth/password-reset.yaml'
+  /auth/password-reset/{encryptedEmail}/{passwordToken}:
+    $ref: './resources/auth/password-reset-token.yaml'
+  /auth/reset-password:
+    $ref: './resources/auth/reset-password.yaml'
+  /auth/cancel-password-reset:
+    $ref: './resources/auth/cancel-password-reset.yaml'
+components:
+  schemas:
+    Id:
+      $ref: './schemas/id.yaml'
+    User:
+      $ref: './schemas/user/user.yaml'
+    Post:
+      $ref: './schemas/post/post.yaml'
+    Tag:
+      $ref: './schemas/tag/tag.yaml'
+  parameters:
+    ResourceIdPathParameter:
+      $ref: './schemas/parameters/resource-id.yaml'
+    EncryptedEmail:
+      $ref: './schemas/parameters/encrypted-email.yaml'
+    EmailToken:
+      $ref: './schemas/parameters/email-token.yaml'
+    PasswordToken:
+      $ref: './schemas/parameters/password-token.yaml'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  -  bearerAuth: []

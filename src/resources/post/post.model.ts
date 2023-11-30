@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import Post from './post.interface';
+import { Post } from './post.interface';
 
 const PostSchema = new Schema(
   {
@@ -14,10 +14,29 @@ const PostSchema = new Schema(
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true
-    }
+      required: true,
+    },
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Tag',
+        required: true,
+      },
+    ],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  },
 );
 
-export default model<Post>('Post', PostSchema);
+PostSchema.post('save', async function (doc, next) {
+  await doc.populate('tags', 'name');
+  next();
+});
+
+PostSchema.pre(['find', 'findOne', 'findOneAndUpdate'], function (next) {
+  this.populate('tags', 'name');
+  next();
+});
+
+export const PostModel = model<Post>('Post', PostSchema);

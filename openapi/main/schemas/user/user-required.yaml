@@ -1,0 +1,3 @@
+allOf: 
+  - $ref: './user-email.yaml'
+  - $ref: './user-password.yaml'

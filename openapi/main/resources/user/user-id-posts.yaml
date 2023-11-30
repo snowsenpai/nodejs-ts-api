@@ -1,0 +1,18 @@
+get:
+  tags: 
+    - Users
+  description: Get a single user with their created posts
+  summary: Get a user and their posts
+  parameters:
+    - $ref: '../../schemas/parameters/resource-id.yaml'
+  security: []
+  operationId: getUserPosts
+  responses:
+    '200':
+      $ref: '../../responses/user/populated-user.yaml'
+    '400':
+      $ref: '../../responses/combined-error.yaml'
+    '404':
+      $ref: '../../responses/error-response.yaml'
+    default:
+      $ref: '../../responses/error-response.yaml'

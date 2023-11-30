@@ -1,0 +1,18 @@
+description: Unauthorized operation
+content: 
+  application/json:
+    schema:
+      $ref: './error.yaml'
+    examples:
+      No-Authorization-Header:
+        value:
+          message: You are unauthorized
+      Bad-Authorization-header:
+        value:
+          message: You are unauthorized
+      Expired-Token:
+        value:
+          message: You are unauthorized
+      Invalid-Token:
+        value:
+          message: You are unauthorized

@@ -1,0 +1,10 @@
+description: Update email address
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    examples:
+      UnverifiedUser:
+        $ref: '../../examples/auth/update-email.yaml'
+      VerifiedUser:
+        $ref: '../../examples/auth/verify-email.yaml'

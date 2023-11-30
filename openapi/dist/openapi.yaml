@@ -1,0 +1,1237 @@
+openapi: 3.0.3
+info:
+  title: Node express api
+  description: OpenApi specification for [snowsenpai/node-ts-api](https://github.com/snowsenpai/node-ts-api/tree/main)
+  version: 1.0.0
+  license: 
+    name: MIT
+    url: https://opensource.org/license/mit/
+servers:
+  - url: http://localhost:3000/api/v1
+    description: The local implementation
+security:
+  - bearerAuth: []
+tags:
+  - name: Users
+    description: Operations for users
+  - name: Posts
+    description: Operations for posts
+  - name: Tags
+    description: Operations for tags
+  - name: Auth
+    description: Authentication operations
+paths:
+  /user/register:
+    post:
+      tags:
+        - Users
+      description: Register a new user
+      summary: Register a new user
+      security: []
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/create-user'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-user'
+      responses:
+        '201':
+          $ref: '#/components/responses/ok'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        default:
+          $ref: '#/components/responses/error-response'
+  /user:
+    get:
+      tags:
+        - Users
+      description: Get user information
+      summary: Get user information
+      operationId: getUser
+      responses:
+        '200':
+          $ref: '#/components/responses/fetch'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    patch:
+      tags:
+        - Users
+      description: Update base user data
+      summary: Update user
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/user-base'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-base'
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    delete:
+      tags:
+        - Users
+      description: Delete user data
+      summary: Delete user
+      operationId: deleteUser
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /user/{id}:
+    get:
+      tags:
+        - Users
+      description: Find a single user
+      summary: Find a single user
+      parameters:
+        - $ref: '#/components/parameters/resource-id'
+      security: []
+      operationId: findUser
+      responses:
+        '200':
+          $ref: '#/components/responses/fetch'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /user/{id}/posts:
+    get:
+      tags:
+        - Users
+      description: Get a single user with their created posts
+      summary: Get a user and their posts
+      parameters:
+        - $ref: '#/components/parameters/resource-id'
+      security: []
+      operationId: getUserPosts
+      responses:
+        '200':
+          $ref: '#/components/responses/populated-user'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /posts:
+    get:
+      tags:
+        - Posts
+      description: Get paginated list of available posts
+      summary: Get paginated list of available posts
+      security: []
+      operationId: getAllPosts
+      responses:
+        '200':
+          $ref: '#/components/responses/post-pagination'
+        '400':
+          $ref: '#/components/responses/error-response'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    post:
+      tags:
+        - Posts
+      description: Create a new post
+      summary: Create a new post
+      operationId: createPost
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/create-post'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-post'
+      responses:
+        '201':
+          $ref: '#/components/responses/create-post'
+        '400':
+          $ref: '#/components/responses/error-response'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /posts/{id}:
+    get:
+      tags:
+        - Posts
+      description: Get a single post
+      summary: Get a single post
+      parameters:
+        - name: creator
+          in: query
+          schema:
+            type: string
+        - $ref: '#/components/parameters/resource-id'
+      security: []
+      operationId: getPost
+      responses:
+        '200':
+          $ref: '#/components/responses/populated-post'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    patch:
+      tags:
+        - Posts
+      description: Update a single post
+      summary: Update a single post
+      parameters:
+        - $ref: '#/components/parameters/resource-id'
+      operationId: updatePost
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/create-post'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-post'
+      responses:
+        '200':
+          $ref: '#/components/responses/create-post'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    delete:
+      tags:
+        - Posts
+      description: Delete a single post
+      summary: Delete a single post
+      parameters:
+        - $ref: '#/components/parameters/resource-id'
+      operationId: deletePost
+      responses:
+        '200':
+          $ref: '#/components/responses/ok'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /tags:
+    get:
+      tags:
+        - Tags
+      description: Get all available tags
+      summary: Get all available tags
+      security: []
+      operationId: getAllTags
+      responses:
+        '200':
+          $ref: '#/components/responses/create-tag'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+    post:
+      tags:
+        - Tags
+      description: Create a new tag
+      summary: Create a new tag
+      security: []
+      operationId: createTag
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/create-tag'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/create-tag'
+      responses:
+        '201':
+          $ref: '#/components/responses/create-tag'
+        '400':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      description: Login to receive access token
+      summary: Login
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/user-required'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-required'
+      responses:
+        '200':
+          $ref: '#/components/responses/login'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/otp/generate:
+    get:
+      tags:
+        - Auth
+      description: Generate otp credentials
+      summary: Generate otp credentials
+      operationId: generateOtp
+      responses:
+        '200':
+          $ref: '#/components/responses/generate-otp'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/verify/otp:
+    post:
+      tags:
+        - Auth
+      description: Verify user's otp generation method
+      summary: Verify user's otp generation method
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+      responses:
+        '200':
+          $ref: '#/components/responses/verify-otp'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/validate/otp:
+    post:
+      tags:
+        - Auth
+      description: Validate otp token
+      summary: Validate otp token
+      operationId: validateOtp
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+      responses:
+        '200':
+          $ref: '#/components/responses/validate-otp'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/disable/otp:
+    post:
+      tags:
+        - Auth
+      description: Disable otp verification
+      summary: Disable otp
+      operationId: disableOtp
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/otp-token'
+      responses:
+        '200':
+          $ref: '#/components/responses/disable-otp'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/verify/recovery-code:
+    post:
+      tags:
+        - Auth
+      description: Verify recovery code
+      summary: Verify recovery code
+      operationId: verifyRecoveryCode
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/recovery-code'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/recovery-code'
+      responses:
+        '200':
+          $ref: '#/components/responses/validate-recovery-code'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '403':
+          $ref: '#/components/responses/error-response'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/verify/email:
+    get:
+      tags:
+        - Auth
+      description: Verify a user's email address
+      summary: Verify a user's email address
+      operationId: verifyEmail
+      responses:
+        '200':
+          $ref: '#/components/responses/verify-email'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/verify/email/{encryptedEmail}/{emailToken}:
+    get:
+      tags:
+        - Auth
+      description: Validate email verification link
+      summary: Validate email verification link
+      parameters:
+        - $ref: '#/components/parameters/encrypted-email'
+        - $ref: '#/components/parameters/email-token'
+      operationId: validateEmail
+      responses:
+        '200':
+          $ref: '#/components/responses/validate-email'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/email:
+    patch:
+      tags:
+        - Auth
+      description: Update user's email address
+      summary: Update user's email address
+      operationId: updateEmail
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/user-email'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-email'
+      responses:
+        '200':
+          $ref: '#/components/responses/update-email'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/password-reset:
+    get:
+      tags:
+        - Auth
+      description: Request for password reset permission
+      summary: Request for password reset permission
+      operationId: passwordReset
+      responses:
+        '200':
+          $ref: '#/components/responses/password-reset-request'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/password-reset/{encryptedEmail}/{passwordToken}:
+    get:
+      tags:
+        - Auth
+      description: Validate password reset link
+      summary: Validate password reset
+      parameters:
+        - $ref: '#/components/parameters/encrypted-email'
+        - $ref: '#/components/parameters/password-token'
+      operationId: validatePasswordReset
+      responses:
+        '200':
+          $ref: '#/components/responses/validate-password-reset'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/reset-password:
+    post:
+      tags:
+        - Auth
+      description: Reset old password
+      summary: Reset old password
+      parameters:
+        - in: header
+          name: passwordtoken
+          required: true
+          schema:
+            type: string
+            format: byte
+            example: Basic xxxxxxxToken
+      operationId: resetPassword
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/user-password'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user-password'
+      responses:
+        '200':
+          $ref: '#/components/responses/reset-password'
+        '400':
+          $ref: '#/components/responses/combined-error'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+  /auth/cancel-password-reset:
+    get:
+      tags:
+        - Auth
+      description: Terminate password reset operation
+      summary: Terminate password reset
+      operationId: cancelPasswordReset
+      responses:
+        '200':
+          $ref: '#/components/responses/cancel-password-reset'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/error-response'
+        default:
+          $ref: '#/components/responses/error-response'
+components:
+  schemas:
+    Id:
+      $ref: '#/components/schemas/id'
+    User:
+      $ref: '#/components/schemas/user'
+    Post:
+      $ref: '#/components/schemas/post'
+    Tag:
+      $ref: '#/components/schemas/tag'
+    create-user:
+      type: object
+      properties:
+        firstName:
+          description: User's first name
+          type: string
+          example: John
+        lastName:
+          description: User's last name
+          type: string
+          example: Smith
+        email:
+          description: User's email address
+          type: string
+        password:
+          description: User's password
+          type: string
+          format: password
+    error:
+      type: object
+      properties:
+        message:
+          type: string
+    response:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+    validation-error:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: string
+          minItems: 1
+    user-base:
+      type: object
+      properties:
+        firstName:
+          description: User's first name
+          type: string
+          example: John
+        lastName:
+          description: User's last name
+          type: string
+          example: Smith
+        fullName:
+          description: User's full name
+          type: string
+          example: John Smith
+    id:
+      type: string
+      pattern: '[a-z0-9]*'
+      minLength: 8
+      maxLength: 30
+      description: A unique identifier for an object
+    create-post:
+      type: object
+      properties:
+        title:
+          description: Post's title
+          type: string
+        body:
+          description: Post's body
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/id'
+    create-tag:
+      type: object
+      properties:
+        name:
+          description: Tag's name
+          type: string
+        description:
+          description: Tag's description
+          type: string
+    user-email:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          description: User's email address
+          type: string
+          format: email
+    user-password:
+      type: object
+      required:
+        - password
+      properties:
+        password:
+          description: User's password
+          type: string
+          format: password
+    user-required:
+      allOf:
+        - $ref: '#/components/schemas/user-email'
+        - $ref: '#/components/schemas/user-password'
+    otp-token:
+      type: object
+      properties:
+        otpToken:
+          description: One time password token
+          type: string
+          minLength: 6
+    recovery-code:
+      type: object
+      properties:
+        otpToken:
+          description: Recovery code
+          type: string
+          minLength: 6
+    user-authentication:
+      type: object
+      properties:
+        role:
+          description: User's role
+          type: string
+        verified:
+          description: Indicates if a user's email address is verified
+          type: boolean
+        secretToken:
+          description: Secret used for authentication processes
+          type: string
+        passwordResetRequest:
+          description: Indicates if a user made a request to reset their password
+          type: boolean
+        grantPasswordReset:
+          description: Indicates if a password reset permission is given
+          type: boolean
+        otpEnabled:
+          description: Indicates if a user has OTP generation enabled
+          type: boolean
+        otpVerified:
+          description: Indicates if a user's OTP generation method is verified
+          type: boolean
+        otpBase32:
+          description: Base32 secret for generating OTP
+          type: string
+        otpAuthUrl:
+          description: Google authenticator key URI
+          type: string
+        recoveryCodes:
+          description: Recovery code objects for a user with otp enabled
+          type: array
+          items:
+            type: object
+            properties:
+              hash:
+                description: Hashed recovery code, plain text codes will be sent to client if user's OTP generation method is verified
+                type: string
+              used:
+                description: Indicates if a recovery code has been used by user
+                type: boolean
+          minItems: 1
+          maxItems: 12
+    user:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              $ref: '#/components/schemas/id'
+        - $ref: '#/components/schemas/user-base'
+        - $ref: '#/components/schemas/user-required'
+        - $ref: '#/components/schemas/user-authentication'
+        - $ref: '#/components/schemas/user-contents'
+        - $ref: '#/components/schemas/timestamp'
+    timestamp:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when an object was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: The timestamp when the object was last updated
+    tag:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              $ref: '#/components/schemas/id'
+            name:
+              description: Tag's name
+              type: string
+            description:
+              description: Tag's description
+              type: string
+        - $ref: '#/components/schemas/timestamp'
+    post:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              $ref: '#/components/schemas/id'
+            title:
+              description: Post's title
+              type: string
+            body:
+              description: Post's body
+              type: string
+            creator:
+              anyOf:
+                - $ref: '#/components/schemas/id'
+                - $ref: '#/components/schemas/user'
+        - type: object
+          properties:
+            tags:
+              type: array
+              items:
+                anyOf:
+                  - $ref: '#/components/schemas/id'
+                  - $ref: '#/components/schemas/tag'
+              minItems: 1
+        - $ref: '#/components/schemas/timestamp'
+    user-contents:
+      type: object
+      properties:
+        posts:
+          type: array
+          items:
+            anyOf:
+              - $ref: '#/components/schemas/id'
+              - $ref: '#/components/schemas/post'
+  parameters:
+    ResourceIdPathParameter:
+      $ref: '#/components/parameters/resource-id'
+    EncryptedEmail:
+      $ref: '#/components/parameters/encrypted-email'
+    EmailToken:
+      $ref: '#/components/parameters/email-token'
+    PasswordToken:
+      $ref: '#/components/parameters/password-token'
+    resource-id:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/id'
+    encrypted-email:
+      name: encryptedEmail
+      in: path
+      required: true
+      schema:
+        type: string
+    email-token:
+      name: emailToken
+      in: path
+      required: true
+      schema:
+        type: string
+    password-token:
+      name: passwordToken
+      in: path
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  responses:
+    error-response:
+      description: Unsuccessful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+    ok:
+      description: Successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+    combined-error:
+      description: Bad request 400 resulting from request validation errors or thrown by the server
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/error'
+              - $ref: '#/components/schemas/validation-error'
+    fetch:
+      description: Retrieved user data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: User data
+            data:
+              _id: 55fbsre671
+              email: smithjohn@exapmle.com
+              fullName: John Smith
+              firstName: John
+              lastName: Smith
+              role: user
+              verified: false
+              passwordResetRequest: false
+              grantPasswordReset: false
+              otpEnabled: false
+              otpVerified: false
+              createdAt: '2023-11-23T08:36:45.838Z'
+              updatedAt: '2023-11-23T08:36:45.838Z'
+    unauthorized:
+      description: Unauthorized operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+          examples:
+            No-Authorization-Header:
+              value:
+                message: You are unauthorized
+            Bad-Authorization-header:
+              value:
+                message: You are unauthorized
+            Expired-Token:
+              value:
+                message: You are unauthorized
+            Invalid-Token:
+              value:
+                message: You are unauthorized
+    populated-user:
+      description: User's posts
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: User data
+            data:
+              _id: 55678abcde
+              email: smithjohn@exapmle.com
+              fullName: John Smith
+              firstName: John
+              lastName: Smith
+              role: user
+              verified: false
+              passwordResetRequest: false
+              grantPasswordReset: false
+              otpEnabled: false
+              otpVerified: false
+              posts:
+                - _id: 38jdbdka213
+                  title: New post
+                  body: May contain details about rocket science
+                  creator: 55678abcde
+                  tags:
+                    - _id: 32ifbsaj021
+                      name: Science
+                    - _id: 56hsggh562
+                      name: Art
+                  createdAt: '2023-11-23T08:36:45.838Z'
+                  updatedAt: '2023-11-23T08:36:45.838Z'
+              createdAt: '2023-11-23T08:36:45.838Z'
+              updatedAt: '2023-11-23T08:36:45.838Z'
+    post-pagination:
+      description: Posts retrieved
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: Posts retrieved
+            data:
+              totalPostsFound: 1
+              currentPage: 1
+              nextPage: null
+              prevPage: null
+              lastPage: 1
+              limit: 1
+              filterOptions:
+                - 123ksjdnv43
+                - 672jdnjsu89
+              posts:
+                - title: New post
+                  body: May contain details about rocket science
+                  creator: 55678abcde
+                  tags:
+                    - _id: 32ifbsaj02
+                      name: Science
+                    - _id: 56hsggh562
+                      name: Art
+                  createdAt: '2023-11-23T08:36:45.838Z'
+                  updatedAt: '2023-11-23T08:36:45.838Z'
+    create-post:
+      description: Post created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: Post created
+            data:
+              _id: 38jdbdka213
+              title: New post
+              body: May contain details about rocket science
+              creator: 55678abcde
+              tags:
+                - _id: 32ifbsaj021
+                  name: Science
+                - _id: 56hsggh562
+                  name: Art
+              createdAt: '2023-11-23T08:36:45.838Z'
+              updatedAt: '2023-11-23T08:36:45.838Z'
+    populated-post:
+      description: Post with creator's information
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: Post created
+            data:
+              title: New post
+              body: May contain details about rocket science
+              creator:
+                _id: 55fbsre671
+                email: smithjohn@exapmle.com
+                fullName: John Smith
+                firstName: John
+                lastName: Smith
+                role: user
+                verified: false
+                passwordResetRequest: false
+                grantPasswordReset: false
+                otpEnabled: false
+                otpVerified: false
+                createdAt: '2023-11-23T08:36:45.838Z'
+                updatedAt: '2023-11-23T08:36:45.838Z'
+              tags:
+                - _id: 32ifbsaj021
+                  name: Science
+                - _id: 56hsggh562
+                  name: Art
+              createdAt: '2023-11-23T08:36:45.838Z'
+              updatedAt: '2023-11-23T08:36:45.838Z'
+    create-tag:
+      description: Tag created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: Tag created
+            data:
+              _id: 67ckhadj678
+              name: Science
+              description: Things may explode
+              createdAt: '2023-11-23T08:36:45.838Z'
+              updatedAt: '2023-11-23T08:36:45.838Z'
+    login:
+      description: Generate access token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: Login successful
+            data:
+              accessToken:
+                expiresIn: 86787
+                token: xxxxxxxxxToken
+              userOtpEnabled: false
+    generate-otp:
+      description: Generate otp credentials
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: generated otp credentials successfully
+            data:
+              otpUrl: otpauth://totp/SnowSenpai:smithjohn@exapmle.com?issuer=SnowSenpai&secret=xxxxxxxxxSecret&algorithm=SHA1&digits=6&period=30
+              base32Secret: xxxxxxxxxSecret
+    verify-otp:
+      description: Verify otp generation method
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: otp verified, two factor authentication is enabled
+            data:
+              otpVerified: true
+              user:
+                id: 55fbsre671
+                firstName: John
+                email: smithjohn@exapmle.com
+                otpEnabled: true
+              recoveryCodes:
+                - acjk8eu9
+                - kajdhdjs
+                - wrbkwjrv
+                - iqwueokn
+                - piwrnfv7
+                - 8wduvohb
+                - sdvgwdv8
+                - bjahvdkj
+                - 9a0d8hyv
+                - chaqevug
+    validate-otp:
+      description: Validate otp token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: otp is valid
+            data:
+              otpValid: true
+    disable-otp:
+      description: Disable otp
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: otp and two factor authentication disabled successfully
+            data:
+              otpDisabled: true
+              user:
+                id: 55fbsre671
+                firstName: John
+                email: smithjohn@exapmle.com
+                otpEnabled: false
+    validate-recovery-code:
+      description: Verify recovery code
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: recovery code is valid and cannot be used again
+            data:
+              validCode: true
+              recoveryCode: bjahvdkj
+    verify-email:
+      description: Verify an email address
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          examples:
+            EmailVerified:
+              $ref: '#/components/examples/verify-email'
+    validate-email:
+      description: Validate email address
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: email account verified successfully
+            data:
+              email: johndoe@example.com
+              emailVerified: true
+    update-email:
+      description: Update email address
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          examples:
+            UnverifiedUser:
+              $ref: '#/components/examples/update-email'
+            VerifiedUser:
+              $ref: '#/components/examples/verify-email'
+    password-reset-request:
+      description: Send password reset email
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: a password reset email has been sent
+            data:
+              sendPasswordResetEmail: true
+    validate-password-reset:
+      description: Validate password reset request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: password reset permission granted
+            data:
+              grantPasswordReset: true
+              passwordToken: xxxxxxxxxToken
+    reset-password:
+      description: Reset old password
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: password reset successful, please login with your new credentials
+            data:
+              successfulPasswordReset: true
+    cancel-password-reset:
+      description: Cancel password reset
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/response'
+          example:
+            message: password reset has been canceled
+            data:
+              passwordResetCanceled: true
+  examples:
+    verify-email:
+      value:
+        message: a verification link has been sent to johndoe@example.com
+        data:
+          sendVerifyEmail: true
+    update-email:
+      value:
+        message: your email has been updated
+        data:
+          emailUpdated: true
+          newEmail: johndoe@example.com
+          verifiedEmail: false

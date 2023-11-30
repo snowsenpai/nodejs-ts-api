@@ -1,0 +1,25 @@
+message: Post created
+data:
+  title: New post
+  body: May contain details about rocket science
+  creator: 
+    _id: 55fbsre671
+    email: smithjohn@exapmle.com
+    fullName: John Smith
+    firstName: John
+    lastName: Smith
+    role: user
+    verified: false
+    passwordResetRequest: false
+    grantPasswordReset: false
+    otpEnabled: false
+    otpVerified: false
+    createdAt: '2023-11-23T08:36:45.838Z'
+    updatedAt: '2023-11-23T08:36:45.838Z'
+  tags:
+    - _id: 32ifbsaj021
+      name: Science
+    - _id: 56hsggh562
+      name: Art
+  createdAt: '2023-11-23T08:36:45.838Z'
+  updatedAt: '2023-11-23T08:36:45.838Z'

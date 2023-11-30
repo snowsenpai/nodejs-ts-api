@@ -1,0 +1,7 @@
+description: User's posts
+content:
+  application/json:
+    schema:
+      $ref: '../response.yaml'
+    example:
+      $ref: '../../examples/user/populated-user.yaml'

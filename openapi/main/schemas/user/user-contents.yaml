@@ -1,0 +1,8 @@
+type: object
+properties:
+  posts:
+    type: array
+    items:
+      anyOf: 
+        - $ref: '../id.yaml'
+        - $ref: '../post/post.yaml'

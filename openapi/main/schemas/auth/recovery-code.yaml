@@ -1,0 +1,6 @@
+type: object
+properties:
+  otpToken:
+    description: Recovery code
+    type: string
+    minLength: 6

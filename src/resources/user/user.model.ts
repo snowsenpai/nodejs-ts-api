@@ -1,24 +1,14 @@
 import { Schema, model } from 'mongoose';
 import bcrypt from 'bcrypt';
-import User from './user.interface';
+import { User } from './user.interface';
 
-const OTPSChema = new Schema({
-  otp_enabled: {
-    type: Boolean,
-    default: false,
-  },
-  otp_verified: {
-    type: Boolean,
-    default: false,
-  },
-  otp_ascii: String,
-  otp_hex: String,
-  otp_base32: String,
-  otp_auth_url: String
-});
-
-const UserSchema = new Schema({
-    name: {
+const UserSchema = new Schema(
+  {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
@@ -30,41 +20,66 @@ const UserSchema = new Schema({
     },
     password: {
       type: String,
+      required: true,
+      select: false,
     },
     role: {
       type: String,
       required: true,
     },
-    otp_enabled: {
+    verified: {
       type: Boolean,
       default: false,
     },
-    otp_verified: {
+    secretToken: {
+      type: String,
+      select: false,
+    },
+    passwordResetRequest: {
       type: Boolean,
       default: false,
     },
-    otp_ascii: String,
-    otp_hex: String,
-    otp_base32: String,
-    otp_auth_url: String,
-    recoveryCodes: [
-      {
-        hash: String,
-        used: Boolean
-      }
-    ]
-  }, {
+    grantPasswordReset: {
+      type: Boolean,
+      default: false,
+    },
+    otpEnabled: {
+      type: Boolean,
+      default: false,
+    },
+    otpVerified: {
+      type: Boolean,
+      default: false,
+    },
+    otpBase32: {
+      type: String,
+      select: false,
+    },
+    otpAuthUrl: {
+      type: String,
+      select: false,
+    },
+    recoveryCodes: {
+      type: [{ hash: String, used: Boolean }],
+      select: false,
+    },
+  },
+  {
     timestamps: true,
     toJSON: {
-      virtuals: true
-    }
-  }
+      virtuals: true,
+    },
+  },
 );
+
+UserSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
 
 UserSchema.virtual('posts', {
   ref: 'Post',
   localField: '_id',
-  foreignField: 'creator'
+  foreignField: 'creator',
 });
 
 UserSchema.pre<User>('save', async function (next) {
@@ -77,10 +92,8 @@ UserSchema.pre<User>('save', async function (next) {
   next();
 });
 
-UserSchema.methods.isValidPassword = async function (
-  password: string
-): Promise<Error | boolean> {
+UserSchema.methods.isValidPassword = async function (password: string): Promise<Error | boolean> {
   return await bcrypt.compare(password, this.password);
 };
 
-export default model<User>('User', UserSchema);
+export const UserModel = model<User>('User', UserSchema);

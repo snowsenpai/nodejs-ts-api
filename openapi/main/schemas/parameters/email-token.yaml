@@ -1,0 +1,5 @@
+name: emailToken
+in: path
+required: true
+schema:
+  type: string
