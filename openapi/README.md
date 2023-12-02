@@ -15,8 +15,8 @@ Main folders of interest:
 
 ## Utilization
 
-The bundled specification file within `dist` is used with [Postman](https://postman.com/product/what-is-postman/) for documentation, testing and mocks. 
+The bundled specification file within `dist` is used with [Postman](https://postman.com/product/what-is-postman/) for api documentation and generating postman collections. 
 
 ## Development
 
-[Redocly CLI](https://www.npmjs.com/package/@redocly/cli) and [redocly vscode extension](https://marketplace.visualstudio.com/items?itemName=Redocly.openapi-vs-code) is used to manage files within this directory.
+[Redocly CLI](https://www.npmjs.com/package/@redocly/cli) and [redocly vscode extension](https://marketplace.visualstudio.com/items?itemName=Redocly.openapi-vs-code) are used to manage files within this directory.
