@@ -7,11 +7,11 @@ import { logger } from '../logger.util';
  * Utilizes mongoose.
  */
 export const mongooseConnect = (): void => {
-  const { MONGO_DATABASE, MONGO_PATH } = process.env;
+  const { MONGODB_CLUSTER } = process.env;
 
   logger.info('Connecting to MongoDB...');
   mongoose
-    .connect(`${MONGO_PATH}/${MONGO_DATABASE}`)
+    .connect(`${MONGODB_CLUSTER}`)
     .then(() => {
       logger.info('connected to MongoDB');
     })
