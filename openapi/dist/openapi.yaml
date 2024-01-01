@@ -7,8 +7,8 @@ info:
     name: MIT
     url: https://opensource.org/license/mit/
 servers:
-  - url: http://localhost:3000/api/v1
-    description: The local implementation
+  - url: https://node-ts-api-likp.onrender.com/api/v1
+    description: Staging server
 security:
   - bearerAuth: []
 tags:
